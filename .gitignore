@@ -1,0 +1,36 @@
+# +--------------+
+# + Apache Maven +
+# +--------------+
+target
+
+# +---------------+
+# + IntelliJ IDEA +
+# +---------------+
+out
+
+# +-------------------+
+# + Project Structure +
+# +-------------------+
+build
+# [Directory Format]
+# User Specific Data
+.idea/dictionaries
+.idea/shelf
+.idea/tasks.xml
+.idea/vcs.xml
+.idea/workspace.xml
+# Application Data
+.idea/copyright
+# Sensitive Data
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/dynamic.xml
+.idea/sqlDataSources.xml
+.idea/uiDesigner.xml
+
+# +------+
+# + Sass +
+# +------+
+.sass-cache/
+*.css.map

@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
++++++++++++++++++++++++++++++++++++++++++++
+title     Project POM                     +
+project   communikey                      +
+version                                   +
++++++++++++++++++++++++++++++++++++++++++++
+
+[Index]
+  > Coordinates
+  > Parent
+  > Project Information
+      Developers
+  > Project Properties
+  > Environment
+      SCM
+  > Dependencies
+  > Build
+      Plugins
+  > Repositories
+      Maven Central
+  > Plugin Repositories
+      Maven Central
+  > Profiles
+      sign-gpg
+      code-coverage
+
+[References]
+Apache Maven Documentation
+  (https://maven.apache.org/guides)
+  (https://maven.apache.org/pom.html)
+Sonatype Maven Reference
+  (http://books.sonatype.com/mvnref-book/reference)
+-->
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <!--+- - - - - - -+
+      + Coordinates +
+      +- - - - - - -+-->
+  <groupId>de.communicode</groupId>
+  <artifactId>communikey</artifactId>
+  <version>0.0.0</version>
+  <packaging>jar</packaging>
+
+  <!--+- - - - +
+      + Parent +
+      +- - - - +-->
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>1.4.0.RELEASE</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+
+  <!--+- - - - - - - - - - -+
+      + Project Information +
+      +- - - - - - - - - - -+-->
+  <name>communikey</name>
+  <description>A simple centralized, cross-platform credential manager.</description>
+  <url>https://communikey.test.communicode.de</url>
+  <inceptionYear>2016</inceptionYear>
+  <organization>
+    <name>communicode AG</name>
+    <url>http://communicode.de</url>
+  </organization>
+
+  <!-- +- Developers -+ -->
+  <developers>
+    <developer>
+      <id>sgreb</id>
+      <name>Sven Greb</name>
+      <email>sgreb@communicode.de</email>
+      <organization>communicode AG</organization>
+      <organizationUrl>http://communicode.de</organizationUrl>
+    </developer>
+  </developers>
+
+  <!--+- - - - - - - - - - +
+      + Project Properties +
+      +- - - - - - - - - - +-->
+  <properties>
+    <application.classpath.prefix>lib</application.classpath.prefix>
+    <application.mainclass>CommunikeyApplication</application.mainclass>
+    <build.root.dir>${basedir}/build</build.root.dir>
+    <build.artifact.dir>${build.root.dir}/artifacts</build.artifact.dir>
+    <!-- The scope of the dependency artifacts to copy to the classpath prefix directory. -->
+    <dependencies.scope>runtime</dependencies.scope>
+    <java.version>1.8</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+
+  <!--+- - - - - - -+
+      + Environment +
+      +- - - - - - -+-->
+  <!--+- SCM -+ -->
+  <scm>
+    <connection>scm:ssh://git@stash.communicode.de:7999/cc/communikey.git</connection>
+    <developerConnection>scm:ssh://git@stash.communicode.de:7999/cc/communikey.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://stash.communicode.de/projects/CC/repos/communikey</url>
+  </scm>
+
+  <!--+- - - - - - - +
+      + Dependencies +
+      +- - - - - - - +-->
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <version>1.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.3</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <!--+- - - -+
+      + Build +
+      +- - - -+-->
+  <build>
+    <finalName>${project.artifactId}-${project.version}</finalName>
+    <directory>${build.root.dir}</directory>
+    <!--+- - - - -+
+        + Plugins +
+        +- - - - -+-->
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.1</version>
+        <inherited>true</inherited>
+        <configuration>
+          <includeEmptyDirs>true</includeEmptyDirs>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <inherited>true</inherited>
+        <configuration>
+          <encoding>${project.build.sourceEncoding}</encoding>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <failOnError>true</failOnError>
+        </configuration>
+      </plugin>
+
+      <!--
+      Copies the project dependency artifacts with the configured scope to the specified prefixed directory and
+      downloads the JavaDoc and sources artifacts of all project dependencies.
+      References:
+        http://maven.apache.org/plugins/maven-dependency-plugin/copy-dependencies-mojo.html
+        http://maven.apache.org/plugins/maven-dependency-plugin/sources-mojo.html
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.10</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeScope>${dependencies.scope}</includeScope>
+              <outputDirectory>${build.artifact.dir}/${application.classpath.prefix}</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>download-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>sources</goal>
+            </goals>
+            <configuration>
+              <classifier>sources</classifier>
+              <silent>true</silent>
+            </configuration>
+          </execution>
+          <execution>
+            <id>download-javadoc</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>sources</goal>
+            </goals>
+            <configuration>
+              <classifier>javadoc</classifier>
+              <silent>true</silent>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <overWriteIfNewer>true</overWriteIfNewer>
+        </configuration>
+      </plugin>
+
+      <!--
+      Builds the JAR project artifacts with the specified manifest values.
+      The classpath will be prefixed with the specified classpath prefix property value.
+      References:
+        https://maven.apache.org/plugins/maven-jar-plugin/jar-mojo.html
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.0.2</version>
+        <inherited>true</inherited>
+        <configuration>
+          <outputDirectory>${build.artifact.dir}</outputDirectory>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
+              <classpathPrefix>${application.classpath.prefix}</classpathPrefix>
+              <classpathLayoutType>simple</classpathLayoutType>
+              <mainClass>${application.mainclass}</mainClass>
+              <packageName>${project.groupId}</packageName>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!--
+      Builds the sources JAR artifact for the main source code with the specified manifest values.
+      References:
+        https://maven.apache.org/plugins/maven-source-plugin/jar-no-fork-mojo.html
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.0.1</version>
+        <inherited>true</inherited>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <outputDirectory>${build.artifact.dir}</outputDirectory>
+          <classifier>sources</classifier>
+          <archive>
+            <addMavenDescriptor>true</addMavenDescriptor>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
+              <packageName>${project.groupId}</packageName>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.4</version>
+        <inherited>true</inherited>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <classifier>javadoc</classifier>
+          <jarOutputDirectory>${build.artifact.dir}</jarOutputDirectory>
+          <encoding>${project.build.sourceEncoding}</encoding>
+          <author>true</author>
+          <bottom>Copyright &#169; {inceptionYear}-{currentYear} {organizationName}</bottom>
+          <doctitle>${project.name} ${project.version} API</doctitle>
+          <windowtitle>${project.name} ${project.version} API</windowtitle>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <version>2.5.2</version>
+        <inherited>true</inherited>
+        <executions>
+          <execution>
+            <phase>install</phase>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <createChecksum>true</createChecksum>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <!--+- - - - - - - +
+      + Repositories +
+      +- - - - - - - +-->
+  <repositories>
+    <!-- +- Maven Central -+-->
+      <!--
+      The default Apache Maven Central Repository with enabled snapshots.
+      Inherited from the Super POM.
+      -->
+    <repository>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>true</enabled>
+        <checksumPolicy>warn</checksumPolicy>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+        <checksumPolicy>fail</checksumPolicy>
+      </releases>
+    </repository>
+  </repositories>
+
+  <!--+- - - - - - - - - - -+
+      + Plugin Repositories +
+      +- - - - - - - - - - -+-->
+  <pluginRepositories>
+    <!-- +- Maven Central -+-->
+      <!--
+      The default Apache Maven Plugin Repository with enabled snapshots.
+      Inherited from the Super POM.
+      -->
+    <pluginRepository>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>true</enabled>
+        <checksumPolicy>warn</checksumPolicy>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+        <checksumPolicy>fail</checksumPolicy>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <!--+- - - - - +
+      + Profiles +
+      +- - - - - +-->
+  <profiles>
+    <!-- +- sign-gpg -+-->
+    <!--
+    Signs all project artifacts using the specified GPG key via the "gpg.keyname" property.
+    References:
+      http://maven.apache.org/plugins/maven-gpg-plugin/sign-mojo.html
+    -->
+    <profile>
+      <id>sign-gpg</id>
+      <activation>
+        <property>
+          <name>gpg.keyname</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <inherited>true</inherited>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <ascDirectory>.</ascDirectory>
+              <keyname>${gpg.keyname}</keyname>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- +- code-coverage -+-->
+    <!--
+    Prepares the agent and creates a code coverage report.
+    References:
+      http://www.eclemma.org/jacoco/trunk/doc/report-mojo.html
+      http://www.eclemma.org/jacoco/trunk/doc/prepare-agent-mojo.html
+    -->
+    <profile>
+      <id>code-coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.7.7.201606060606</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>coverage-report</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
