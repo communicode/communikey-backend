@@ -22,7 +22,6 @@ version                                   +
   > Plugin Repositories
       Maven Central
   > Profiles
-      sign-gpg
       code-coverage
 
 [References]
@@ -84,8 +83,6 @@ Sonatype Maven Reference
   <properties>
     <application.classpath.prefix>lib</application.classpath.prefix>
     <application.mainclass>CommunikeyApplication</application.mainclass>
-    <build.root.dir>${basedir}/build</build.root.dir>
-    <build.artifact.dir>${build.root.dir}/artifacts</build.artifact.dir>
     <!-- The scope of the dependency artifacts to copy to the classpath prefix directory. -->
     <dependencies.scope>runtime</dependencies.scope>
     <java.version>1.8</java.version>
@@ -98,8 +95,8 @@ Sonatype Maven Reference
       +- - - - - - -+-->
   <!--+- SCM -+ -->
   <scm>
-    <connection>scm:ssh://git@stash.communicode.de:7999/cc/communikey.git</connection>
-    <developerConnection>scm:ssh://git@stash.communicode.de:7999/cc/communikey.git</developerConnection>
+    <connection>scm:git:ssh://git@stash.communicode.de:7999/cc/communikey.git</connection>
+    <developerConnection>scm:git:ssh://git@stash.communicode.de:7999/cc/communikey.git</developerConnection>
     <tag>HEAD</tag>
     <url>https://stash.communicode.de/projects/CC/repos/communikey</url>
   </scm>
@@ -162,8 +159,6 @@ Sonatype Maven Reference
       + Build +
       +- - - -+-->
   <build>
-    <finalName>${project.artifactId}-${project.version}</finalName>
-    <directory>${build.root.dir}</directory>
     <!--+- - - - -+
         + Plugins +
         +- - - - -+-->
@@ -171,185 +166,6 @@ Sonatype Maven Reference
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.0.1</version>
-        <inherited>true</inherited>
-        <configuration>
-          <includeEmptyDirs>true</includeEmptyDirs>
-          <encoding>${project.build.sourceEncoding}</encoding>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
-        <inherited>true</inherited>
-        <configuration>
-          <encoding>${project.build.sourceEncoding}</encoding>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-          <failOnError>true</failOnError>
-        </configuration>
-      </plugin>
-
-      <!--
-      Copies the project dependency artifacts with the configured scope to the specified prefixed directory and
-      downloads the JavaDoc and sources artifacts of all project dependencies.
-      References:
-        http://maven.apache.org/plugins/maven-dependency-plugin/copy-dependencies-mojo.html
-        http://maven.apache.org/plugins/maven-dependency-plugin/sources-mojo.html
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.10</version>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <includeScope>${dependencies.scope}</includeScope>
-              <outputDirectory>${build.artifact.dir}/${application.classpath.prefix}</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>download-sources</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>sources</goal>
-            </goals>
-            <configuration>
-              <classifier>sources</classifier>
-              <silent>true</silent>
-            </configuration>
-          </execution>
-          <execution>
-            <id>download-javadoc</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>sources</goal>
-            </goals>
-            <configuration>
-              <classifier>javadoc</classifier>
-              <silent>true</silent>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <overWriteIfNewer>true</overWriteIfNewer>
-        </configuration>
-      </plugin>
-
-      <!--
-      Builds the JAR project artifacts with the specified manifest values.
-      The classpath will be prefixed with the specified classpath prefix property value.
-      References:
-        https://maven.apache.org/plugins/maven-jar-plugin/jar-mojo.html
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.2</version>
-        <inherited>true</inherited>
-        <configuration>
-          <outputDirectory>${build.artifact.dir}</outputDirectory>
-          <archive>
-            <addMavenDescriptor>false</addMavenDescriptor>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
-              <classpathPrefix>${application.classpath.prefix}</classpathPrefix>
-              <classpathLayoutType>simple</classpathLayoutType>
-              <mainClass>${application.mainclass}</mainClass>
-              <packageName>${project.groupId}</packageName>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-
-      <!--
-      Builds the sources JAR artifact for the main source code with the specified manifest values.
-      References:
-        https://maven.apache.org/plugins/maven-source-plugin/jar-no-fork-mojo.html
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>3.0.1</version>
-        <inherited>true</inherited>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <outputDirectory>${build.artifact.dir}</outputDirectory>
-          <classifier>sources</classifier>
-          <archive>
-            <addMavenDescriptor>true</addMavenDescriptor>
-            <manifest>
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
-              <packageName>${project.groupId}</packageName>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.4</version>
-        <inherited>true</inherited>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <classifier>javadoc</classifier>
-          <jarOutputDirectory>${build.artifact.dir}</jarOutputDirectory>
-          <encoding>${project.build.sourceEncoding}</encoding>
-          <author>true</author>
-          <bottom>Copyright &#169; {inceptionYear}-{currentYear} {organizationName}</bottom>
-          <doctitle>${project.name} ${project.version} API</doctitle>
-          <windowtitle>${project.name} ${project.version} API</windowtitle>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <version>2.5.2</version>
-        <inherited>true</inherited>
-        <executions>
-          <execution>
-            <phase>install</phase>
-            <goals>
-              <goal>install</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <createChecksum>true</createChecksum>
-        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -408,43 +224,6 @@ Sonatype Maven Reference
       + Profiles +
       +- - - - - +-->
   <profiles>
-    <!-- +- sign-gpg -+-->
-    <!--
-    Signs all project artifacts using the specified GPG key via the "gpg.keyname" property.
-    References:
-      http://maven.apache.org/plugins/maven-gpg-plugin/sign-mojo.html
-    -->
-    <profile>
-      <id>sign-gpg</id>
-      <activation>
-        <property>
-          <name>gpg.keyname</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
-            <inherited>true</inherited>
-            <executions>
-              <execution>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <ascDirectory>.</ascDirectory>
-              <keyname>${gpg.keyname}</keyname>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
     <!-- +- code-coverage -+-->
     <!--
     Prepares the agent and creates a code coverage report.
