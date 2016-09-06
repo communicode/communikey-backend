@@ -84,8 +84,6 @@ Sonatype Maven Reference
   <properties>
     <application.classpath.prefix>lib</application.classpath.prefix>
     <application.mainclass>CommunikeyApplication</application.mainclass>
-    <build.root.dir>${basedir}/build</build.root.dir>
-    <build.artifact.dir>${build.root.dir}/artifacts</build.artifact.dir>
     <!-- The scope of the dependency artifacts to copy to the classpath prefix directory. -->
     <dependencies.scope>runtime</dependencies.scope>
     <java.version>1.8</java.version>
@@ -162,8 +160,6 @@ Sonatype Maven Reference
       + Build +
       +- - - -+-->
   <build>
-    <finalName>${project.artifactId}-${project.version}</finalName>
-    <directory>${build.root.dir}</directory>
     <!--+- - - - -+
         + Plugins +
         +- - - - -+-->
@@ -217,7 +213,7 @@ Sonatype Maven Reference
             </goals>
             <configuration>
               <includeScope>${dependencies.scope}</includeScope>
-              <outputDirectory>${build.artifact.dir}/${application.classpath.prefix}</outputDirectory>
+              <outputDirectory>${build.directory}/${application.classpath.prefix}</outputDirectory>
             </configuration>
           </execution>
           <execution>
@@ -260,7 +256,6 @@ Sonatype Maven Reference
         <version>3.0.2</version>
         <inherited>true</inherited>
         <configuration>
-          <outputDirectory>${build.artifact.dir}</outputDirectory>
           <archive>
             <addMavenDescriptor>false</addMavenDescriptor>
             <manifest>
@@ -296,7 +291,6 @@ Sonatype Maven Reference
           </execution>
         </executions>
         <configuration>
-          <outputDirectory>${build.artifact.dir}</outputDirectory>
           <classifier>sources</classifier>
           <archive>
             <addMavenDescriptor>true</addMavenDescriptor>
@@ -325,7 +319,6 @@ Sonatype Maven Reference
         </executions>
         <configuration>
           <classifier>javadoc</classifier>
-          <jarOutputDirectory>${build.artifact.dir}</jarOutputDirectory>
           <encoding>${project.build.sourceEncoding}</encoding>
           <author>true</author>
           <bottom>Copyright &#169; {inceptionYear}-{currentYear} {organizationName}</bottom>
