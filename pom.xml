@@ -95,8 +95,8 @@ Sonatype Maven Reference
       +- - - - - - -+-->
   <!--+- SCM -+ -->
   <scm>
-    <connection>scm:ssh://git@stash.communicode.de:7999/cc/communikey.git</connection>
-    <developerConnection>scm:ssh://git@stash.communicode.de:7999/cc/communikey.git</developerConnection>
+    <connection>scm:git:ssh://git@stash.communicode.de:7999/cc/communikey.git</connection>
+    <developerConnection>scm:git:ssh://git@stash.communicode.de:7999/cc/communikey.git</developerConnection>
     <tag>HEAD</tag>
     <url>https://stash.communicode.de/projects/CC/repos/communikey</url>
   </scm>
