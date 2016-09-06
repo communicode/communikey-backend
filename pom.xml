@@ -22,7 +22,6 @@ version                                   +
   > Plugin Repositories
       Maven Central
   > Profiles
-      sign-gpg
       code-coverage
 
 [References]
@@ -225,43 +224,6 @@ Sonatype Maven Reference
       + Profiles +
       +- - - - - +-->
   <profiles>
-    <!-- +- sign-gpg -+-->
-    <!--
-    Signs all project artifacts using the specified GPG key via the "gpg.keyname" property.
-    References:
-      http://maven.apache.org/plugins/maven-gpg-plugin/sign-mojo.html
-    -->
-    <profile>
-      <id>sign-gpg</id>
-      <activation>
-        <property>
-          <name>gpg.keyname</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
-            <inherited>true</inherited>
-            <executions>
-              <execution>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <ascDirectory>.</ascDirectory>
-              <keyname>${gpg.keyname}</keyname>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
     <!-- +- code-coverage -+-->
     <!--
     Prepares the agent and creates a code coverage report.
