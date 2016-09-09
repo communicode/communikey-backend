@@ -1,13 +1,13 @@
 /*
   * Copyright (C) 2016 communicode AG
  */
-package de.communicode;
+package de.communicode.communikey;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * @author Sven Greb &lt;sgreb@communicode.de&gt;
+ * @author sgreb@communicode.de
  */
 @SpringBootApplication
 public class CommunikeyApplication {

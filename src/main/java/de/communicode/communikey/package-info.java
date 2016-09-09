@@ -1,4 +1,4 @@
 /*
   * Copyright (C) 2016 communicode AG
  */
-package de.communicode;
+package de.communicode.communikey;
