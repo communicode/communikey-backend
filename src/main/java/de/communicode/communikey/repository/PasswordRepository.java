@@ -17,19 +17,19 @@ import java.sql.Timestamp;
  */
 @Repository
 public interface PasswordRepository extends CrudRepository<Password, Long> {
-  /**
-   * Finds and returns the {@link Password} specified by the given {@code id}.
-   *
-   * @param id The ID of the {@link Password} to find
-   * @return the {@link Password} with the given {@code id}
-   */
-  Password findOneById(long id);
+    /**
+     * Finds and returns the {@link Password} specified by the given {@code id}.
+     *
+     * @param id The ID of the {@link Password} to find
+     * @return the {@link Password} with the given {@code id}
+     */
+    Password findOneById(long id);
 
-  /**
-   * Finds and returns the first {@link Password} found with the given creation {@link Timestamp}.
-   *
-   * @param creationTimestamp The creation {@link Timestamp} for a {@link Password} to find
-   * @return the {@link Password} with the given creation {@link Timestamp}
-   */
-  Password findOneByCreationTimestamp(Timestamp creationTimestamp);
+    /**
+     * Finds and returns the first {@link Password} found with the given creation {@link Timestamp}.
+     *
+     * @param creationTimestamp The creation {@link Timestamp} for a {@link Password} to find
+     * @return the {@link Password} with the given creation {@link Timestamp}
+     */
+    Password findOneByCreationTimestamp(Timestamp creationTimestamp);
 }
