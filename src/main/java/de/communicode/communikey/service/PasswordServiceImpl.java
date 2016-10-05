@@ -13,36 +13,36 @@ import java.sql.Timestamp;
 @Service
 public class PasswordServiceImpl implements PasswordService {
 
-  @Autowired
-  private PasswordRepository passwordRepository;
+    @Autowired
+    private PasswordRepository passwordRepository;
 
-  @Override
-  public Iterable<Password> getAllPasswords() {
-    return passwordRepository.findAll();
-  }
+    @Override
+    public Iterable<Password> getAllPasswords() {
+        return passwordRepository.findAll();
+    }
 
-  @Override
-  public Password getPasswordById(long id) {
-    return passwordRepository.findOne(id);
-  }
+    @Override
+    public Password getPasswordById(long id) {
+        return passwordRepository.findOne(id);
+    }
 
-  @Override
-  public Password getPasswordByCreationDate(Timestamp timestamp) {
-    return passwordRepository.findOneByCreationTimestamp(timestamp);
-  }
+    @Override
+    public Password getPasswordByCreationDate(Timestamp timestamp) {
+        return passwordRepository.findOneByCreationTimestamp(timestamp);
+    }
 
-  @Override
-  public void deletePassword(Password password) {
-    passwordRepository.delete(password);
-  }
+    @Override
+    public void deletePassword(Password password) {
+        passwordRepository.delete(password);
+    }
 
-  @Override
-  public void modifyPasswordValue(Password password, String newValue) {
-    passwordRepository.findOne(password.getId()).setValue(newValue);
-  }
+    @Override
+    public void modifyPasswordValue(Password password, String newValue) {
+        passwordRepository.findOne(password.getId()).setValue(newValue);
+    }
 
-  @Override
-  public Password savePassword(Password password) {
-    return passwordRepository.save(password);
-  }
+    @Override
+    public Password savePassword(Password password) {
+        return passwordRepository.save(password);
+    }
 }
