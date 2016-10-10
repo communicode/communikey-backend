@@ -25,10 +25,10 @@ version                                   +
       code-coverage
 
 [References]
-Apache Maven Documentation
+Apache Maven
   (https://maven.apache.org/guides)
   (https://maven.apache.org/pom.html)
-Sonatype Maven Reference
+Sonatype
   (http://books.sonatype.com/mvnref-book/reference)
 -->
 <project
@@ -36,27 +36,19 @@ Sonatype Maven Reference
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <!--+- - - - - - -+
-      + Coordinates +
-      +- - - - - - -+-->
+
   <groupId>de.communicode</groupId>
   <artifactId>communikey</artifactId>
   <version>0.0.0</version>
   <packaging>jar</packaging>
 
-  <!--+- - - - +
-      + Parent +
-      +- - - - +-->
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>1.4.0.RELEASE</version>
-    <relativePath/> <!-- lookup parent from repository -->
+    <relativePath/>
   </parent>
 
-  <!--+- - - - - - - - - - -+
-      + Project Information +
-      +- - - - - - - - - - -+-->
   <name>communikey</name>
   <description>A simple centralized, cross-platform credential manager.</description>
   <url>https://communikey.test.communicode.de</url>
@@ -66,7 +58,6 @@ Sonatype Maven Reference
     <url>http://communicode.de</url>
   </organization>
 
-  <!-- +- Developers -+ -->
   <developers>
     <developer>
       <id>sgreb</id>
@@ -77,23 +68,11 @@ Sonatype Maven Reference
     </developer>
   </developers>
 
-  <!--+- - - - - - - - - - +
-      + Project Properties +
-      +- - - - - - - - - - +-->
   <properties>
-    <application.classpath.prefix>lib</application.classpath.prefix>
-    <application.mainclass>CommunikeyApplication</application.mainclass>
-    <!-- The scope of the dependency artifacts to copy to the classpath prefix directory. -->
-    <dependencies.scope>runtime</dependencies.scope>
     <java.version>1.8</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
-  <!--+- - - - - - -+
-      + Environment +
-      +- - - - - - -+-->
-  <!--+- SCM -+ -->
   <scm>
     <connection>scm:git:ssh://git@stash.communicode.de:7999/cc/communikey.git</connection>
     <developerConnection>scm:git:ssh://git@stash.communicode.de:7999/cc/communikey.git</developerConnection>
@@ -101,9 +80,6 @@ Sonatype Maven Reference
     <url>https://stash.communicode.de/projects/CC/repos/communikey</url>
   </scm>
 
-  <!--+- - - - - - - +
-      + Dependencies +
-      +- - - - - - - +-->
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -160,13 +136,7 @@ Sonatype Maven Reference
     </dependency>
   </dependencies>
 
-  <!--+- - - -+
-      + Build +
-      +- - - -+-->
   <build>
-    <!--+- - - - -+
-        + Plugins +
-        +- - - - -+-->
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -175,15 +145,7 @@ Sonatype Maven Reference
     </plugins>
   </build>
 
-  <!--+- - - - - - - +
-      + Repositories +
-      +- - - - - - - +-->
   <repositories>
-    <!-- +- Maven Central -+-->
-      <!--
-      The default Apache Maven Central Repository with enabled snapshots.
-      Inherited from the Super POM.
-      -->
     <repository>
       <id>central</id>
       <name>Central Repository</name>
@@ -200,15 +162,7 @@ Sonatype Maven Reference
     </repository>
   </repositories>
 
-  <!--+- - - - - - - - - - -+
-      + Plugin Repositories +
-      +- - - - - - - - - - -+-->
   <pluginRepositories>
-    <!-- +- Maven Central -+-->
-      <!--
-      The default Apache Maven Plugin Repository with enabled snapshots.
-      Inherited from the Super POM.
-      -->
     <pluginRepository>
       <id>central</id>
       <name>Central Repository</name>
@@ -225,17 +179,7 @@ Sonatype Maven Reference
     </pluginRepository>
   </pluginRepositories>
 
-  <!--+- - - - - +
-      + Profiles +
-      +- - - - - +-->
   <profiles>
-    <!-- +- code-coverage -+-->
-    <!--
-    Prepares the agent and creates a code coverage report.
-    References:
-      http://www.eclemma.org/jacoco/trunk/doc/report-mojo.html
-      http://www.eclemma.org/jacoco/trunk/doc/prepare-agent-mojo.html
-    -->
     <profile>
       <id>code-coverage</id>
       <build>
