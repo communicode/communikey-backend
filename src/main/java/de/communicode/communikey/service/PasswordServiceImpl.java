@@ -38,7 +38,8 @@ public class PasswordServiceImpl implements PasswordService {
 
     @Override
     public void modifyPasswordValue(Password password, String newValue) {
-        passwordRepository.findOne(password.getId()).setValue(newValue);
+        password.setValue(newValue);
+        passwordRepository.save(password);
     }
 
     @Override
