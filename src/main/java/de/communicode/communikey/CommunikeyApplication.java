@@ -19,7 +19,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class CommunikeyApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(CommunikeyApplication.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(CommunikeyApplication.class, args);
+    }
 }
