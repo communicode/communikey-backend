@@ -3,6 +3,8 @@
  */
 package de.communicode.communikey.controller;
 
+import static de.communicode.communikey.CommunikeyConstants.TEMPLATE_PASSWORD_EDIT;
+import static de.communicode.communikey.CommunikeyConstants.TEMPLATE_PASSWORD_NEW;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,7 +61,7 @@ public class PasswordControllerTest {
             .andExpect(model().attributeExists("password"))
             .andExpect(model().attributeExists("newPasswordForm"))
             .andExpect(model().size(2))
-            .andExpect(view().name("/passwords-new"));
+            .andExpect(view().name(TEMPLATE_PASSWORD_NEW));
 
         mockMvc.perform(post("/passwords/new"))
             .andExpect(view().name("redirect:/passwords"))
@@ -73,7 +75,7 @@ public class PasswordControllerTest {
 
         mockMvc.perform(get("/passwords/1/edit"))
             .andExpect(status().isOk())
-            .andExpect(view().name("/passwords-edit"))
+            .andExpect(view().name(TEMPLATE_PASSWORD_EDIT))
             .andExpect(model().attributeExists("password"))
             .andExpect(model().attributeExists("editPasswordForm"))
             .andExpect(model().size(2));
