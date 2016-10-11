@@ -1,36 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-+++++++++++++++++++++++
-title     Project POM +
-project   communikey  +
-version               +
-+++++++++++++++++++++++
-
-[Index]
-  > Coordinates
-  > Parent
-  > Project Information
-      Developers
-  > Project Properties
-  > Environment
-      SCM
-  > Dependencies
-  > Build
-      Plugins
-  > Repositories
-      Maven Central
-  > Plugin Repositories
-      Maven Central
-  > Profiles
-      code-coverage
-
-[References]
-Apache Maven
-  (https://maven.apache.org/guides)
-  (https://maven.apache.org/pom.html)
-Sonatype
-  (http://books.sonatype.com/mvnref-book/reference)
--->
 <project
         xmlns="http://maven.apache.org/POM/4.0.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
