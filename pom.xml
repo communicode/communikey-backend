@@ -51,7 +51,7 @@ Sonatype
 
     <name>communikey</name>
     <description>A simple centralized, cross-platform credential manager.</description>
-    <url>https://communikey.test.communicode.de</url>
+    <url>https://key.communicode.de</url>
     <inceptionYear>2016</inceptionYear>
     <organization>
         <name>communicode AG</name>
