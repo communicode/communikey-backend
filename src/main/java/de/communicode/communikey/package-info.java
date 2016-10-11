@@ -1,4 +1,16 @@
 /*
-  * Copyright (C) 2016 communicode AG
+ * Copyright (C) communicode AG - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * 2016
+*/
+/**
+ * A simple centralized, cross-platform credential manager.
+ *
+ * <p>
+ *   The application entry point is the {@link de.communicode.communikey.CommunikeyApplication} boot class.
+ * </p>
+ *
+ * @since 0.1.0
  */
 package de.communicode.communikey;

@@ -1,0 +1,140 @@
+body {
+  overflow-x: hidden;
+}
+
+input::-moz-focus-inner {
+  border: 0;
+}
+
+a,
+a:hover,
+a:active,
+a:focus {
+  outline: 0;
+}
+
+#wrapper {
+  padding-left: 0;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+#sidebar-wrapper {
+  z-index: 1000;
+  position: fixed;
+  left: 250px;
+  width: 0;
+  height: 100%;
+  margin-left: -250px;
+  overflow-y: auto;
+  background: #8DB91C;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+#page-content-wrapper {
+  width: 100%;
+  position: absolute;
+  padding: 15px;
+}
+
+.sidebar-nav {
+  position: absolute;
+  top: 0;
+  width: 250px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar-nav li {
+  text-indent: 20px;
+  line-height: 40px;
+}
+
+.sidebar-nav li a {
+  display: block;
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+.sidebar-nav li a:hover {
+  text-decoration: none;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-nav li a:active,
+.sidebar-nav li a:focus {
+  text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+  height: 65px;
+  font-size: 18px;
+  line-height: 60px;
+}
+
+.sidebar-nav > .sidebar-brand a {
+  color: #6F9D21;
+  font-weight: 600;
+}
+
+.sidebar-nav > .sidebar-brand a:hover {
+  color: #FFFFFF;
+  background: none;
+}
+
+.fa-trash-o,
+.fa-pencil {
+  color: #2D2D2E;
+}
+
+.btn-outline-primary,
+.btn-outline-secondary {
+  -webkit-transition: all 400ms ease;
+  -moz-transition: all 400ms ease;
+  -ms-transition: all 400ms ease;
+  -o-transition: all 400ms ease;
+  transition: all 400ms ease;
+  background-color: transparent;
+}
+
+.btn-outline-primary {
+  color: #8DB91C;
+  border-color: #8DB91C;
+}
+
+.btn-outline-primary:hover{
+  color: #FFFFFF;
+  background-color: #8DB91C;
+}
+
+.btn-outline-secondary {
+  color: #B9464D;
+  border-color: #B9464D;
+}
+
+.btn-outline-secondary:hover {
+  color: #FFFFFF;
+  background-color: #B9464D;
+}
+
+@media (min-width: 768px) {
+  #wrapper {
+    padding-left: 250px;
+  }
+
+  #sidebar-wrapper {
+    width: 250px;
+  }
+
+  #page-content-wrapper {
+    padding: 20px;
+    position: relative;
+  }
+}
