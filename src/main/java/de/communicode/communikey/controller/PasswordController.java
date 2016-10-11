@@ -1,6 +1,9 @@
 /*
-  * Copyright (C) 2016 communicode AG
- */
+ * Copyright (C) communicode AG - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * 2016
+*/
 package de.communicode.communikey.controller;
 
 import de.communicode.communikey.domain.Password;
