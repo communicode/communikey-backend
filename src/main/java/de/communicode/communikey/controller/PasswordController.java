@@ -69,12 +69,16 @@ public class PasswordController {
      */
     @GetMapping(value = REQUEST_PASSWORD_EDIT)
     String editPasswordForm(@PathVariable long id, Model model) {
-        Password password = passwordRepository.findOne(id);
-        EditPasswordForm editPasswordForm = new EditPasswordForm();
-        editPasswordForm.setValue(password.getValue());
-        model.addAttribute("password", password);
-        model.addAttribute("editPasswordForm", editPasswordForm);
-        return TEMPLATE_PASSWORD_EDIT;
+        if (passwordRepository.findOne(id) == null) {
+            return asRedirect(ENDPOINT_PASSWORDS);
+        } else {
+            Password password = passwordRepository.findOne(id);
+            EditPasswordForm editPasswordForm = new EditPasswordForm();
+            editPasswordForm.setValue(password.getValue());
+            model.addAttribute("password", password);
+            model.addAttribute("editPasswordForm", editPasswordForm);
+            return TEMPLATE_PASSWORD_EDIT;
+        }
     }
 
     /**
