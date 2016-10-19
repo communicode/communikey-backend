@@ -15,9 +15,23 @@ package de.communicode.communikey;
 public class CommunikeyConstants {
 
     /**
+     * The name of the login session ID cookie.
+     *
+     * @since 0.2.0
+     */
+    public static final String COOKIE_LOGIN_SESSION_ID = "JSESSIONID";
+
+    /**
+     * The endpoint for the {@code 403} HTTP status code.
+     *
+     * @since 0.2.0
+     */
+    public static final String ENDPOINT_HTTP_STATUS_CODE_403 = "/accessDenied";
+
+    /**
      * The endpoint for {@link de.communicode.communikey.domain.Password} entities.
      */
-    public static final String ENDPOINT_PASSWORDS = "passwords";
+    public static final String ENDPOINT_PASSWORDS = "/passwords";
 
     /**
      * The name of the model attribute for {@link de.communicode.communikey.domain.Password} IDs.
@@ -77,6 +91,26 @@ public class CommunikeyConstants {
      * @return the string with the prepended redirection string
      */
     public static String asRedirect(String endpoint) {
-        return "redirect:/" + endpoint;
+        return "redirect:" + endpoint;
+    }
+
+    /**
+     * Suffixes the given {@code parameters} with the ampersand character ({@code &}) to the given {@code endpoint}.
+     *
+     * @param endpoint the endpoint to append the {@code parameters} to
+     * @param parameters the parameters to be appended to the {@code endpoint}
+     * @return the endpoint string with the appended parameters
+     * @since 0.2.0
+     */
+    public static String withParameters(String endpoint, String... parameters) {
+        if (parameters.length == 1) {
+            return endpoint + "?" + parameters[0];
+        } else {
+            StringBuilder sb = new StringBuilder(endpoint);
+            for (String parameter : parameters) {
+                sb.append("?").append(parameter);
+            }
+            return sb.toString();
+        }
     }
 }
