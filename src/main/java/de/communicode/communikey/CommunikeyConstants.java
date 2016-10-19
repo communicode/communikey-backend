@@ -15,6 +15,20 @@ package de.communicode.communikey;
 public class CommunikeyConstants {
 
     /**
+     * The name of the login session ID cookie.
+     *
+     * @since 0.2.0
+     */
+    public static final String COOKIE_LOGIN_SESSION_ID = "JSESSIONID";
+
+    /**
+     * The endpoint for the {@code 403} HTTP status code.
+     *
+     * @since 0.2.0
+     */
+    public static final String ENDPOINT_HTTP_STATUS_CODE_403 = "/accessDenied";
+
+    /**
      * The endpoint for {@link de.communicode.communikey.domain.Password} entities.
      */
     public static final String ENDPOINT_PASSWORDS = "passwords";
