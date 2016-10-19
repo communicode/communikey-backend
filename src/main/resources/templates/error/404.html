@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>communikey - 404</title>
+    <th:block th:include="fragments/base/head :: base-head"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/404.css}" href="../../static/css/404.css"/>
+  </head>
+  <body>
+    <div class="container-404">
+      <div class="wrapper-404">
+        <div>
+          <img class="tag-404" src="../../static/svg/404-tag.svg" th:src="@{/svg/404-tag.svg}"/>
+        </div>
+        <div class="shadow-404"></div>
+        <h1>Whoops!</h1>
+        <p>
+          We couldn't find the page you were looking for.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

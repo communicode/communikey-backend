@@ -1,5 +1,6 @@
 body {
   overflow-x: hidden;
+  background-color: #ECEFF4;
 }
 
 input::-moz-focus-inner {
@@ -29,7 +30,7 @@ a:focus {
   height: 100%;
   margin-left: -250px;
   overflow-y: auto;
-  background: #8DB91C;
+  background-color: #2E3440;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
@@ -59,13 +60,13 @@ a:focus {
 .sidebar-nav li a {
   display: block;
   text-decoration: none;
-  color: #FFFFFF;
+  color: #D8DEE9;
 }
 
 .sidebar-nav li a:hover {
   text-decoration: none;
-  color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.2);
+  color: #D8DEE9;
+  background-color: #434C5E;
 }
 
 .sidebar-nav li a:active,
@@ -80,13 +81,13 @@ a:focus {
 }
 
 .sidebar-nav > .sidebar-brand a {
-  color: #6F9D21;
+  color: #A3BE8C;
   font-weight: 600;
 }
 
 .sidebar-nav > .sidebar-brand a:hover {
-  color: #FFFFFF;
-  background: none;
+  background-color: transparent;
+  color: #A3BE8C;
 }
 
 .fa-trash-o,
@@ -105,23 +106,31 @@ a:focus {
 }
 
 .btn-outline-primary {
-  color: #8DB91C;
-  border-color: #8DB91C;
+  color: #88C0D0;
+  border-color: #88C0D0;
 }
 
 .btn-outline-primary:hover{
-  color: #FFFFFF;
-  background-color: #8DB91C;
+  color: #4C566A;
+  background-color: #88C0D0;
 }
 
 .btn-outline-secondary {
-  color: #B9464D;
-  border-color: #B9464D;
+  color: #BF616A;
+  border-color: #BF616A;
 }
 
 .btn-outline-secondary:hover {
-  color: #FFFFFF;
-  background-color: #B9464D;
+  color: #D8DEE9;
+  background-color: #BF616A;
+}
+
+.table {
+  background-color: #ECEFF4;
+}
+
+.table-striped > tbody > tr:nth-of-type(2n+1) {
+  background-color: #E5E9F0;
 }
 
 @media (min-width: 768px) {

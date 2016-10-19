@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>communikey - Login</title>
+    <th:block th:include="fragments/base/head :: base-head"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/login.css}" href="/css/login.css"/>
+  </head>
+  <body>
+    <section id="frameLogo" class="frame">
+      <section class="frameLogo">
+        <img src="../static/svg/communikey-logo.svg" th:src="@{/svg/communikey-logo.svg}" width="96" height="96"/>
+      </section>
+    </section>
+    <section id="frameLogin" class="frame frameLogin">
+      <h1>Login</h1>
+      <form method="post" name="login_form" id="login_form" role="form">
+        <fieldset>
+          <input type="text" id="username" class="ckInput" name="username" placeholder="&#xF007;" required="required"
+                 autofocus="autofocus"/>
+          <input type="password" id="password" class="ckInput ckInputDark ckLarger" name="password" placeholder="&#xF084;" required="required"/>
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+          <button type="submit" class="ckButton ckButtonDefault">Login</button>
+          <p class="ckText">
+            <a href="#">Forgot login?</a>
+          </p>
+          <p>
+            <a href="#">No account?</a>
+          </p>
+        </fieldset>
+      </form>
+    </section>
+    <footer> &copy; communicode 2016</footer>
+  </body>
+  <script type="text/javascript">
+    function moveLogo() {
+      document.getElementById("frameLogo").className += " frameMove";
+      setTimeout("showIt()", 1000);
+    }
+
+    function showIt() {
+      document.getElementById("frameLogin").style.display = "block";
+    }
+    setTimeout("moveLogo()", 400);
+  </script>
+</html>
