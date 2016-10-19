@@ -31,7 +31,7 @@ public class CommunikeyConstants {
     /**
      * The endpoint for {@link de.communicode.communikey.domain.Password} entities.
      */
-    public static final String ENDPOINT_PASSWORDS = "passwords";
+    public static final String ENDPOINT_PASSWORDS = "/passwords";
 
     /**
      * The name of the model attribute for {@link de.communicode.communikey.domain.Password} IDs.
