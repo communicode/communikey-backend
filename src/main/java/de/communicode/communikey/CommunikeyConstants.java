@@ -22,6 +22,27 @@ public class CommunikeyConstants {
     public static final String COOKIE_LOGIN_SESSION_ID = "JSESSIONID";
 
     /**
+     * The {@link de.communicode.communikey.domain.User} login endpoint.
+     *
+     * @since 0.2.0
+     */
+    public static final String ENDPOINT_LOGIN = "/login";
+
+    /**
+     * The {@link de.communicode.communikey.domain.User} logout endpoint.
+     *
+     * @since 0.2.0
+     */
+    public static final String ENDPOINT_LOGOUT= "/logout";
+
+    /**
+     * The endpoint to the root endpoint.
+     *
+     * @since 0.2.0
+     */
+    public static final String ENDPOINT_ROOT= "/";
+
+    /**
      * The endpoint for the {@code 403} HTTP status code.
      *
      * @since 0.2.0
@@ -37,6 +58,13 @@ public class CommunikeyConstants {
      * The name of the model attribute for {@link de.communicode.communikey.domain.Password} IDs.
      */
     public static final String MODEL_ID = "id";
+
+    /**
+     * The request parameter for the {@value ENDPOINT_LOGIN} endpoint to logout from a session.
+     *
+     * @since 0.2.0
+     */
+    public static final String REQUEST_PARAM_LOGIN_LOGOUT = "logout";
 
     /**
      * The endpoint mapping for {@link de.communicode.communikey.domain.Password} edit requests.
@@ -73,6 +101,20 @@ public class CommunikeyConstants {
      * @since 0.2.0
      */
     public static final String TABLE_USERS_COLUMN_ENABLED = "enabled";
+
+    /**
+     * The path to the template file for the HTTP status code {@code 404}.
+     *
+     * @since 0.2.0
+     */
+    public static final String TEMPLATE_HTTP_STATUS_CODE_404 = "error/404";
+
+    /**
+     * The path to the template file for the HTTP status code {@code 403}.
+     *
+     * @since 0.2.0
+     */
+    public static final String TEMPLATE_HTTP_STATUS_CODE_403 = "error/403";
 
     /**
      * The path to the template file to edit {@link de.communicode.communikey.domain.Password} entities.
