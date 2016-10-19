@@ -93,4 +93,24 @@ public class CommunikeyConstants {
     public static String asRedirect(String endpoint) {
         return "redirect:" + endpoint;
     }
+
+    /**
+     * Suffixes the given {@code parameters} with the ampersand character ({@code &}) to the given {@code endpoint}.
+     *
+     * @param endpoint the endpoint to append the {@code parameters} to
+     * @param parameters the parameters to be appended to the {@code endpoint}
+     * @return the endpoint string with the appended parameters
+     * @since 0.2.0
+     */
+    public static String withParameters(String endpoint, String... parameters) {
+        if (parameters.length == 1) {
+            return endpoint + "?" + parameters[0];
+        } else {
+            StringBuilder sb = new StringBuilder(endpoint);
+            for (String parameter : parameters) {
+                sb.append("?").append(parameter);
+            }
+            return sb.toString();
+        }
+    }
 }
