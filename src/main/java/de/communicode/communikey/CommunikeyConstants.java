@@ -91,6 +91,6 @@ public class CommunikeyConstants {
      * @return the string with the prepended redirection string
      */
     public static String asRedirect(String endpoint) {
-        return "redirect:/" + endpoint;
+        return "redirect:" + endpoint;
     }
 }
