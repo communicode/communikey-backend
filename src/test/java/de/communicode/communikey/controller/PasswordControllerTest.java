@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 import de.communicode.communikey.CommunikeyApplication;
 import de.communicode.communikey.domain.Password;
@@ -34,8 +35,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.servlet.Filter;
-
 /**
  * Unit tests for the {@link PasswordController} class.
  *
@@ -46,19 +45,15 @@ import javax.servlet.Filter;
 @WebAppConfiguration
 public class PasswordControllerTest {
     private MockMvc mockMvc;
-    private PasswordController passwordController;
     @Autowired
     private PasswordRepository passwordRepository;
     @Autowired
     private WebApplicationContext wac;
-    @Autowired
-    private Filter springSecurityFilterChain;
 
     @Before
     public void setup() {
-        passwordController = new PasswordController();
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-            .addFilters(springSecurityFilterChain)
+            .apply(springSecurity())
             .defaultRequest(get(ENDPOINT_ROOT).with(user("user").password("pass").roles("USER")))
             .build();
     }
