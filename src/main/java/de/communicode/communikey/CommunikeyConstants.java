@@ -82,6 +82,21 @@ public class CommunikeyConstants {
     public static final String REQUEST_PASSWORD_NEW = ENDPOINT_PASSWORDS + "/new";
 
     /**
+     * The name of the table for the link table of {@link de.communicode.communikey.domain.UserGroup}- and {@link de.communicode.communikey.domain.User}
+     * entities.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_LINK_USERS_TO_USER_GROUPS = "link_users_to_user_groups";
+
+    /**
+     * The name of the table for {@link de.communicode.communikey.domain.UserGroup} entities.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_USER_GROUPS = "user_groups";
+
+    /**
      * The name of the table for {@link de.communicode.communikey.domain.User} entities.
      *
      * @since 0.2.0
@@ -101,6 +116,20 @@ public class CommunikeyConstants {
      * @since 0.2.0
      */
     public static final String TABLE_USERS_COLUMN_ENABLED = "enabled";
+
+    /**
+     * The name of the column for the {@link de.communicode.communikey.domain.UserGroup} entity ID.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_USER_GROUPS_COLUMN_USER_GROUP_ID = "user_group_id";
+
+    /**
+     * The name of the column for the {@link de.communicode.communikey.domain.UserGroup} entity name.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_USER_GROUPS_COLUMN_NAME = "name";
 
     /**
      * The path to the template file for the HTTP status code {@code 404}.
