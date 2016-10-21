@@ -39,7 +39,7 @@ public class SessionController {
      * @return the string to the endpoint
      */
     @GetMapping(value = ENDPOINT_HTTP_STATUS_CODE_403)
-    String accessDenied() {
+    public String accessDenied() {
         return TEMPLATE_HTTP_STATUS_CODE_403;
     }
 
