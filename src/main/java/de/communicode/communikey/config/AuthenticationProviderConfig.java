@@ -36,7 +36,7 @@ public class AuthenticationProviderConfig {
      *
      * @return the configured JDBC {@link DriverManagerDataSource}
      */
-    @Bean()
+    @Bean
     public DriverManagerDataSource dataSource() {
         DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
         driverManagerDataSource.setDriverClassName(databaseDriverClassName);
