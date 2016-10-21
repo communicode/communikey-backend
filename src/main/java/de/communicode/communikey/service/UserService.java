@@ -9,6 +9,8 @@ package de.communicode.communikey.service;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.type.UserRoleType;
 
+import java.util.Set;
+
 /**
  * A service to interact with {@link User} entities via the {@link de.communicode.communikey.repository.UserRepository}.
  *
@@ -27,9 +29,9 @@ public interface UserService {
     /**
      * Gets all {@link User} entities of the {@link de.communicode.communikey.repository.UserRepository}.
      *
-     * @return a {@link Iterable<User>} of all {@link User} entities
+     * @return a collection of all {@link User} entities
      */
-    Iterable<User> getAllUsers();
+    Set<User> getAllUsers();
 
     /**
      * Gets the {@link User} with the given {@code id}.

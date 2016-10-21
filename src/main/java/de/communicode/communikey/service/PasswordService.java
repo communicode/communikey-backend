@@ -9,6 +9,7 @@ package de.communicode.communikey.service;
 import de.communicode.communikey.domain.Password;
 
 import java.sql.Timestamp;
+import java.util.Set;
 
 /**
  * A service to interact with the {@link de.communicode.communikey.repository.PasswordRepository}.
@@ -20,9 +21,9 @@ public interface PasswordService {
     /**
      * Gets all {@link Password} entities of the {@link de.communicode.communikey.repository.PasswordRepository}.
      *
-     * @return a {@link Iterable<Password>} of all {@link Password} entities
+     * @return a collection of all {@link Password} entities
      */
-    Iterable<Password> getAllPasswords();
+    Set<Password> getAllPasswords();
 
     /**
      * Gets the {@link Password} with the given {@code id}.

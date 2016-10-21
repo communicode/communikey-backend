@@ -14,6 +14,11 @@ import de.communicode.communikey.type.UserRoleType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 /**
  * Service to interact with the {@link de.communicode.communikey.repository.PasswordRepository}.
  *
@@ -36,8 +41,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Iterable<User> getAllUsers() {
-        return userRepository.findAll();
+    public Set<User> getAllUsers() {
+        return StreamSupport.stream(userRepository.findAll().spliterator(), false)
+            .collect(Collectors.toSet());
+
     }
 
     @Override

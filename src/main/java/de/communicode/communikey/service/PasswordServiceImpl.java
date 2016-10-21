@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class PasswordServiceImpl implements PasswordService {
@@ -20,8 +23,9 @@ public class PasswordServiceImpl implements PasswordService {
     private PasswordRepository passwordRepository;
 
     @Override
-    public Iterable<Password> getAllPasswords() {
-        return passwordRepository.findAll();
+    public Set<Password> getAllPasswords() {
+        return StreamSupport.stream(passwordRepository.findAll().spliterator(), false)
+            .collect(Collectors.toSet());
     }
 
     @Override
