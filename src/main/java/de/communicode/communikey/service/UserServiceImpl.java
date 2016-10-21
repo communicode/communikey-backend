@@ -14,7 +14,6 @@ import de.communicode.communikey.type.UserRoleType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -49,14 +48,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(long id) {
-        requireNonNull(userRepository.findOneById(id), "Invalid user id!");
-        return userRepository.findOneById(id);
+        return requireNonNull(userRepository.findOneById(id), "Invalid user id!");
     }
 
     @Override
     public User getUserByUsername(String username) {
-        requireNonNull(userRepository.findOneByUsername(username), "Invalid username!");
-        return userRepository.findOneByUsername(username);
+        return requireNonNull(userRepository.findOneByUsername(username), "Invalid username!");
     }
 
     @Override
