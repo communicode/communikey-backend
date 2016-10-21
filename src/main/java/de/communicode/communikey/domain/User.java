@@ -45,6 +45,8 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    private User() {}
+
     /**
      * Constructs a new user entity object with an auto-generated ID.
      *

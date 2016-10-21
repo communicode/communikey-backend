@@ -32,6 +32,8 @@ public class Password {
     private Timestamp creationTimestamp;
     private String value;
 
+    private Password() {}
+
     public Password(String value) {
         this.value = value;
         long time = Calendar.getInstance().getTimeInMillis();
