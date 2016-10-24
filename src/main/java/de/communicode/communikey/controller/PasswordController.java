@@ -6,6 +6,8 @@
  */
 package de.communicode.communikey.controller;
 
+import static java.util.Objects.requireNonNull;
+
 import de.communicode.communikey.domain.Password;
 import de.communicode.communikey.form.EditPasswordForm;
 import de.communicode.communikey.form.NewPasswordForm;
@@ -41,8 +43,8 @@ public class PasswordController {
 
     @Autowired
     public PasswordController(PasswordService passwordService, PasswordRepository passwordRepository) {
-        this.passwordService = passwordService;
-        this.passwordRepository = passwordRepository;
+        this.passwordService = requireNonNull(passwordService, "passwordService must not be null!");
+        this.passwordRepository = requireNonNull(passwordRepository, "passwordRepository must not be null!");
     }
 
     /**

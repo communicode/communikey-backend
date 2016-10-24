@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+        this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
     }
 
     @Override

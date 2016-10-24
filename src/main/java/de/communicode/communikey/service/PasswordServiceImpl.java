@@ -25,7 +25,7 @@ public class PasswordServiceImpl implements PasswordService {
 
     @Autowired
     public PasswordServiceImpl(PasswordRepository passwordRepository) {
-        this.passwordRepository = passwordRepository;
+        this.passwordRepository = requireNonNull(passwordRepository, "passwordRepository must not be null!");
     }
 
     @Override
