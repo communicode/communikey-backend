@@ -172,7 +172,7 @@
             <url>https://repo.maven.apache.org/maven2</url>
             <layout>default</layout>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
                 <checksumPolicy>warn</checksumPolicy>
             </snapshots>
             <releases>
@@ -189,7 +189,7 @@
             <url>https://repo.maven.apache.org/maven2</url>
             <layout>default</layout>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
                 <checksumPolicy>warn</checksumPolicy>
             </snapshots>
             <releases>
