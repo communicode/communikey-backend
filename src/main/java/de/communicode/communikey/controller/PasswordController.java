@@ -36,10 +36,14 @@ import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
 @Controller
 public class PasswordController {
 
+    private final PasswordRepository passwordRepository;
+    private final PasswordService passwordService;
+
     @Autowired
-    private PasswordRepository passwordRepository;
-    @Autowired
-    private PasswordService passwordService;
+    public PasswordController(PasswordService passwordService, PasswordRepository passwordRepository) {
+        this.passwordService = passwordService;
+        this.passwordRepository = passwordRepository;
+    }
 
     /**
      * Endpoint to list all {@link Password} entities.

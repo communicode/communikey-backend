@@ -21,8 +21,12 @@ import java.util.stream.StreamSupport;
 @Service
 public class PasswordServiceImpl implements PasswordService {
 
+    private final PasswordRepository passwordRepository;
+
     @Autowired
-    private PasswordRepository passwordRepository;
+    public PasswordServiceImpl(PasswordRepository passwordRepository) {
+        this.passwordRepository = passwordRepository;
+    }
 
     @Override
     public Set<Password> getAllPasswords() {

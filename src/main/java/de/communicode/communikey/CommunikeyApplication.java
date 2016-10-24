@@ -14,7 +14,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  * <p>
  *   This is the application boot class.
- * </p>
  *
  * @author sgreb@communicode.de
  * @since 0.1.0

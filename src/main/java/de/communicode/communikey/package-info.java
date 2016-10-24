@@ -9,7 +9,6 @@
  *
  * <p>
  *   The application entry point is the {@link de.communicode.communikey.CommunikeyApplication} boot class.
- * </p>
  *
  * @since 0.1.0
  */
