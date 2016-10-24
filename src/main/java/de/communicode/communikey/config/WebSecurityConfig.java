@@ -3,7 +3,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  * 2016
-*/
+ */
 package de.communicode.communikey.config;
 
 import static de.communicode.communikey.CommunikeyConstants.COOKIE_LOGIN_SESSION_ID;
