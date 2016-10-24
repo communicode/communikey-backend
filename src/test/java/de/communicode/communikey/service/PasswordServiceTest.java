@@ -3,12 +3,11 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  * 2016
-*/
+ */
 package de.communicode.communikey.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import de.communicode.communikey.domain.Password;
@@ -28,7 +27,6 @@ import java.util.List;
 public class PasswordServiceTest {
     @Autowired
     PasswordService passwordService;
-
 
     @Test
     public void shouldReturnAllPasswords() {
@@ -50,12 +48,12 @@ public class PasswordServiceTest {
         assertThat(passwordService.getPasswordById(1L).getId(), is(password.getId()));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void shouldDeletePassword() {
         Password password = new Password("yogurt");
         passwordService.savePassword(password);
         passwordService.deletePassword(passwordService.getPasswordById(1L));
-        assertNull(passwordService.getPasswordById(1L));
+        passwordService.getPasswordById(1L);
     }
 
     @Test

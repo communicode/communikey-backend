@@ -30,37 +30,42 @@ public interface PasswordService {
      *
      * @param id The ID of the {@link Password}
      * @return the {@link Password} with the given ID
+     * @throws NullPointerException if the given {@code id} is invalid
      */
-    Password getPasswordById(long id);
+    Password getPasswordById(long id) throws NullPointerException;
 
     /**
-     * Gets the first {@link Password} found with the given creation {@link Timestamp}.
+     * Gets the first {@link Password} found with the given creation date.
      *
      * @param timestamp The {@link Timestamp} of a {@link Password} to find
      * @return a {@link Password} with the given creation timestamp
+     * @throws NullPointerException if no password found with the given {@code timestamp}
      */
-    Password getPasswordByCreationDate(Timestamp timestamp);
+    Password getPasswordByCreationDate(Timestamp timestamp) throws NullPointerException;
 
     /**
      * Deletes the given {@link Password}.
      *
      * @param password The {@link Password} to delete
+     * @throws NullPointerException if the given {@code password} is null
      */
-    void deletePassword(Password password);
+    void deletePassword(Password password) throws NullPointerException;
 
     /**
      * Modifies the value of the given {@link Password}.
      *
      * @param password The {@link Password} to modify the value of
      * @param newValue The new value for the given {@link Password}
+     * @throws NullPointerException if the given {@code password} is null
      */
-    void modifyPasswordValue(Password password, String newValue);
+    void modifyPasswordValue(Password password, String newValue) throws NullPointerException;
 
     /**
      * Saves the given {@link Password} in the {@link de.communicode.communikey.repository.PasswordRepository}.
      *
      * @param password The {@link Password} to save
      * @return the saved {@link Password}
+     * @throws NullPointerException if the given {@code password} is null
      */
-    Password savePassword(Password password);
+    Password savePassword(Password password) throws NullPointerException;
 }

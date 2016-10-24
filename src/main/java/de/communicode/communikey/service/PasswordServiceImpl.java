@@ -6,6 +6,8 @@
  */
 package de.communicode.communikey.service;
 
+import static java.util.Objects.requireNonNull;
+
 import de.communicode.communikey.domain.Password;
 import de.communicode.communikey.repository.PasswordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,17 +32,18 @@ public class PasswordServiceImpl implements PasswordService {
 
     @Override
     public Password getPasswordById(long id) {
-        return passwordRepository.findOne(id);
+        return requireNonNull(passwordRepository.findOneById(id), "Invalid password id!");
     }
 
     @Override
     public Password getPasswordByCreationDate(Timestamp timestamp) {
-        return passwordRepository.findOneByCreationTimestamp(timestamp);
+        return requireNonNull(passwordRepository.findOneByCreationTimestamp(timestamp), "No password found with the given creation date!");
     }
 
     @Override
     public void deletePassword(Password password) {
-        passwordRepository.delete(password);
+        requireNonNull(password, "password must not be null!");
+        passwordRepository.delete(passwordRepository.findOneById(password.getId()));
     }
 
     @Override
@@ -51,6 +54,6 @@ public class PasswordServiceImpl implements PasswordService {
 
     @Override
     public Password savePassword(Password password) {
-        return passwordRepository.save(password);
+        return requireNonNull(passwordRepository.save(password), "password must not be null!");
     }
 }
