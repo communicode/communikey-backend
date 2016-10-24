@@ -42,14 +42,11 @@ public final class CommunikeyConstantsUtil {
      * @since 0.2.0
      */
     public static String withParameters(String endpoint, String... parameters) {
-        if (parameters.length == 1) {
-            return endpoint + "?" + parameters[0];
-        } else {
-            StringBuilder sb = new StringBuilder(endpoint);
-            for (String parameter : parameters) {
-                sb.append("?").append(parameter);
-            }
-            return sb.toString();
-        }
+        endpoint = Optional.ofNullable(endpoint).orElse(ENDPOINT_HTTP_STATUS_CODE_404);
+        parameters = Optional.ofNullable(parameters).orElse(new String[0]);
+
+        return Stream.of(parameters)
+            .map("?"::concat)
+            .collect(collectingAndThen(joining(), endpoint::concat));
     }
 }
