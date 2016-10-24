@@ -3,8 +3,10 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  * 2016
-*/
+ */
 package de.communicode.communikey.controller;
+
+import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Password;
 import de.communicode.communikey.form.EditPasswordForm;
@@ -19,13 +21,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import static de.communicode.communikey.CommunikeyConstants.ENDPOINT_PASSWORDS;
-import static de.communicode.communikey.CommunikeyConstants.REQUEST_PASSWORD_DELETE;
-import static de.communicode.communikey.CommunikeyConstants.REQUEST_PASSWORD_EDIT;
-import static de.communicode.communikey.CommunikeyConstants.REQUEST_PASSWORD_NEW;
-import static de.communicode.communikey.CommunikeyConstants.TEMPLATE_PASSWORD_EDIT;
-import static de.communicode.communikey.CommunikeyConstants.TEMPLATE_PASSWORD_NEW;
-import static de.communicode.communikey.CommunikeyConstants.asRedirect;
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_PASSWORDS;
+import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PASSWORD_DELETE;
+import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PASSWORD_EDIT;
+import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PASSWORD_NEW;
+import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_PASSWORD_EDIT;
+import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_PASSWORD_NEW;
+import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
 
 /**
  * The controller for all password endpoints.
@@ -36,10 +38,14 @@ import static de.communicode.communikey.CommunikeyConstants.asRedirect;
 @Controller
 public class PasswordController {
 
+    private final PasswordRepository passwordRepository;
+    private final PasswordService passwordService;
+
     @Autowired
-    private PasswordRepository passwordRepository;
-    @Autowired
-    private PasswordService passwordService;
+    public PasswordController(PasswordService passwordService, PasswordRepository passwordRepository) {
+        this.passwordService = requireNonNull(passwordService, "passwordService must not be null!");
+        this.passwordRepository = requireNonNull(passwordRepository, "passwordRepository must not be null!");
+    }
 
     /**
      * Endpoint to list all {@link Password} entities.

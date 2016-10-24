@@ -1,0 +1,80 @@
+body {
+    background-color: #ECEFF4;
+}
+
+.container-404 {
+    font-family: 'Varela Round', sans-serif;
+    color: #4C566A;
+    position: relative;
+    height: 100vh;
+    text-align: center;
+    font-size: 16px;
+}
+
+.container-404 h1 {
+    font-size: 32px;
+    margin-top: 32px;
+}
+
+.wrapper-404 {
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding-top: 64px;
+    padding-bottom: 64px;
+}
+
+.tag-404 {
+    background-color: #ECEFF4;
+    margin-left: auto;
+    margin-right: auto;
+    border-bottom: 0;
+    overflow: hidden;
+    position: relative;
+    width: 160px;
+    height: 184px;
+    animation: floating404 3s ease-in-out infinite;
+}
+
+.shadow-404 {
+    width: 128px;
+    height: 16px;
+    background-color: rgba(216, 222, 233, 0.75);
+    margin-top: 40px;
+    margin-right: auto;
+    margin-left: auto;
+    border-radius: 50%;
+    animation: floatingShadow404 3s ease-in-out infinite;
+}
+
+@keyframes floating404 {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+    45% {
+        transform: translate3d(0, -10%, 0);
+    }
+    55% {
+        transform: translate3d(0, -10%, 0);
+    }
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes floatingShadow404 {
+    0% {
+        transform: scale(1);
+    }
+    45% {
+        transform: scale(0.85);
+    }
+    55% {
+        transform: scale(0.85);
+    }
+    100% {
+        transform: scale(1);
+    }
+}

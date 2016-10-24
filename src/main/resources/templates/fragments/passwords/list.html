@@ -18,7 +18,7 @@
           <!--/*@thymesVar id="password" type="de.communicode.communikey.domain.Password"*/-->
           <td class="message" th:text="${password.id}"></td>
           <td class="message" th:text="${password.value}"></td>
-          <td class="message" th:text="${#dates.format(password.creationTimestamp, 'yyyy-mm-dd hh:mm:ss')}"></td>
+          <td class="message" th:text="${#dates.format(password.creationTimestamp, 'yyyy-MM-dd hh:mm:ss')}"></td>
           <td>
             <a th:href="@{'/passwords/{id}/edit'(id=${password.id})}" class="edit"
                th:attr="name=${password.value}">

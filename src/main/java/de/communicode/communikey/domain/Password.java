@@ -3,7 +3,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  * 2016
-*/
+ */
 package de.communicode.communikey.domain;
 
 import javax.persistence.Column;
@@ -32,8 +32,7 @@ public class Password {
     private Timestamp creationTimestamp;
     private String value;
 
-    private Password() {
-    }
+    private Password() {}
 
     public Password(String value) {
         this.value = value;
