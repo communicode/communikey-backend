@@ -48,6 +48,12 @@ public class PasswordServiceImpl implements PasswordService {
 
     @Override
     public void modifyPasswordValue(Password password, String newValue) {
+        requireNonNull(password, "password must not be null!");
+
+        if (newValue.isEmpty()) {
+            throw new IllegalArgumentException("New value can not be empty!");
+        }
+
         password.setValue(newValue);
         passwordRepository.save(password);
     }

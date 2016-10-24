@@ -57,8 +57,9 @@ public interface PasswordService {
      * @param password The {@link Password} to modify the value of
      * @param newValue The new value for the given {@link Password}
      * @throws NullPointerException if the given {@code password} is null
+     * @throws IllegalArgumentException if the given new value is empty
      */
-    void modifyPasswordValue(Password password, String newValue) throws NullPointerException;
+    void modifyPasswordValue(Password password, String newValue) throws NullPointerException, IllegalArgumentException;
 
     /**
      * Saves the given {@link Password} in the {@link de.communicode.communikey.repository.PasswordRepository}.

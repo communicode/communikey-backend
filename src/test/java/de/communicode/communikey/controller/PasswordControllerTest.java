@@ -3,7 +3,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  * 2016
-*/
+ */
 package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.CommunikeyConstants.ENDPOINT_PASSWORDS;
@@ -15,6 +15,7 @@ import static de.communicode.communikey.CommunikeyConstants.asRedirect;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -22,6 +23,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 import de.communicode.communikey.domain.Password;
+import de.communicode.communikey.form.EditPasswordForm;
 import de.communicode.communikey.repository.PasswordRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,11 +94,15 @@ public class PasswordControllerTest {
             .andExpect(model().attributeExists("editPasswordForm"))
             .andExpect(model().size(2));
 
-        mockMvc.perform(post("/passwords/1/edit")
-            .with(csrf())
+        EditPasswordForm editPasswordForm = new EditPasswordForm();
+        editPasswordForm.setValue("newPassword");
+
+        mockMvc.perform(post("/passwords/1/edit").with(csrf())
+            .flashAttr("editPasswordForm", editPasswordForm)
         )
+            .andExpect(status().isFound())
             .andExpect(view().name(asRedirect(ENDPOINT_PASSWORDS)))
-            .andExpect(status().is3xxRedirection());
+            .andExpect(redirectedUrl(ENDPOINT_PASSWORDS));
     }
 
     @Test
