@@ -6,12 +6,12 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.CommunikeyConstants.ENDPOINT_PASSWORDS;
-import static de.communicode.communikey.CommunikeyConstants.ENDPOINT_ROOT;
-import static de.communicode.communikey.CommunikeyConstants.REQUEST_PASSWORD_NEW;
-import static de.communicode.communikey.CommunikeyConstants.TEMPLATE_PASSWORD_EDIT;
-import static de.communicode.communikey.CommunikeyConstants.TEMPLATE_PASSWORD_NEW;
-import static de.communicode.communikey.CommunikeyConstants.asRedirect;
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_PASSWORDS;
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_ROOT;
+import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PASSWORD_NEW;
+import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_PASSWORD_EDIT;
+import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_PASSWORD_NEW;
+import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

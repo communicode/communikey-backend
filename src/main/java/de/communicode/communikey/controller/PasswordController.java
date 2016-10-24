@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import static de.communicode.communikey.CommunikeyConstants.ENDPOINT_PASSWORDS;
-import static de.communicode.communikey.CommunikeyConstants.REQUEST_PASSWORD_DELETE;
-import static de.communicode.communikey.CommunikeyConstants.REQUEST_PASSWORD_EDIT;
-import static de.communicode.communikey.CommunikeyConstants.REQUEST_PASSWORD_NEW;
-import static de.communicode.communikey.CommunikeyConstants.TEMPLATE_PASSWORD_EDIT;
-import static de.communicode.communikey.CommunikeyConstants.TEMPLATE_PASSWORD_NEW;
-import static de.communicode.communikey.CommunikeyConstants.asRedirect;
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_PASSWORDS;
+import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PASSWORD_DELETE;
+import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PASSWORD_EDIT;
+import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PASSWORD_NEW;
+import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_PASSWORD_EDIT;
+import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_PASSWORD_NEW;
+import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
 
 /**
  * The controller for all password endpoints.

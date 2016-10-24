@@ -6,11 +6,11 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.CommunikeyConstants.ENDPOINT_PASSWORDS;
-import static de.communicode.communikey.CommunikeyConstants.ENDPOINT_ROOT;
-import static de.communicode.communikey.CommunikeyConstants.asRedirect;
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_PASSWORDS;
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_ROOT;
+import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
 
-import de.communicode.communikey.CommunikeyConstants;
+import de.communicode.communikey.config.CommunikeyConstants;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**

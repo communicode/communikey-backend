@@ -6,9 +6,9 @@
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.CommunikeyConstants.TABLE_USERS;
-import static de.communicode.communikey.CommunikeyConstants.TABLE_USERS_COLUMN_ENABLED;
-import static de.communicode.communikey.CommunikeyConstants.TABLE_USERS_COLUMN_USER_ID;
+import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USERS;
+import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USERS_COLUMN_ENABLED;
+import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USERS_COLUMN_USER_ID;
 
 import de.communicode.communikey.type.UserRoleType;
 

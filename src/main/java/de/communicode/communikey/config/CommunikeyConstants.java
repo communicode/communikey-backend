@@ -4,7 +4,7 @@
  * Proprietary and confidential
  * 2016
  */
-package de.communicode.communikey;
+package de.communicode.communikey.config;
 
 /**
  * Provides constants for the communikey application.
@@ -50,6 +50,13 @@ public final class CommunikeyConstants {
      * @since 0.2.0
      */
     public static final String ENDPOINT_HTTP_STATUS_CODE_403 = "/accessDenied";
+
+    /**
+     * The endpoint for the {@code 404} HTTP status code.
+     *
+     * @since 0.2.0
+     */
+    public static final String ENDPOINT_HTTP_STATUS_CODE_404 = "/error/404";
 
     /**
      * The endpoint for {@link de.communicode.communikey.domain.Password} entities.
@@ -127,34 +134,4 @@ public final class CommunikeyConstants {
      * The path to the template file to create a new {@link de.communicode.communikey.domain.Password} entity.
      */
     public static final String TEMPLATE_PASSWORD_NEW  = "passwords-new";
-
-    /**
-     * Prefixes the given {@code endpoint} with the {@code redirect:/} string.
-     *
-     * @param endpoint the endpoint to prepend the redirection to
-     * @return the string with the prepended redirection string
-     */
-    public static String asRedirect(String endpoint) {
-        return "redirect:" + endpoint;
-    }
-
-    /**
-     * Suffixes the given {@code parameters} with the ampersand character ({@code &}) to the given {@code endpoint}.
-     *
-     * @param endpoint the endpoint to append the {@code parameters} to
-     * @param parameters the parameters to be appended to the {@code endpoint}
-     * @return the endpoint string with the appended parameters
-     * @since 0.2.0
-     */
-    public static String withParameters(String endpoint, String... parameters) {
-        if (parameters.length == 1) {
-            return endpoint + "?" + parameters[0];
-        } else {
-            StringBuilder sb = new StringBuilder(endpoint);
-            for (String parameter : parameters) {
-                sb.append("?").append(parameter);
-            }
-            return sb.toString();
-        }
-    }
 }

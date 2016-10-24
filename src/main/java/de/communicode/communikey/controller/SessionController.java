@@ -6,15 +6,15 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.CommunikeyConstants.ENDPOINT_HTTP_STATUS_CODE_403;
-import static de.communicode.communikey.CommunikeyConstants.ENDPOINT_LOGIN;
-import static de.communicode.communikey.CommunikeyConstants.ENDPOINT_LOGOUT;
-import static de.communicode.communikey.CommunikeyConstants.REQUEST_PARAM_LOGIN_LOGOUT;
-import static de.communicode.communikey.CommunikeyConstants.TEMPLATE_HTTP_STATUS_CODE_403;
-import static de.communicode.communikey.CommunikeyConstants.asRedirect;
-import static de.communicode.communikey.CommunikeyConstants.withParameters;
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_HTTP_STATUS_CODE_403;
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_LOGIN;
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_LOGOUT;
+import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PARAM_LOGIN_LOGOUT;
+import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_HTTP_STATUS_CODE_403;
+import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
+import static de.communicode.communikey.util.CommunikeyConstantsUtil.withParameters;
 
-import de.communicode.communikey.CommunikeyConstants;
+import de.communicode.communikey.config.CommunikeyConstants;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
