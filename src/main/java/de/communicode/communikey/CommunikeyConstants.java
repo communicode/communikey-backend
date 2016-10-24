@@ -12,7 +12,9 @@ package de.communicode.communikey;
  * @author sgreb@communicode.de
  * @since 0.1.0
  */
-public class CommunikeyConstants {
+public final class CommunikeyConstants {
+
+    private CommunikeyConstants() {}
 
     /**
      * The name of the login session ID cookie.
