@@ -8,9 +8,9 @@ package de.communicode.communikey.config;
 
 import static de.communicode.communikey.config.CommunikeyConstants.COOKIE_LOGIN_SESSION_ID;
 import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_HTTP_STATUS_CODE_403;
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_KEYS;
 import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_LOGIN;
 import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_LOGOUT;
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_PASSWORDS;
 import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_ROOT;
 import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PARAM_LOGIN_LOGOUT;
 import static de.communicode.communikey.util.CommunikeyConstantsUtil.withParameters;
@@ -60,7 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(ENDPOINT_LOGIN).permitAll()
             .antMatchers(
                 ENDPOINT_ROOT,
-                ENDPOINT_PASSWORDS + "/**"
+                ENDPOINT_KEYS + "/**"
             ).access("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
             .and()
             .exceptionHandling().accessDeniedPage(ENDPOINT_HTTP_STATUS_CODE_403)

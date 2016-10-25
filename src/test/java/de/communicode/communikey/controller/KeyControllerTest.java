@@ -6,11 +6,11 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_PASSWORDS;
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_KEYS;
 import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_ROOT;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PASSWORD_NEW;
-import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_PASSWORD_EDIT;
-import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_PASSWORD_NEW;
+import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_KEY_NEW;
+import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_KEY_EDIT;
+import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_KEY_NEW;
 import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -22,30 +22,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
-import de.communicode.communikey.domain.Password;
-import de.communicode.communikey.form.EditPasswordForm;
-import de.communicode.communikey.repository.PasswordRepository;
+import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.form.EditKeyForm;
+import de.communicode.communikey.repository.KeyRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
- * Unit tests for the {@link PasswordController} class.
+ * Unit tests for the {@link KeyController} class.
  *
  * @since 0.1.0
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class PasswordControllerTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+public class KeyControllerTest {
     private MockMvc mockMvc;
     @Autowired
-    private PasswordRepository passwordRepository;
+    private KeyRepository keyRepository;
     @Autowired
     private WebApplicationContext wac;
 
@@ -58,60 +60,62 @@ public class PasswordControllerTest {
     }
 
     @Test
-    public void passwordsEndpoint() throws Exception {
-        mockMvc.perform(get(ENDPOINT_PASSWORDS))
+    public void keysEndpoint() throws Exception {
+        mockMvc.perform(get(ENDPOINT_KEYS))
             .andExpect(status().isOk())
-            .andExpect(view().name(ENDPOINT_PASSWORDS));
+            .andExpect(view().name(ENDPOINT_KEYS));
     }
 
     @Test
-    public void passwordsNewEndpoints() throws Exception {
-        mockMvc.perform(get(REQUEST_PASSWORD_NEW)
+    public void keysNewEndpoints() throws Exception {
+        mockMvc.perform(get(REQUEST_KEY_NEW)
             .with(csrf())
         )
             .andExpect(status().isOk())
-            .andExpect(model().attributeExists("password"))
-            .andExpect(model().attributeExists("newPasswordForm"))
+            .andExpect(model().attributeExists("key"))
+            .andExpect(model().attributeExists("newKeyForm"))
             .andExpect(model().size(2))
-            .andExpect(view().name(TEMPLATE_PASSWORD_NEW));
+            .andExpect(view().name(TEMPLATE_KEY_NEW));
 
-        mockMvc.perform(post(REQUEST_PASSWORD_NEW)
+        mockMvc.perform(post(REQUEST_KEY_NEW)
             .with(csrf())
         )
-            .andExpect(view().name(asRedirect(ENDPOINT_PASSWORDS)))
+            .andExpect(view().name(asRedirect(ENDPOINT_KEYS)))
             .andExpect(status().is3xxRedirection());
     }
 
     @Test
-    public void passwordsEditEndpoints() throws Exception {
-        Password password = new Password("yogurt");
-        passwordRepository.save(password);
+    public void keysEditEndpoints() throws Exception {
+        Key key = new Key("yogurt");
+        keyRepository.save(key);
 
-        mockMvc.perform(get("/passwords/1/edit"))
+        mockMvc.perform(get("/keys/1/edit")
+            .with(csrf())
+        )
             .andExpect(status().isOk())
-            .andExpect(view().name(TEMPLATE_PASSWORD_EDIT))
-            .andExpect(model().attributeExists("password"))
-            .andExpect(model().attributeExists("editPasswordForm"))
+            .andExpect(view().name(TEMPLATE_KEY_EDIT))
+            .andExpect(model().attributeExists("key"))
+            .andExpect(model().attributeExists("editKeyForm"))
             .andExpect(model().size(2));
 
-        EditPasswordForm editPasswordForm = new EditPasswordForm();
-        editPasswordForm.setValue("newPassword");
+        EditKeyForm editKeyForm = new EditKeyForm();
+        editKeyForm.setValue("newKey");
 
-        mockMvc.perform(post("/passwords/1/edit").with(csrf())
-            .flashAttr("editPasswordForm", editPasswordForm)
+        mockMvc.perform(post("/keys/1/edit").with(csrf())
+            .flashAttr("editKeyForm", editKeyForm)
         )
             .andExpect(status().isFound())
-            .andExpect(view().name(asRedirect(ENDPOINT_PASSWORDS)))
-            .andExpect(redirectedUrl(ENDPOINT_PASSWORDS));
+            .andExpect(view().name(asRedirect(ENDPOINT_KEYS)))
+            .andExpect(redirectedUrl(ENDPOINT_KEYS));
     }
 
     @Test
-    public void passwordsDeleteRedirectionEndpoint() throws Exception {
-        Password password = new Password("yogurt");
-        passwordRepository.save(password);
+    public void keysDeleteRedirectionEndpoint() throws Exception {
+        Key key = new Key("yogurt");
+        keyRepository.save(key);
 
-        mockMvc.perform(get("/passwords/1/delete"))
-            .andExpect(view().name(asRedirect(ENDPOINT_PASSWORDS)))
+        mockMvc.perform(get("/keys/1/delete"))
+            .andExpect(view().name(asRedirect(ENDPOINT_KEYS)))
             .andExpect(status().is3xxRedirection());
     }
 }
