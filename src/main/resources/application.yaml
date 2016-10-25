@@ -10,6 +10,3 @@ spring:
       ddl-auto: create-drop
   thymeleaf:
     cache: false
-security:
-  basic:
-    enabled: false

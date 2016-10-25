@@ -1,0 +1,158 @@
+body {
+    background-color: #ECEFF4;
+    color: #4C566A;
+    font-size: 15px;
+}
+
+footer {
+    text-align: center;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    color: #4C566A;
+    margin: 10px auto;
+}
+
+a {
+    color: #4C566A;
+    outline: 0 !important;
+}
+
+.ckInput {
+    font-family: FontAwesome;
+    font-size: 1.2em;
+    background-color: #4C566A;
+    border: 1px solid #4C566A;
+    width: 100%;
+    margin-top: 20px;
+    outline: 0 none;
+    padding: 4px;
+    color: #88C0D0;
+    transition: all 400ms ease;
+    -moz-transition: all 400ms ease;
+    -webkit-transition: all 400ms ease;
+}
+
+.ckInput:focus {
+    border-color: #D8DEE9;
+    background-color: #D8DEE9;
+    color: #4C566A;
+}
+
+.ckInput::-webkit-input-placeholder {
+    opacity: 1.0;
+}
+
+.ckInput:-ms-input-placeholder {
+    opacity: 1.0;
+}
+
+.ckInput::-moz-placeholder {
+    opacity: 1.0;
+}
+
+.ckInput:-moz-placeholder {
+    opacity: 1.0;
+}
+
+.ckButton {
+    background-color: transparent;
+    border: 1px solid #ECEFF4;
+    border-radius: 4px;
+    color: #ECEFF4;
+    margin-top: 20px;
+    padding: 2px 10px;
+    outline: 0 none;
+    transition: all 400ms ease;
+    -moz-transition: all 400ms ease;
+    -webkit-transition: all 400ms ease;
+}
+
+.ckButtonDefault {
+    border-color: #ECEFF4;
+}
+
+.ckButtonDefault:hover {
+    background-color: #ECEFF4;
+    color: #434C5E;
+}
+
+.ckText {
+    margin-top: 20px;
+}
+
+.frame {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    text-align: center;
+}
+
+.frameLogo {
+    padding-top: 15%;
+    font-size: 150pt;
+}
+
+.frameMove {
+    transition: transform 2s;
+    transform: translate(0px, -250px);
+}
+
+.frameLogin {
+    padding: 35px 55px 35px;
+    color: #FFFFFF;
+    background-color: #434C5E;
+    box-shadow: 0 1px 11px #434C5E;
+    border-radius: 2px;
+    width: 600px;
+    height: 380px;
+    display: none;
+    animation: fadein 2s;
+    -moz-animation: fadein 2s;
+    -webkit-animation: fadein 2s;
+}
+
+.frameLogin a {
+    color: #ECEFF4;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-moz-keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-o-keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

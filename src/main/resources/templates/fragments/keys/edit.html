@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <div th:fragment="keys-edit">
+    <form method="post" name="key_form" id="key_form" role="form">
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Key ID</label>
+        <div class="col-sm-10">
+          <p th:text="${key.id}"/>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="key_value" class="col-sm-2 col-form-label">Value</label>
+        <div class="col-sm-10">
+          <input th:field="${editKeyForm.value}" th:value="${editKeyForm.value}" class="form-control" id="key_value" type="text"/>
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        </div>
+      </div>
+      <div class="pull-right" role="group">
+        <button class="btn btn-outline-primary" type="submit">Save</button>
+        <a th:href="@{/keys}">
+          <div class="btn btn-outline-secondary">Cancel</div>
+        </a>
+      </div>
+    </form>
+  </div>
+</html>
