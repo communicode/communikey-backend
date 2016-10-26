@@ -6,9 +6,9 @@
  */
 package de.communicode.communikey.controller;
 
+import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_KEYS;
 import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_LOGIN;
 import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_LOGOUT;
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_PASSWORDS;
 import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PARAM_LOGIN_LOGOUT;
 import static de.communicode.communikey.util.CommunikeyConstantsUtil.withParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
@@ -55,7 +55,7 @@ public class SessionControllerTest {
     public void loginWithCSRFProtection() throws Exception {
         mockMvc.perform(formLogin(ENDPOINT_LOGIN))
             .andExpect(status().isFound())
-            .andExpect(redirectedUrl(ENDPOINT_PASSWORDS));
+            .andExpect(redirectedUrl(ENDPOINT_KEYS));
     }
 
     @Test

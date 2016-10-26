@@ -6,13 +6,15 @@
  */
 package de.communicode.communikey.form;
 
+import de.communicode.communikey.domain.Key;
+
 /**
- * The form to create new {@link de.communicode.communikey.domain.Password} entities.
+ * The form to create new {@link Key} entities.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
  */
-public class NewPasswordForm {
+public class NewKeyForm {
   private String value;
 
   public String getValue() {

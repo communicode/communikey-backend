@@ -59,12 +59,12 @@ public final class CommunikeyConstants {
     public static final String ENDPOINT_HTTP_STATUS_CODE_404 = "/error/404";
 
     /**
-     * The endpoint for {@link de.communicode.communikey.domain.Password} entities.
+     * The endpoint for {@link de.communicode.communikey.domain.Key} entities.
      */
-    public static final String ENDPOINT_PASSWORDS = "/passwords";
+    public static final String ENDPOINT_KEYS = "/keys";
 
     /**
-     * The name of the model attribute for {@link de.communicode.communikey.domain.Password} IDs.
+     * The name of the model attribute for {@link de.communicode.communikey.domain.Key} IDs.
      */
     public static final String MODEL_ID = "id";
 
@@ -76,19 +76,26 @@ public final class CommunikeyConstants {
     public static final String REQUEST_PARAM_LOGIN_LOGOUT = "logout";
 
     /**
-     * The endpoint mapping for {@link de.communicode.communikey.domain.Password} edit requests.
+     * The endpoint mapping for {@link de.communicode.communikey.domain.Key} edit requests.
      */
-    public static final String REQUEST_PASSWORD_EDIT = ENDPOINT_PASSWORDS + "/" + "{" + MODEL_ID + "}" + "/edit";
+    public static final String REQUEST_KEY_EDIT = ENDPOINT_KEYS + "/" + "{" + MODEL_ID + "}" + "/edit";
 
     /**
-     * The endpoint mapping for {@link de.communicode.communikey.domain.Password} delete requests.
+     * The endpoint mapping for {@link de.communicode.communikey.domain.Key} delete requests.
      */
-    public static final String REQUEST_PASSWORD_DELETE = ENDPOINT_PASSWORDS + "/" + "{" + MODEL_ID + "}" + "/delete";
+    public static final String REQUEST_KEY_DELETE = ENDPOINT_KEYS + "/" + "{" + MODEL_ID + "}" + "/delete";
 
     /**
-     * The endpoint mapping for new {@link de.communicode.communikey.domain.Password} requests.
+     * The endpoint mapping for new {@link de.communicode.communikey.domain.Key} requests.
      */
-    public static final String REQUEST_PASSWORD_NEW = ENDPOINT_PASSWORDS + "/new";
+    public static final String REQUEST_KEY_NEW = ENDPOINT_KEYS + "/new";
+
+    /**
+     * The name of the table for {@link de.communicode.communikey.domain.Key} entities.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_KEYS = "\"keys\"";
 
     /**
      * The name of the table for the link table of {@link de.communicode.communikey.domain.UserGroup}- and {@link de.communicode.communikey.domain.User}
@@ -111,6 +118,13 @@ public final class CommunikeyConstants {
      * @since 0.2.0
      */
     public static final String TABLE_USERS = "users";
+
+    /**
+     * The name of the column for {@link de.communicode.communikey.domain.Key} entity IDs.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_KEYS_COLUMN_KEY_ID = "key_id";
 
     /**
      * The name of the column for {@link de.communicode.communikey.domain.User} entity IDs.
@@ -155,12 +169,12 @@ public final class CommunikeyConstants {
     public static final String TEMPLATE_HTTP_STATUS_CODE_403 = "error/403";
 
     /**
-     * The path to the template file to edit {@link de.communicode.communikey.domain.Password} entities.
+     * The path to the template file to edit {@link de.communicode.communikey.domain.Key} entities.
      */
-    public static final String TEMPLATE_PASSWORD_EDIT = "passwords-edit";
+    public static final String TEMPLATE_KEY_EDIT = "keys-edit";
 
     /**
-     * The path to the template file to create a new {@link de.communicode.communikey.domain.Password} entity.
+     * The path to the template file to create a new {@link de.communicode.communikey.domain.Key} entity.
      */
-    public static final String TEMPLATE_PASSWORD_NEW  = "passwords-new";
+    public static final String TEMPLATE_KEY_NEW  = "keys-new";
 }

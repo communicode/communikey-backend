@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <div th:fragment="keys-list">
+    <div class="btn-group pull-right" role="group">
+      <a class="btn btn-outline-primary" th:href="@{'/keys/new'}">New Key</a>
+    </div>
+    <table class="table table-striped" id="keys_list">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Value</th>
+          <th>Creation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!--/*@thymesVar id="keys" type="java.lang.Iterable<de.communicode.communikey.domain.Key>"*/-->
+        <tr th:each="key : ${keys}">
+          <!--/*@thymesVar id="key" type="de.communicode.communikey.domain.Key"*/-->
+          <td class="message" th:text="${key.id}"></td>
+          <td class="message" th:text="${key.value}"></td>
+          <td class="message" th:text="${#dates.format(key.creationTimestamp, 'yyyy-MM-dd hh:mm:ss')}"></td>
+          <td>
+            <a th:href="@{'/keys/{id}/edit'(id=${key.id})}" class="edit"
+               th:attr="name=${key.value}">
+              <span class="fa-stack">
+                <i class="fa fa-pencil fa-lg"></i>
+              </span>
+            </a>
+            <a th:href="@{'/keys/{id}/delete'(id=${key.id})}" class="delete"
+               th:attr="name=${key.value}">
+              <span class="fa-stack">
+                <i class="fa fa-trash-o fa-lg"></i>
+              </span>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</html>

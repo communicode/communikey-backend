@@ -82,7 +82,7 @@ public class User {
      *
      * @param username the name of the user
      * @param password the password of the user
-     * @param role     the {@link UserRoleType} of the user
+     * @param role the {@link UserRoleType} of the user
      */
     public User(String username, String password, UserRoleType role, Set<UserGroup> groups)  {
         this.groups = groups;

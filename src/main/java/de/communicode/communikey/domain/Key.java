@@ -6,6 +6,9 @@
  */
 package de.communicode.communikey.domain;
 
+import static de.communicode.communikey.config.CommunikeyConstants.TABLE_KEYS;
+import static de.communicode.communikey.config.CommunikeyConstants.TABLE_KEYS_COLUMN_KEY_ID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GenerationType;
@@ -17,24 +20,24 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 
 /**
- * Represents a password entity.
+ * Represents a key entity.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
  */
 @Entity
-@Table(name = "credential_passwords")
-public class Password {
+@Table(name = TABLE_KEYS)
+public class Key {
     @Id
-    @Column(name = "CREDENTIAL_PASSWORD_ID")
+    @Column(name = TABLE_KEYS_COLUMN_KEY_ID)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private Timestamp creationTimestamp;
     private String value;
 
-    private Password() {}
+    private Key() {}
 
-    public Password(String value) {
+    public Key(String value) {
         this.value = value;
         long time = Calendar.getInstance().getTimeInMillis();
         this.creationTimestamp = new Timestamp(time);

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
- * Service to interact with the {@link de.communicode.communikey.repository.PasswordRepository}.
+ * Service to interact with the {@link de.communicode.communikey.repository.KeyRepository}.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
