@@ -61,7 +61,7 @@ public class User {
             )
         }
     )
-    private Set<UserGroup> groups = new HashSet<>();
+    private Set<UserGroup> groups;
 
     @Column(name = TABLE_USERS_COLUMN_ENABLED, nullable = false)
     private boolean isEnabled;
@@ -85,7 +85,7 @@ public class User {
      * @param role the {@link UserRoleType} of the user
      */
     public User(String username, String password, UserRoleType role, Set<UserGroup> groups)  {
-        this.groups = groups;
+        this.groups = new HashSet<>(groups);
         isEnabled = true;
         this.password = password;
         this.username = username;
@@ -97,7 +97,7 @@ public class User {
     }
 
     public Set<UserGroup> getGroups() {
-        return groups;
+        return new HashSet<>(groups);
     }
 
     public String getPassword() {
@@ -113,7 +113,7 @@ public class User {
     }
 
     public void setGroups(Set<UserGroup> groups) {
-        this.groups = groups;
+        this.groups = new HashSet<>(groups);
     }
 
     public boolean isEnabled() {
