@@ -14,6 +14,8 @@ import javax.persistence.Entity;
 import javax.persistence.GenerationType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import java.sql.Timestamp;
@@ -32,6 +34,11 @@ public class Key {
     @Column(name = TABLE_KEYS_COLUMN_KEY_ID)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    @ManyToOne
+    @JoinColumn(name = "creator_user_id")
+    private User creator;
+
     private Timestamp creationTimestamp;
     private String value;
 
@@ -51,12 +58,32 @@ public class Key {
         return creationTimestamp;
     }
 
+    /**
+     * @since 0.2.0
+     * @return the creator of this key
+     */
+    public User getCreator() {
+        return creator;
+    }
+
+    public long getId() {
+        return id;
+    }
+
     public String getValue() {
         return value;
     }
 
     public void setCreationTimestamp(Timestamp creationTimestamp) {
         this.creationTimestamp = creationTimestamp;
+    }
+
+    /**
+     * @since 0.2.0
+     * @param creator the creator of this key
+     */
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
     public void setValue(String value) {

@@ -24,6 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import java.util.HashSet;
@@ -42,6 +43,9 @@ public class User {
     @Column(name = TABLE_USERS_COLUMN_USER_ID, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator")
+    private Set<Key> keys;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
@@ -78,13 +82,35 @@ public class User {
     private User() {}
 
     /**
-     * Constructs a new user entity object with an auto-generated ID.
+     * Constructs a new user entity object with an auto-generated ID, the default user role {@link UserRoleType#ROLE_USER} and no assigned user groups.
+     *
+     * @param username the name of the user
+     * @param password the password of the user
+     */
+    public User(String username, String password) {
+        this(username, password, UserRoleType.ROLE_USER, new HashSet<>(0));
+    }
+
+    /**
+     * Constructs a new user entity object with an auto-generated ID and no assigned user groups.
      *
      * @param username the name of the user
      * @param password the password of the user
      * @param role the {@link UserRoleType} of the user
      */
-    public User(String username, String password, UserRoleType role, Set<UserGroup> groups)  {
+    public User(String username, String password, UserRoleType role) {
+        this(username, password, role, new HashSet<>(0));
+    }
+
+    /**
+     * Constructs a new user entity object with an auto-generated ID.
+     *
+     * @param username the name of the user
+     * @param password the password of the user
+     * @param role the {@link UserRoleType} of the user
+     * @param groups a collection {@link UserGroup} to assign the user to
+     */
+    public User(String username, String password, UserRoleType role, Set<UserGroup> groups) {
         this.groups = new HashSet<>(groups);
         isEnabled = true;
         this.password = password;
@@ -98,6 +124,10 @@ public class User {
 
     public Set<UserGroup> getGroups() {
         return new HashSet<>(groups);
+    }
+
+    public Set<Key> getKeys() {
+        return keys;
     }
 
     public String getPassword() {
@@ -114,6 +144,10 @@ public class User {
 
     public void setGroups(Set<UserGroup> groups) {
         this.groups = new HashSet<>(groups);
+    }
+
+    public void setKeys(Set<Key> keys) {
+        this.keys = keys;
     }
 
     public boolean isEnabled() {
