@@ -106,6 +106,13 @@ public final class CommunikeyConstants {
     public static final String TABLE_LINK_USERS_TO_USER_GROUPS = "link_users_to_user_groups";
 
     /**
+     * The name of the table for {@link de.communicode.communikey.domain.KeyCategory} entities.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_CATEGORIES = "categories";
+
+    /**
      * The name of the table for {@link de.communicode.communikey.domain.UserGroup} entities.
      *
      * @since 0.2.0
@@ -120,11 +127,46 @@ public final class CommunikeyConstants {
     public static final String TABLE_USERS = "users";
 
     /**
+     * The name of the column for {@link de.communicode.communikey.domain.KeyCategory} entity IDs.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_CATEGORIES_COLUMN_KEY_CATEGORY_ID = "key_category_id";
+
+    /**
+     * The name of the column for {@link de.communicode.communikey.domain.KeyCategory} entity creator {@link de.communicode.communikey.domain.User} IDs.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_CATEGORIES_CREATOR_USER_ID = "creator_user_id";
+
+    /**
+     * The name of the column for {@link de.communicode.communikey.domain.KeyCategory} entity esponsible {@link de.communicode.communikey.domain.User} IDs.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_CATEGORIES_RESPONSIBLE_USER_ID = "responsible_user_id";
+
+    /**
+     * The name of the column for the {@link de.communicode.communikey.domain.Key} entity creator {@link de.communicode.communikey.domain.User} IDs.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_KEYS_COLUMN_CREATOR_USER_ID = "creator_user_id";
+
+    /**
      * The name of the column for {@link de.communicode.communikey.domain.Key} entity IDs.
      *
      * @since 0.2.0
      */
     public static final String TABLE_KEYS_COLUMN_KEY_ID = "key_id";
+
+    /**
+     * The name of the column for the {@link de.communicode.communikey.domain.Key} entity {@link de.communicode.communikey.domain.KeyCategory} IDs.
+     *
+     * @since 0.2.0
+     */
+    public static final String TABLE_KEYS_COLUMN_KEY_CATEGORY_ID = "key_category_id";
 
     /**
      * The name of the column for {@link de.communicode.communikey.domain.User} entity IDs.

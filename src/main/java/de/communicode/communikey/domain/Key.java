@@ -7,6 +7,8 @@
 package de.communicode.communikey.domain;
 
 import static de.communicode.communikey.config.CommunikeyConstants.TABLE_KEYS;
+import static de.communicode.communikey.config.CommunikeyConstants.TABLE_KEYS_COLUMN_CREATOR_USER_ID;
+import static de.communicode.communikey.config.CommunikeyConstants.TABLE_KEYS_COLUMN_KEY_CATEGORY_ID;
 import static de.communicode.communikey.config.CommunikeyConstants.TABLE_KEYS_COLUMN_KEY_ID;
 
 import javax.persistence.Column;
@@ -14,10 +16,13 @@ import javax.persistence.Entity;
 import javax.persistence.GenerationType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Optional;
 
 /**
  * Represents a key entity.
@@ -32,6 +37,15 @@ public class Key {
     @Column(name = TABLE_KEYS_COLUMN_KEY_ID)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    @ManyToOne
+    @JoinColumn(name = TABLE_KEYS_COLUMN_CREATOR_USER_ID, nullable = false)
+    private User creator;
+
+    @ManyToOne
+    @JoinColumn(name = TABLE_KEYS_COLUMN_KEY_CATEGORY_ID)
+    private KeyCategory category;
+
     private Timestamp creationTimestamp;
     private String value;
 
@@ -43,20 +57,44 @@ public class Key {
         this.creationTimestamp = new Timestamp(time);
     }
 
-    public long getId() {
-        return id;
+    public Optional<KeyCategory> getCategory() {
+        return Optional.of(category);
     }
 
     public Timestamp getCreationTimestamp() {
         return creationTimestamp;
     }
 
+    /**
+     * @return the creator of this key
+     * @since 0.2.0
+     */
+    public User getCreator() {
+        return creator;
+    }
+
+    public long getId() {
+        return id;
+    }
+
     public String getValue() {
         return value;
     }
 
+    public void setCategory(KeyCategory category) {
+        this.category = category;
+    }
+
     public void setCreationTimestamp(Timestamp creationTimestamp) {
         this.creationTimestamp = creationTimestamp;
+    }
+
+    /**
+     * @param creator the creator of this key
+     * @since 0.2.0
+     */
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
     public void setValue(String value) {
