@@ -51,7 +51,8 @@ public class Key {
 
     private Key() {}
 
-    public Key(String value) {
+    public Key(String value, User creator) {
+        this.creator = creator;
         this.value = value;
         long time = Calendar.getInstance().getTimeInMillis();
         this.creationTimestamp = new Timestamp(time);
