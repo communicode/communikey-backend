@@ -98,6 +98,14 @@ public class KeyCategory {
         this.childs = childs;
     }
 
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public void setKeys(Set<Key> keys) {
         this.keys = keys;
     }

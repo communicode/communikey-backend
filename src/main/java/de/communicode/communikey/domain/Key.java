@@ -22,7 +22,6 @@ import javax.persistence.Table;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.Optional;
 
 /**
  * Represents a key entity.
@@ -58,8 +57,8 @@ public class Key {
         this.creationTimestamp = new Timestamp(time);
     }
 
-    public Optional<KeyCategory> getCategory() {
-        return Optional.of(category);
+    public KeyCategory getCategory() {
+        return this.category;
     }
 
     public Timestamp getCreationTimestamp() {
@@ -84,18 +83,6 @@ public class Key {
 
     public void setCategory(KeyCategory category) {
         this.category = category;
-    }
-
-    public void setCreationTimestamp(Timestamp creationTimestamp) {
-        this.creationTimestamp = creationTimestamp;
-    }
-
-    /**
-     * @param creator the creator of this key
-     * @since 0.2.0
-     */
-    public void setCreator(User creator) {
-        this.creator = creator;
     }
 
     public void setValue(String value) {
