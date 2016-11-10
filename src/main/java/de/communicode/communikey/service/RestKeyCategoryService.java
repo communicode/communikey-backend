@@ -11,6 +11,9 @@ import static java.util.Objects.requireNonNull;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
+import de.communicode.communikey.exception.KeyCategoryNotFoundException;
+import de.communicode.communikey.exception.KeyNotFoundException;
+import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.KeyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +25,13 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
-public class KeyCategoryServiceImpl implements KeyCategoryService {
+public class RestKeyCategoryService implements KeyCategoryService {
 
     private final KeyCategoryRepository keyCategoryRepository;
     private final KeyRepository keyRepository;
 
     @Autowired
-    public KeyCategoryServiceImpl(KeyCategoryRepository keyCategoryRepository, KeyRepository keyRepository) {
+    public RestKeyCategoryService(KeyCategoryRepository keyCategoryRepository, KeyRepository keyRepository) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
     }
@@ -46,7 +49,7 @@ public class KeyCategoryServiceImpl implements KeyCategoryService {
     }
 
     @Override
-    public Set<KeyCategory> getAllByCreator(User creator) throws NullPointerException {
+    public Set<KeyCategory> getAllByCreator(User creator) throws UserNotFoundException { //TODO: exception
         requireNonNull(creator, "creator must not be null!");
         return creator.getKeyCategories();
     }
@@ -60,30 +63,36 @@ public class KeyCategoryServiceImpl implements KeyCategoryService {
     }
 
     @Override
-    public Set<KeyCategory> getAllByParent(KeyCategory category) throws NullPointerException {
+    public Set<KeyCategory> getAllByParent(KeyCategory category) throws KeyCategoryNotFoundException { //TODO: exception
         requireNonNull(category, "category must not be null!");
         return keyCategoryRepository.findAllByParent(category);
     }
 
     @Override
-    public Set<KeyCategory> getAllByResponsible(User responsible) throws NullPointerException {
+    public Set<KeyCategory> getAllByResponsible(User responsible) throws UserNotFoundException { //TODO: exception
         requireNonNull(responsible, "responsible must not be null!");
         return keyCategoryRepository.findAllByResponsible(responsible);
     }
 
     @Override
-    public KeyCategory getById(long id) throws NullPointerException {
+    public Set<Key> getAllKeys(KeyCategory category) throws KeyCategoryNotFoundException { //TODO: exception
+        requireNonNull(category, "category must not be null!");
+        return category.getKeys();
+    }
+
+    @Override
+    public KeyCategory getById(long id) throws KeyCategoryNotFoundException { //TODO: exception
         return requireNonNull(keyCategoryRepository.findOneById(id), "key category must not be null!");
     }
 
     @Override
-    public Set<KeyCategory> getChilds(KeyCategory category) throws NullPointerException {
+    public Set<KeyCategory> getChilds(KeyCategory category) throws KeyCategoryNotFoundException { //TODO: exception
         requireNonNull(category, "category must not be null!");
         return category.getChilds();
     }
 
     @Override
-    public Optional<Key> getKey(long id, KeyCategory category) throws NullPointerException {
+    public Optional<Key> getKey(long id, KeyCategory category) throws KeyCategoryNotFoundException { //TODO: exception
         requireNonNull(category, "category must not be null!");
         return category.getKeys().stream()
             .filter(key -> keyRepository.findOneById(id).equals(key))
@@ -91,26 +100,21 @@ public class KeyCategoryServiceImpl implements KeyCategoryService {
     }
 
     @Override
-    public Set<Key> getAllKeys(KeyCategory category) throws NullPointerException {
-        requireNonNull(category, "category must not be null!");
-        return category.getKeys();
-    }
-
-    @Override
     public Optional<KeyCategory> getParent(KeyCategory category) {
         requireNonNull(category, "category must not be null!");
+        //return category.getParent();
         return category.getParent();
     }
 
     @Override
-    public boolean hasChild(KeyCategory parentCategory, KeyCategory category) throws NullPointerException {
+    public boolean hasChild(KeyCategory parentCategory, KeyCategory category) throws KeyCategoryNotFoundException { //TODO: exception
         requireNonNull(parentCategory, "parentCategory must not be null!");
         requireNonNull(category, "category must not be null!");
         return parentCategory.getChilds().contains(category);
     }
 
     @Override
-    public boolean hasKey(Key key, KeyCategory category) throws NullPointerException {
+    public boolean hasKey(Key key, KeyCategory category) throws KeyNotFoundException, KeyCategoryNotFoundException { //TODO: exception
         requireNonNull(key, "key must not be null!");
         requireNonNull(category, "category must not be null!");
         return category.getKeys().contains(key);
@@ -129,5 +133,10 @@ public class KeyCategoryServiceImpl implements KeyCategoryService {
     public KeyCategory save(KeyCategory category) throws NullPointerException {
         requireNonNull(category, "category must not be null!");
         return keyCategoryRepository.save(category);
+    }
+
+    @Override
+    public KeyCategory validate(long keyCategoryId) throws KeyCategoryNotFoundException {
+        return Optional.ofNullable(keyCategoryRepository.findOneById(keyCategoryId)).orElseThrow(() -> new KeyCategoryNotFoundException(keyCategoryId));
     }
 }
