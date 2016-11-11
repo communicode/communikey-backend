@@ -20,6 +20,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 /**
  * Represents a user group entity.
@@ -44,7 +45,7 @@ public class UserGroup {
     private UserGroup() {}
 
     /**
-     * Constructs a new user group entity object with an auto-generated ID.
+     * Constructs a new user group entity object with the given attributes and an auto-generated ID with no {@link User} assigned to.
      *
      * @param name the name of the user group
      */
@@ -60,7 +61,15 @@ public class UserGroup {
         return this.name;
     }
 
+    public Set<User> getUsers() {
+        return users;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 }

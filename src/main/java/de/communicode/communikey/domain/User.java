@@ -12,6 +12,8 @@ import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USERS_C
 import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USERS_COLUMN_USER_ID;
 import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USER_GROUPS_COLUMN_USER_GROUP_ID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.communicode.communikey.exception.UserGroupNotFoundException;
 import de.communicode.communikey.type.UserRoleType;
 
 import javax.persistence.CascadeType;
@@ -76,6 +78,7 @@ public class User {
     private boolean isEnabled;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(nullable = false)
@@ -87,7 +90,8 @@ public class User {
     private User() {}
 
     /**
-     * Constructs a new user entity object with an auto-generated ID, the default user role {@link UserRoleType#ROLE_USER} and no assigned user groups.
+     * Constructs a new user entity object with the given attributes, an auto-generated ID, the default user role {@link UserRoleType#ROLE_USER} and no
+     * assigned user groups.
      *
      * @param username the name of the user
      * @param password the password of the user
@@ -97,7 +101,7 @@ public class User {
     }
 
     /**
-     * Constructs a new user entity object with an auto-generated ID and no assigned user groups.
+     * Constructs a new user entity object with the given attributes, an auto-generated ID and no assigned user groups.
      *
      * @param username the name of the user
      * @param password the password of the user
@@ -108,7 +112,7 @@ public class User {
     }
 
     /**
-     * Constructs a new user entity object with an auto-generated ID.
+     * Constructs a new user entity object with the given attributes and an auto-generated ID.
      *
      * @param username the name of the user
      * @param password the password of the user
@@ -123,16 +127,16 @@ public class User {
         this.role = role.name();
     }
 
+    public Set<UserGroup> getGroups() {
+        return new HashSet<>(groups);
+    }
+
     public long getId() {
         return id;
     }
 
     public Set<KeyCategory> getKeyCategories() {
         return keyCategories;
-    }
-
-    public Set<UserGroup> getGroups() {
-        return new HashSet<>(groups);
     }
 
     public Set<Key> getKeys() {
@@ -143,10 +147,6 @@ public class User {
         return password;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
     public Set<KeyCategory> getResponsibleKeyCategories() {
         return responsibleKeyCategories;
     }
@@ -155,16 +155,8 @@ public class User {
         return role;
     }
 
-    public void setKeyCategories(Set<KeyCategory> keyCategories) {
-        this.keyCategories = keyCategories;
-    }
-
-    public void setGroups(Set<UserGroup> groups) {
-        this.groups = new HashSet<>(groups);
-    }
-
-    public void setKeys(Set<Key> keys) {
-        this.keys = keys;
+    public String getUsername() {
+        return username;
     }
 
     public boolean isEnabled() {
@@ -175,12 +167,20 @@ public class User {
         isEnabled = enabled;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setGroups(Set<UserGroup> groups) {
+        this.groups = new HashSet<>(groups);
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setKeyCategories(Set<KeyCategory> keyCategories) {
+        this.keyCategories = keyCategories;
+    }
+
+    public void setKeys(Set<Key> keys) {
+        this.keys = keys;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setResponsibleKeyCategories(Set<KeyCategory> responsibleKeyCategories) {
@@ -189,5 +189,9 @@ public class User {
 
     public void setRole(UserRoleType role) {
         this.role = role.name();
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

@@ -50,6 +50,12 @@ public class Key {
 
     private Key() {}
 
+    /**
+     * Constructs a new key entity object with the given attributes, an auto-generated ID and creation timestamp.
+     *
+     * @param value the value of the key
+     * @param creator the {@link User} who created this key
+     */
     public Key(String value, User creator) {
         this.creator = creator;
         this.value = value;
