@@ -6,11 +6,12 @@
  */
 package de.communicode.communikey.exception;
 
+import de.communicode.communikey.domain.UserGroup;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Thrown to indicate that a method has been passed an not existing {@link de.communicode.communikey.domain.Key} entity.
+ * Thrown to indicate that a method has been passed an not existing {@link UserGroup} entity.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -19,11 +20,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class UserGroupNotFoundException extends RuntimeException {
 
     /**
-     * Constructs an {@code UserGroupNotFoundException} with the given {@code userGroupId} applied to the message.
+     * Constructs an {@code UserGroupNotFoundException} with the specified {@link UserGroup} ID applied to the message.
      *
-     * @param userGroupId the ID of the {@link de.communicode.communikey.domain.UserGroup} entity
+     * @param userGroupId the ID of the user group ID entity that has not been found
      */
     public UserGroupNotFoundException(long userGroupId) {
-        super("could not find user group '" + userGroupId + "'.");
+        super("could not find user group with ID" + userGroupId);
     }
 }

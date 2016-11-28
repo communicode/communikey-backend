@@ -6,11 +6,12 @@
  */
 package de.communicode.communikey.exception;
 
+import de.communicode.communikey.domain.Key;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Thrown to indicate that a method has been passed an not existing {@link de.communicode.communikey.domain.Key} entity.
+ * Thrown to indicate that a method has been passed an not existing {@link Key} entity.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -19,11 +20,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class KeyNotFoundException extends RuntimeException {
 
     /**
-     * Constructs an {@code KeyNotFoundException} with the given {@code keyId} applied to the message.
+     * Constructs an {@code KeyNotFoundException} with the specified {@link Key} ID applied to the message.
      *
-     * @param keyId the ID of the {@link de.communicode.communikey.domain.Key} entity
+     * @param keyId the ID of the key entity that has not been found
      */
     public KeyNotFoundException(long keyId) {
-        super("could not find key '" + keyId + "'.");
+        super("could not find key with ID " + keyId);
     }
 }

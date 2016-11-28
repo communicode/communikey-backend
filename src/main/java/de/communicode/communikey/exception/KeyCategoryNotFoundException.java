@@ -6,11 +6,12 @@
  */
 package de.communicode.communikey.exception;
 
+import de.communicode.communikey.domain.KeyCategory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Thrown to indicate that a method has been passed an not existing {@link de.communicode.communikey.domain.KeyCategory} entity.
+ * Thrown to indicate that a method has been passed an not existing {@link KeyCategory} entity.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -19,11 +20,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class KeyCategoryNotFoundException extends RuntimeException {
 
     /**
-     * Constructs an {@code KeyCategoryNotFoundException} with the given {@code keyCategoryId} applied to the message.
+     * Constructs an {@code KeyCategoryNotFoundException} with the specified {@link KeyCategory} ID applied to the message.
      *
-     * @param keyCategoryId the ID of the {@link de.communicode.communikey.domain.KeyCategory} entity
+     * @param keyCategoryId the ID of the key category entity that has not been found
      */
     public KeyCategoryNotFoundException(long keyCategoryId) {
-        super("could not find key category '" + keyCategoryId + "'.");
+        super("could not find key category with ID " + keyCategoryId);
     }
 }
