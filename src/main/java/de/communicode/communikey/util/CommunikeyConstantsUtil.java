@@ -6,7 +6,7 @@
  */
 package de.communicode.communikey.util;
 
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_HTTP_STATUS_CODE_404;
+import static de.communicode.communikey.controller.RequestMapping.HTTP_STATUS_CODE_404;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.joining;
 
@@ -42,7 +42,7 @@ public final class CommunikeyConstantsUtil {
      * @since 0.2.0
      */
     public static String withParameters(String endpoint, String... parameters) {
-        endpoint = Optional.ofNullable(endpoint).orElse(ENDPOINT_HTTP_STATUS_CODE_404);
+        endpoint = Optional.ofNullable(endpoint).orElse(HTTP_STATUS_CODE_404);
         parameters = Optional.ofNullable(parameters).orElse(new String[0]);
 
         return Stream.of(parameters)

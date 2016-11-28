@@ -6,10 +6,10 @@
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_CATEGORIES;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_CATEGORIES_COLUMN_KEY_CATEGORY_ID;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_CATEGORIES_CREATOR_USER_ID;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_CATEGORIES_RESPONSIBLE_USER_ID;
+import static de.communicode.communikey.config.constant.DataSource.CATEGORIES;
+import static de.communicode.communikey.config.constant.DataSource.CREATOR_USER_ID;
+import static de.communicode.communikey.config.constant.DataSource.KEY_CATEGORY_ID;
+import static de.communicode.communikey.config.constant.DataSource.RESPONSIBLE_USER_ID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,22 +32,22 @@ import java.util.Set;
  * @since 0.2.0
  */
 @Entity
-@Table(name = TABLE_CATEGORIES)
+@Table(name = CATEGORIES)
 public class KeyCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = TABLE_CATEGORIES_COLUMN_KEY_CATEGORY_ID, nullable = false)
+    @Column(name = KEY_CATEGORY_ID, nullable = false)
     private long id;
 
     @OneToMany(mappedBy = "parent")
     private Set<KeyCategory> childs;
 
     @ManyToOne
-    @JoinColumn(name = TABLE_CATEGORIES_CREATOR_USER_ID, nullable = false)
+    @JoinColumn(name = CREATOR_USER_ID, nullable = false)
     private User creator;
 
     @ManyToOne
-    @JoinColumn(name = TABLE_CATEGORIES_RESPONSIBLE_USER_ID, nullable = false)
+    @JoinColumn(name = RESPONSIBLE_USER_ID, nullable = false)
     private User responsible;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "category")

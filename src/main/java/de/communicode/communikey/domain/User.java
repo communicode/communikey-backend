@@ -6,11 +6,11 @@
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_LINK_USERS_TO_USER_GROUPS;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USERS;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USERS_COLUMN_ENABLED;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USERS_COLUMN_USER_ID;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USER_GROUPS_COLUMN_USER_GROUP_ID;
+import static de.communicode.communikey.config.constant.DataSource.USERS_TO_GROUPS;
+import static de.communicode.communikey.config.constant.DataSource.USERS;
+import static de.communicode.communikey.config.constant.DataSource.USER_ENABLED;
+import static de.communicode.communikey.config.constant.DataSource.USER_ID;
+import static de.communicode.communikey.config.constant.DataSource.USER_GROUP_ID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.communicode.communikey.type.UserRoleType;
@@ -38,10 +38,10 @@ import java.util.Set;
  * @since 0.2.0
  */
 @Entity
-@Table(name = TABLE_USERS)
+@Table(name = USERS)
 public class User {
     @Id
-    @Column(name = TABLE_USERS_COLUMN_USER_ID, nullable = false)
+    @Column(name = USER_ID, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
@@ -56,24 +56,24 @@ public class User {
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
-        name = TABLE_LINK_USERS_TO_USER_GROUPS,
+        name = USERS_TO_GROUPS,
         joinColumns = {
             @JoinColumn(
-                name = TABLE_USERS_COLUMN_USER_ID,
+                name = USER_ID,
                 nullable = false,
                 updatable = false
             )
         },
         inverseJoinColumns = {
             @JoinColumn(
-                name = TABLE_USER_GROUPS_COLUMN_USER_GROUP_ID,
+                name = USER_GROUP_ID,
                 nullable = false
             )
         }
     )
     private Set<UserGroup> groups;
 
-    @Column(name = TABLE_USERS_COLUMN_ENABLED, nullable = false)
+    @Column(name = USER_ENABLED, nullable = false)
     private boolean isEnabled;
 
     @JsonIgnore

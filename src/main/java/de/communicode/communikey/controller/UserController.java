@@ -6,11 +6,10 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_USERS;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_VARIABLE_USER_ID;
+import static de.communicode.communikey.controller.RequestMapping.USERS;
+import static de.communicode.communikey.controller.RequestMapping.USER_ID;
 import static java.util.Objects.requireNonNull;
 
-import de.communicode.communikey.config.CommunikeyConstants;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserDto;
 import de.communicode.communikey.domain.converter.UserDtoConverter;
@@ -30,13 +29,13 @@ import java.util.stream.Collectors;
 /**
  * The REST API controller to process {@link User} entities.
  * <p>
- *     Mapped to the {@value CommunikeyConstants#ENDPOINT_USERS} endpoint.
+ *     Mapped to the {@value de.communicode.communikey.controller.RequestMapping#USERS} endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
 @RestController
-@RequestMapping(ENDPOINT_USERS)
+@RequestMapping(USERS)
 public class UserController {
 
     private final UserRestService userService;
@@ -52,7 +51,7 @@ public class UserController {
     /**
      * Gets all {@link User} entities.
      * <p>
-     *     This endpoint is mapped to "{@value CommunikeyConstants#ENDPOINT_USERS}{@value CommunikeyConstants#REQUEST_VARIABLE_USER_ID}".
+     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#USERS}{@value de.communicode.communikey.controller.RequestMapping#USER_ID}".
      *
      * @param limit the amount of user data transfer objects to include in the response
      * @param username the name of the user entities to get
@@ -71,13 +70,13 @@ public class UserController {
     /**
      * Gets the {@link User} entity with the specified ID.
      * <p>
-     *     This endpoint is mapped to "{@value CommunikeyConstants#ENDPOINT_USERS}{@value CommunikeyConstants#REQUEST_VARIABLE_USER_ID}".
+     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#USERS}{@value de.communicode.communikey.controller.RequestMapping#USER_ID}".
      *
      * @param userId the ID of the user entity to get
      * @return the user data transfer object
      * @throws UserNotFoundException if the user entity with the specified ID has not been found
      */
-    @GetMapping(value = REQUEST_VARIABLE_USER_ID)
+    @GetMapping(value = USER_ID)
     UserDto get(@PathVariable long userId) throws UserNotFoundException {
         return convertToDto(userService.getById(userId));
     }

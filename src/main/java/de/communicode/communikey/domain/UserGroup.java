@@ -6,9 +6,9 @@
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USER_GROUPS;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USER_GROUPS_COLUMN_NAME;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USER_GROUPS_COLUMN_USER_GROUP_ID;
+import static de.communicode.communikey.config.constant.DataSource.USER_GROUPS;
+import static de.communicode.communikey.config.constant.DataSource.USER_GROUP_NAME;
+import static de.communicode.communikey.config.constant.DataSource.USER_GROUP_ID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,14 +28,14 @@ import java.util.Set;
  * @since 0.2.0
  */
 @Entity
-@Table(name = TABLE_USER_GROUPS)
+@Table(name = USER_GROUPS)
 public class UserGroup {
     @Id
-    @Column(name = TABLE_USER_GROUPS_COLUMN_USER_GROUP_ID, nullable = false)
+    @Column(name = USER_GROUP_ID, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(name = TABLE_USER_GROUPS_COLUMN_NAME, nullable = false)
+    @Column(name = USER_GROUP_NAME, nullable = false)
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")

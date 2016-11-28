@@ -6,15 +6,11 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_HTTP_STATUS_CODE_403;
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_LOGIN;
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_LOGOUT;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_PARAM_LOGIN_LOGOUT;
-import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_HTTP_STATUS_CODE_403;
+import static de.communicode.communikey.controller.RequestMapping.HTTP_STATUS_CODE_403;
+import static de.communicode.communikey.controller.RequestMapping.LOGIN;
+import static de.communicode.communikey.controller.RequestMapping.LOGOUT;
 import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
-import static de.communicode.communikey.util.CommunikeyConstantsUtil.withParameters;
 
-import de.communicode.communikey.config.CommunikeyConstants;
 import de.communicode.communikey.domain.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,42 +33,42 @@ public class SessionController {
     /**
      * Endpoint to the HTTP status code 403 error page for unprivileged {@link User}.
      * <p>
-     *     Mapped to the "{@value CommunikeyConstants#ENDPOINT_HTTP_STATUS_CODE_403}" endpoint.
+     *     Mapped to the "{@value RequestMapping#HTTP_STATUS_CODE_403}" endpoint.
      *
      * @return the string to the endpoint
      */
-    @GetMapping(value = ENDPOINT_HTTP_STATUS_CODE_403)
+    @GetMapping(value = HTTP_STATUS_CODE_403)
     public String accessDenied() {
-        return TEMPLATE_HTTP_STATUS_CODE_403;
+        return HTTP_STATUS_CODE_403;
     }
 
     /**
      * Endpoint to the {@link User} login.
      * <p>
-     *     Mapped to the "{@value CommunikeyConstants#ENDPOINT_LOGIN}" endpoint.
+     *     Mapped to the "{@value RequestMapping#LOGIN}" endpoint.
      *
      * @return the string to the endpoint
      */
-    @GetMapping(value = ENDPOINT_LOGIN)
+    @GetMapping(value = LOGIN)
     public String login() {
-        return ENDPOINT_LOGIN;
+        return LOGIN;
     }
 
     /**
      * Endpoint to the {@link User} logout.
      * <p>
-     *     Redirects to the {@value CommunikeyConstants#ENDPOINT_LOGOUT} endpoint.
+     *     Redirects to the {@value RequestMapping#LOGOUT} endpoint.
      *
      * @param request the HTTP request information
      * @param response the HTTP response information
      * @return the string to the endpoint redirection
      */
-    @GetMapping(value = ENDPOINT_LOGOUT)
+    @GetMapping(value = LOGOUT)
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null){
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
-        return asRedirect(withParameters(ENDPOINT_LOGIN, REQUEST_PARAM_LOGIN_LOGOUT));
+        return asRedirect(LOGOUT);
     }
 }

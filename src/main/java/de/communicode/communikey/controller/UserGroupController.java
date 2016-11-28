@@ -6,11 +6,10 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_USER_GROUPS;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_VARIABLE_USER_GROUP_ID;
+import static de.communicode.communikey.controller.RequestMapping.USER_GROUPS;
+import static de.communicode.communikey.controller.RequestMapping.USER_GROUP_ID;
 import static java.util.Objects.requireNonNull;
 
-import de.communicode.communikey.config.CommunikeyConstants;
 import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.domain.UserGroupDto;
 import de.communicode.communikey.domain.converter.UserGroupDtoConverter;
@@ -30,13 +29,13 @@ import java.util.stream.Collectors;
 /**
  * The REST API controller to process {@link UserGroup} entities.
  * <p>
- *     Mapped to the {@value CommunikeyConstants#ENDPOINT_USER_GROUPS} endpoint.
+ *     Mapped to the {@value de.communicode.communikey.controller.RequestMapping#USER_GROUPS} endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
 @RestController
-@RequestMapping(ENDPOINT_USER_GROUPS)
+@RequestMapping(USER_GROUPS)
 public class UserGroupController {
 
     private final UserGroupRestService userGroupService;
@@ -52,7 +51,7 @@ public class UserGroupController {
     /**
      * Gets all {@link UserGroup} entities.
      * <p>
-     *     This endpoint is mapped to "{@value CommunikeyConstants#ENDPOINT_USER_GROUPS}{@value CommunikeyConstants#REQUEST_VARIABLE_USER_GROUP_ID}".
+     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#USER_GROUPS}{@value de.communicode.communikey.controller.RequestMapping#USER_GROUP_ID}".
      *
      * @param limit the amount of user group  data transfer objects to include in the response
      * @return a collection of user group data transfer objects
@@ -68,13 +67,13 @@ public class UserGroupController {
     /**
      * Gets the {@link UserGroup} entity with the specified ID.
      * <p>
-     *     This endpoint is mapped to "{@value CommunikeyConstants#ENDPOINT_USER_GROUPS}{@value CommunikeyConstants#REQUEST_VARIABLE_USER_GROUP_ID}".
+     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#USER_GROUPS}{@value de.communicode.communikey.controller.RequestMapping#USER_GROUP_ID}".
      *
      * @param userGroupId the ID of the user group entity to get
      * @return the user group data transfer object
      * @throws UserGroupNotFoundException if the user group entity with the specified ID has not been found
      */
-    @GetMapping(value = REQUEST_VARIABLE_USER_GROUP_ID)
+    @GetMapping(value = USER_GROUP_ID)
     UserGroupDto get(@PathVariable long userGroupId) throws UserGroupNotFoundException {
         return convertToDto(userGroupService.getById(userGroupId));
     }
