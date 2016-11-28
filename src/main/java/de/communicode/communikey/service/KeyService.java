@@ -7,9 +7,8 @@
 package de.communicode.communikey.service;
 
 import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.domain.KeyCategory;
-import de.communicode.communikey.domain.User;
 import de.communicode.communikey.exception.KeyNotFoundException;
+import de.communicode.communikey.exception.UserNotFoundException;
 
 import java.sql.Timestamp;
 import java.util.Set;
@@ -23,90 +22,82 @@ import java.util.Set;
 public interface KeyService {
 
     /**
-     * Deletes the given {@link Key}.
+     * Deletes the specified key.
      *
-     * @param key the {@link Key} entity to delete
-     * @throws NullPointerException if the given {@code key} entity is null
+     * @param keyId the ID of the key entity to delete
+     * @throws KeyNotFoundException if the specified key has not been found
      */
-    void delete(Key key) throws NullPointerException;
+    void delete(long keyId) throws KeyNotFoundException;
 
     /**
-     * Gets all {@link Key} entities of the {@link de.communicode.communikey.repository.KeyRepository}.
+     * Gets all key entities.
      *
-     * @return a collection of all {@link Key} entities
+     * @return a collection of all key entities
      */
     Set<Key> getAll();
 
     /**
-     * Gets all {@link Key} entities with the given {@link KeyCategory}.
+     * Gets all key entities with the specified creation timestamp.
      *
-     * @param keyCategory the {@link KeyCategory} from which all {@link Key} entities are to be found
-     * @return a collection of found {@link Key} entities
-     * @since 0.2.0
-     */
-    Set<Key> getAllByKeyCategory(KeyCategory keyCategory);
-
-    /**
-     * Gets all {@link Key} entities with the given creation {@code timestamp}.
-     *
-     * @param timestamp the creation {@link Timestamp} from which all {@link Key} are to be found
-     * @return a collection of found {@link Key} entities
+     * @param timestamp the creation timestamp from which all key are to be found
+     * @return a collection of found key entities
      * @since 0.2.0
      */
     Set<Key> getAllByCreationTimestamp(Timestamp timestamp);
 
     /**
-     * Gets all {@link Key} entities created by the given {@link User}.
+     * Gets all key entities created by the specified user.
      *
-     * @param creator the {@link User} entity to find all created {@link Key} entities of
-     * @return a collection of found {@link Key} entities
+     * @param creatorUserId the ID of the user entity to find all created key entities of
+     * @return a collection of found key entities
+     * @throws UserNotFoundException if the user entity with the specified ID has not been found
      * @since 0.2.0
      */
-    Set<Key> getAllByCreator(User creator);
+    Set<Key> getAllByCreator(long creatorUserId) throws UserNotFoundException;
 
     /**
-     * Gets all {@link Key} entities with the given {@code value}.
+     * Gets all key entities with the specified value.
      *
-     * @param value the value from which all {@link Key} entity are to be found
-     * @return a collection of found {@link Key} entities
+     * @param value the value from which all key entity are to be found
+     * @return a collection of found key entities
      * @since 0.2.0
      */
     Set<Key> getAllByValue(String value);
 
     /**
-     * Gets the {@link Key} with the given {@code id}.
+     * Gets the key with the specified ID.
      *
-     * @param keyId the ID of the {@link Key} entity to get
-     * @return the {@link Key} entity with the given ID
-     * @throws de.communicode.communikey.exception.KeyNotFoundException if no {@link Key} with the given {@code keyId} has been found
+     * @param keyId the ID of the key entity to get
+     * @return the key entity with the specified ID
+     * @throws KeyNotFoundException if no key with the specified ID has been found
      */
     Key getById(long keyId) throws KeyNotFoundException;
 
     /**
-     * Modifies the value of the given {@link Key}.
+     * Modifies the value of the specified key.
      *
-     * @param key the {@link Key} entity to modify the value of
-     * @param newValue the new value for the given {@link Key} entity
-     * @throws NullPointerException if the given {@code key} entity is null
-     * @throws IllegalArgumentException if the given new value is empty
+     * @param keyId the ID of the key entity to modify the value of
+     * @param newValue the new value for the specified key entity
+     * @throws KeyNotFoundException if no key with the specified ID has been found
+     * @throws IllegalArgumentException if the specified new value is empty
      */
-    void modifyValue(Key key, String newValue) throws NullPointerException, IllegalArgumentException;
+    void modifyValue(long keyId, String newValue) throws KeyNotFoundException, IllegalArgumentException;
 
     /**
-     * Saves the given {@link Key} in the {@link de.communicode.communikey.repository.KeyRepository}.
+     * Saves the specified key entity.
      *
-     * @param key the {@link Key} entity to save
-     * @return the saved {@link Key}
-     * @throws NullPointerException if the given {@code key} entity is null
+     * @param key the key entity to save
+     * @return the saved key entity
+     * @throws NullPointerException if the specified key entity is null
      */
     Key save(Key key) throws NullPointerException;
 
     /**
-     * Validates that the given {@link Key} entity exists in the {@link de.communicode.communikey.repository.KeyRepository}.
+     * Validates the specified {@link Key} entity.
      *
-     * @param keyId the ID of the {@link Key} entity to validate
-     * @return the validated {@link Key}
-     * @throws KeyNotFoundException if the {@link Key} with the given {@code keyId} has not been found
+     * @param keyId the ID of the key entity to validate
+     * @return the key entity if validated
+     * @throws KeyNotFoundException if no key entity with the specified ID has been found
      */
     Key validate(long keyId) throws KeyNotFoundException;
 }

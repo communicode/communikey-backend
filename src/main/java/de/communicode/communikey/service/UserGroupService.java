@@ -7,75 +7,88 @@
 package de.communicode.communikey.service;
 
 import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.exception.UserGroupConflictException;
+import de.communicode.communikey.exception.UserGroupNotFoundException;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
- * A service to interact with {@link UserGroup} entities via the {@link de.communicode.communikey.repository.UserGroupRepository}.
+ * A service to process {@link UserGroup} entities.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
 public interface UserGroupService {
-    /**
-     * Creates a new {@link UserGroup}.
-     *
-     * @param name The name of the {@link UserGroup} to create
-     * @throws NullPointerException if the given {@code name} is null
-     * @throws IllegalArgumentException if the given name already exists or is empty
-     */
-    void create(String name) throws NullPointerException, IllegalArgumentException;
 
     /**
-     * Deletes the given {@link UserGroup}.
+     * Creates a new user group.
      *
-     * @param userGroup The {@link UserGroup} to delete
-     * @throws NullPointerException if the given {@code userGroup} is null
+     * @param userGroupName the name of the user group entity to create
+     * @return the created user group entity
+     * @throws UserGroupConflictException if a user group entity with the specified name already exists
+     * @throws IllegalArgumentException if the specified name is empty
      */
-    void delete(UserGroup userGroup) throws NullPointerException;
+    UserGroup create(String userGroupName) throws UserGroupConflictException, IllegalArgumentException;
 
     /**
-     * Gets all {@link UserGroup} entities of the {@link de.communicode.communikey.repository.UserGroupRepository}.
+     * Deletes the specified {@link UserGroup}.
      *
-     * @return a collection of all {@link UserGroup} entities
+     * @param userGroupId the ID of the user group entity to delete
+     * @throws UserGroupNotFoundException if the user group entity with the specified ID has not been found
      */
-    Set<UserGroup> getAllUserGroups();
+    void delete(long userGroupId) throws UserGroupNotFoundException;
 
     /**
-     * Gets the {@link UserGroup} with the given {@code id}.
+     * Gets all user groups.
      *
-     * @param id The ID of the {@link UserGroup}
-     * @return the {@link UserGroup} with the given ID
-     * @throws NullPointerException if the given {@code id} is null
-     * @throws IllegalArgumentException if the given {@code id} is less than or equal to {@code 0}
+     * @return a collection of all user group entities
      */
-    UserGroup getById(long id) throws NullPointerException, IllegalArgumentException;
+    Set<UserGroup> getAll();
 
     /**
-     * Gets the {@link UserGroup} with the given {@code name}.
+     * Gets the user group with the specified ID.
      *
-     * @param name The name of the {@link UserGroup}
-     * @return the {@link UserGroup} with the given name
-     * @throws NullPointerException if the given {@code name} is null
-     * @throws IllegalArgumentException if the given name is empty
+     * @param userGroupId the ID of the user group entity to get
+     * @return the user group entity with the specified ID
+     * @throws UserGroupNotFoundException if the user group with the specified ID has not been found
      */
-    UserGroup getByName(String name) throws NullPointerException, IllegalArgumentException;
+    UserGroup getById(long userGroupId) throws UserGroupNotFoundException;
 
     /**
-     * Modifies the name of the given {@link UserGroup}.
+     * Gets the user group with the specified name.
      *
-     * @param userGroup The {@link UserGroup} to modify the name of
-     * @param newName The new name for the given {@link UserGroup}
-     * @throws NullPointerException if the given {@code userGroup} is null
-     * @throws IllegalArgumentException if the given new name already exists or is empty
+     * @param name the name to find the user group entity of
+     * @return the user group entity with the specified name if found, {@link Optional#EMPTY} otherwise
+     * @throws IllegalArgumentException if the specified name is empty
      */
-    void modifyName(UserGroup userGroup, String newName) throws NullPointerException, IllegalArgumentException;
+    Optional<UserGroup> getByName(String userGroupName) throws IllegalArgumentException;
 
     /**
-     * Saves the given {@code userGroup} into the {@link de.communicode.communikey.repository.UserGroupRepository}.
+     * Modifies the name of the specified {@link UserGroup}.
      *
-     * @param userGroup The {@link UserGroup} to save
-     * @throws NullPointerException if the given {@code userGroup} is null
+     * @param userGroupId the ID of the user group entity to modify the name of
+     * @param newName the new name for the specified user group entity
+     * @throws UserGroupNotFoundException if the user group entity with the specified ID has not been found
+     * @throws UserGroupConflictException if a user group entity with the specified new name already exists
+     * @throws IllegalArgumentException if the specified new name is empty
      */
-    void save(UserGroup userGroup) throws NullPointerException;
+    void modifyName(long userGroupId, String newName) throws UserGroupNotFoundException, UserGroupConflictException, IllegalArgumentException;
+
+    /**
+     * Saves the specified user group.
+     *
+     * @param userGroup the user group entity to save
+     * @throws NullPointerException if the specified user group entity is null
+     */
+    UserGroup save(UserGroup userGroup) throws NullPointerException;
+
+    /**
+     * Validates the specified {@link UserGroup} entity.
+     *
+     * @param userGroupId the ID of the user group entity to validate
+     * @return the user group if validated
+     * @throws UserGroupNotFoundException if the user group entity with the specified ID has not been found
+     */
+    UserGroup validate(long userGroupId) throws UserGroupNotFoundException;
 }

@@ -7,75 +7,109 @@
 package de.communicode.communikey.service;
 
 import de.communicode.communikey.domain.User;
+import de.communicode.communikey.exception.UserConflictException;
+import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.type.UserRoleType;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
- * A service to interact with {@link User} entities via the {@link de.communicode.communikey.repository.UserRepository}.
+ * A service to process {@link User} entities.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
 public interface UserService {
-    /**
-     * Deletes the given {@link User}.
-     *
-     * @param user The {@link User} to delete
-     * @throws NullPointerException if the given {@code user} is null
-     */
-    void deleteUser(User user) throws NullPointerException;
 
     /**
-     * Gets all {@link User} entities of the {@link de.communicode.communikey.repository.UserRepository}.
+     * Creates a new user.
      *
-     * @return a collection of all {@link User} entities
+     * @param username the username of the user entity to create
+     * @param password the password of the user entity to create
+     * @return the created user entity
+     * @throws UserConflictException if a user entity with the specified username already exists
+     * @throws IllegalArgumentException if the specified username or password is empty
      */
-    Set<User> getAllUsers();
+    User create(String username, String password) throws UserConflictException, IllegalArgumentException;
 
     /**
-     * Gets the {@link User} with the given {@code id}.
+     * Deletes the specified user.
      *
-     * @param id The ID of the {@link User}
-     * @return the {@link User} with the given ID
-     * @throws NullPointerException if the given {@code id} is invalid
+     * @param userId the ID of the user entity to delete
+     * @throws UserNotFoundException if the user with the specified ID has not been found
      */
-    User getUserById(long id) throws NullPointerException;
+    void delete(long userId) throws UserNotFoundException;
 
     /**
-     * Gets the {@link User} with the given {@code username}.
+     * Gets all user entities.
      *
-     * @param username The username of the {@link User}
-     * @return the {@link User} with the given username
-     * @throws NullPointerException if the given {@code username} is invalid
+     * @return a collection of all user entities
      */
-    User getUserByUsername(String username) throws NullPointerException;
+    Set<User> getAll();
 
     /**
-     * Modifies the username of the given {@link User}.
+     * Gets the user with the specified ID.
      *
-     * @param user The {@link User} to modify the username of
-     * @param newUsername The new username for the given {@link User}
-     * @throws NullPointerException if the given {@code user} is null
-     * @throws IllegalArgumentException if the given new username already exists or is empty
+     * @param userId the ID of the user entity to get
+     * @return the user entity with the specified ID
+     * @throws UserNotFoundException if the user with the specified ID has not been found
      */
-    void modifyUsername(User user, String newUsername) throws NullPointerException, IllegalArgumentException;
+    User getById(long userId) throws UserNotFoundException;
 
     /**
-     * Modifies the role of the given {@link User}.
+     * Gets the user with the specified username.
      *
-     * @param user The {@link User} to modify the role of
-     * @param newRole The new role for the given {@link User}
-     * @throws NullPointerException if the given {@code user} is null
+     * @param username the username to find the user entity of
+     * @return the user entity with the specified username if found, {@link Optional#EMPTY} otherwise
+     * @throws IllegalArgumentException if the specified username is empty
      */
-    void modifyUserRole(User user, UserRoleType newRole) throws NullPointerException;
+    Optional<User> getByUsername(String username) throws IllegalArgumentException;
 
     /**
-     * Sets the activation status of the given {@link User}.
+     * Modifies the username of the specified user.
      *
-     * @param user The {@link User} to set the activation status of
-     * @param isEnabled The new activation status for the given {@link User}
-     * @throws NullPointerException if the given {@code user} is null
+     * @param userId the ID of the user entity to modify the username of
+     * @param newUsername the new username for the specified user entity
+     * @throws UserNotFoundException if the user with the specified ID has not been found
+     * @throws UserConflictException if a user entity with the specified new username already exists
+     * @throws IllegalArgumentException if the specified new username is empty
      */
-    void setUserEnabled(User user, boolean isEnabled) throws NullPointerException;
+    void modifyUsername(long userId, String newUsername) throws UserNotFoundException, UserConflictException, IllegalArgumentException;
+
+    /**
+     * Modifies the role of the specified user.
+     *
+     * @param userId the ID of the user to modify the role of
+     * @param newRole the new role type
+     * @throws UserNotFoundException if the specified {@code user} has not been found
+     */
+    void modifyRole(long userId, UserRoleType newRole) throws UserNotFoundException;
+
+    /**
+     * Saves the specified user.
+     *
+     * @param user the user entity to save
+     * @return the saved user entity
+     * @throws NullPointerException if the specified user entity is null
+     */
+    User save(User user) throws NullPointerException;
+
+    /**
+     * Sets the activation status of the specified user.
+     *
+     * @param userId the ID of the user entity to set the activation status of
+     * @param isEnabled the new activation status
+     * @throws UserNotFoundException if the user entity with the specified ID has not been found
+     */
+    void setEnabled(long userId, boolean isEnabled) throws UserNotFoundException;
+
+    /**
+     * Validates the specified {@link User} entity.
+     *
+     * @param userId the ID of the user entity to validate
+     * @return the user entity if validated
+     * @throws UserNotFoundException if the user entity with the specified ID has not been found
+     */
+    User validate(long userId) throws UserNotFoundException;
 }
