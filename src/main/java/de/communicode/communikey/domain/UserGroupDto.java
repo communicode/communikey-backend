@@ -7,7 +7,7 @@
 package de.communicode.communikey.domain;
 
 /**
- * A data transfer object for a {@link Key} entity.
+ * A data transfer object for a {@link UserGroup} entity.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0

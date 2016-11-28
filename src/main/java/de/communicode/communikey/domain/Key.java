@@ -33,7 +33,7 @@ import java.util.Calendar;
 @Table(name = TABLE_KEYS)
 public class Key {
     @Id
-    @Column(name = TABLE_KEYS_COLUMN_KEY_ID)
+    @Column(name = TABLE_KEYS_COLUMN_KEY_ID, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
@@ -46,21 +46,21 @@ public class Key {
     private KeyCategory category;
 
     private Timestamp creationTimestamp;
+
     private String value;
 
     private Key() {}
 
     /**
-     * Constructs a new key entity object with the given attributes, an auto-generated ID and creation timestamp.
+     * Constructs a new key entity with the given attributes, an auto-generated ID and creation timestamp.
      *
      * @param value the value of the key
-     * @param creator the {@link User} who created this key
+     * @param creator the user who created this key
      */
     public Key(String value, User creator) {
         this.creator = creator;
         this.value = value;
-        long time = Calendar.getInstance().getTimeInMillis();
-        this.creationTimestamp = new Timestamp(time);
+        this.creationTimestamp = new Timestamp(Calendar.getInstance().getTimeInMillis());
     }
 
     public KeyCategory getCategory() {
@@ -71,10 +71,6 @@ public class Key {
         return creationTimestamp;
     }
 
-    /**
-     * @return the creator of this key
-     * @since 0.2.0
-     */
     public User getCreator() {
         return creator;
     }

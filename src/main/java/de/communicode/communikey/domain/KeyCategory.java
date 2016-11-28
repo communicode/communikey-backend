@@ -36,7 +36,7 @@ import java.util.Set;
 public class KeyCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = TABLE_CATEGORIES_COLUMN_KEY_CATEGORY_ID)
+    @Column(name = TABLE_CATEGORIES_COLUMN_KEY_CATEGORY_ID, nullable = false)
     private long id;
 
     @OneToMany(mappedBy = "parent")
@@ -47,7 +47,7 @@ public class KeyCategory {
     private User creator;
 
     @ManyToOne
-    @JoinColumn(name = TABLE_CATEGORIES_RESPONSIBLE_USER_ID)
+    @JoinColumn(name = TABLE_CATEGORIES_RESPONSIBLE_USER_ID, nullable = false)
     private User responsible;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "category")
@@ -61,6 +61,12 @@ public class KeyCategory {
 
     private KeyCategory() {}
 
+    /**
+     * Constructs a new key category entity with the given value and an auto-generated ID.
+     *
+     * @param name the name of the key category
+     * @param creator the user who created this key category
+     */
     public KeyCategory(String name, User creator) {
         this.name = name;
         this.creator = creator;

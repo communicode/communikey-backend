@@ -15,6 +15,8 @@ package de.communicode.communikey.domain;
 public class KeyCategoryDto {
     private long id;
 
+    private long[] childs;
+
     private long creatorId;
 
     private String name;
@@ -25,6 +27,10 @@ public class KeyCategoryDto {
 
     public long getId() {
         return id;
+    }
+
+    public long[] getChilds() {
+        return childs;
     }
 
     public long getCreatorId() {
@@ -45,6 +51,10 @@ public class KeyCategoryDto {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public void setChilds(long[] childs) {
+        this.childs = childs;
     }
 
     public void setCreatorId(long creatorId) {

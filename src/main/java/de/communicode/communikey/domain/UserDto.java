@@ -6,8 +6,6 @@
  */
 package de.communicode.communikey.domain;
 
-import java.util.Set;
-
 /**
  * A data transfer object for a {@link User} entity.
  *

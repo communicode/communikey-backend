@@ -13,7 +13,6 @@ import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USERS_C
 import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USER_GROUPS_COLUMN_USER_GROUP_ID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.communicode.communikey.exception.UserGroupNotFoundException;
 import de.communicode.communikey.type.UserRoleType;
 
 import javax.persistence.CascadeType;
@@ -77,8 +76,8 @@ public class User {
     @Column(name = TABLE_USERS_COLUMN_ENABLED, nullable = false)
     private boolean isEnabled;
 
-    @Column(nullable = false)
     @JsonIgnore
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
@@ -90,7 +89,7 @@ public class User {
     private User() {}
 
     /**
-     * Constructs a new user entity object with the given attributes, an auto-generated ID, the default user role {@link UserRoleType#ROLE_USER} and no
+     * Constructs a new user entity with the given attributes, an auto-generated ID, the default user role {@link UserRoleType#ROLE_USER} and no
      * assigned user groups.
      *
      * @param username the name of the user
@@ -101,23 +100,23 @@ public class User {
     }
 
     /**
-     * Constructs a new user entity object with the given attributes, an auto-generated ID and no assigned user groups.
+     * Constructs a new user entity with the given attributes, an auto-generated ID and no assigned user groups.
      *
      * @param username the name of the user
      * @param password the password of the user
-     * @param role the {@link UserRoleType} of the user
+     * @param role the user role type of the user
      */
     public User(String username, String password, UserRoleType role) {
         this(username, password, role, new HashSet<>(0));
     }
 
     /**
-     * Constructs a new user entity object with the given attributes and an auto-generated ID.
+     * Constructs a new user entity with the given attributes and an auto-generated ID.
      *
      * @param username the name of the user
      * @param password the password of the user
-     * @param role the {@link UserRoleType} of the user
-     * @param groups a collection {@link UserGroup} to assign the user to
+     * @param role the user role type of the user
+     * @param groups a collection of user groups to assign the user to
      */
     public User(String username, String password, UserRoleType role, Set<UserGroup> groups) {
         this.groups = new HashSet<>(groups);

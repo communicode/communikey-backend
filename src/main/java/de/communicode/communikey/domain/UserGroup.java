@@ -3,7 +3,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  * 2016
-*/
+ */
 package de.communicode.communikey.domain;
 
 import static de.communicode.communikey.config.CommunikeyConstants.TABLE_USER_GROUPS;
@@ -20,7 +20,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import java.util.Set;
-import java.util.stream.StreamSupport;
 
 /**
  * Represents a user group entity.
@@ -45,7 +44,7 @@ public class UserGroup {
     private UserGroup() {}
 
     /**
-     * Constructs a new user group entity object with the given attributes and an auto-generated ID with no {@link User} assigned to.
+     * Constructs a new user group entity with the specified attributes and an auto-generated ID with no {@link User} assigned to.
      *
      * @param name the name of the user group
      */

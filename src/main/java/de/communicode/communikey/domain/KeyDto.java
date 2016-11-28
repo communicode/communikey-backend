@@ -45,7 +45,7 @@ public class KeyDto {
         return value;
     }
 
-    public void setCategoryId(Long categoryId) {
+    public void setCategoryId(long categoryId) {
         this.categoryId = categoryId;
     }
 
@@ -53,7 +53,7 @@ public class KeyDto {
         this.creationTimestamp = creationTimestamp;
     }
 
-    public void setCreatorId(Long creatorId) {
+    public void setCreatorId(long creatorId) {
         this.creatorId = creatorId;
     }
 
