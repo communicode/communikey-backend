@@ -8,7 +8,6 @@ package de.communicode.communikey.repository;
 
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
-import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -24,43 +23,34 @@ import java.util.Set;
 public interface KeyCategoryRepository extends CrudRepository<KeyCategory, Long> {
 
     /**
-     * Finds all {@link KeyCategory} entities created by the given {@link User}.
+     * Finds all key category entities created by the specified {@link User} ID.
      *
-     * @param creator the {@link User} to get all created {@link KeyCategory} entities of
-     * @return a collection of all found {@link KeyCategory} entities
+     * @param creatorUserId the ID of the user to get all created key categories entities of
+     * @return a collection of found key category entities
      */
-    Set<KeyCategory> findAllByCreator(User creator);
+    Set<KeyCategory> findAllByCreator(long creatorUserId);
 
     /**
-     * Finds all {@link KeyCategory} entities with the given {@code name}.
+     * Finds all key category entities with the specified name.
      *
-     * @param name the name of the {@link KeyCategory} entities to find
-     * @return a collection of all found {@link KeyCategory} entities
+     * @param name the name of the key category entities to find
+     * @return a collection of found key category entities
      */
     Set<KeyCategory> findAllByName(String name);
 
     /**
-     * Finds all {@link KeyCategory} entities owned by the given parent {@link KeyCategory}.
+     * Finds all key category entities owned by the specified parent {@link KeyCategory} ID.
      *
-     * @param keyCategory the parent {@link KeyCategory} to get all child {@link KeyCategory} entities of
-     * @return a collection of all found {@link KeyCategory} entities
+     * @param keyCategoryId the parent key category to get all child key category entities of
+     * @return a collection of found key category entities
      */
-    Set<KeyCategory> findAllByParent(KeyCategory keyCategory);
+    Set<KeyCategory> findAllByParent(long keyCategoryId);
 
     /**
-     * Finds  all {@link KeyCategory} entities the given {@link User} is responsible for.
+     * Finds all key category entities the specified {@link User} is responsible for.
      *
-     * @param responsible the responsible {@link User} to get all {@link KeyCategory} entities of
-     * @return a collection of all found {@link KeyCategory} entities
+     * @param responsibleUserId the ID of the responsible user to get all key category entities of
+     * @return a collection of found key category entities
      */
-    Set<KeyCategory> findAllByResponsible(User responsible);
-
-    /**
-     * Finds the {@link KeyCategory} with by the given {@code id}.
-     *
-     * @param id the ID of the {@link KeyCategory} to find
-     * @return the {@link KeyCategory} entity if found
-     * @throws KeyCategoryNotFoundException if no {@link KeyCategory} entity with the given {@code id} has been found
-     */
-    KeyCategory findOneById(long id) throws KeyCategoryNotFoundException;
+    Set<KeyCategory> findAllByResponsible(long responsibleUserId);
 }

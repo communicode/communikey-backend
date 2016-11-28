@@ -10,8 +10,10 @@ import org.springframework.data.repository.CrudRepository;
 import de.communicode.communikey.domain.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
- * The repository for {@link User} entities.
+ * A repository for {@link User} entities.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -20,18 +22,10 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends CrudRepository<User, Long> {
 
     /**
-     * Finds and returns the {@link User} specified by the given {@code id}.
+     * Finds the user entity with the specified username.
      *
-     * @param id The ID of the {@link User} to find
-     * @return the {@link User} with the given {@code id}
+     * @param username the username of the user to find
+     * @return the optional user entity
      */
-    User findOneById(long id);
-
-    /**
-     * Finds and returns the first {@link User} found with the given {@code username}.
-     *
-     * @param username The {@code username} for a {@link User} to find
-     * @return the {@link User} with the given {@code username}
-     */
-    User findOneByUsername(String username);
+    Optional<User> findOneByUsername(String username);
 }

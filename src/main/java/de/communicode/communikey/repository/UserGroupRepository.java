@@ -10,27 +10,22 @@ import de.communicode.communikey.domain.UserGroup;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
- * The repository for {@link UserGroup} entities.
+ * A repository for {@link UserGroup} entities.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
 @Repository
 public interface UserGroupRepository extends CrudRepository<UserGroup, Long> {
-    /**
-     * Finds and returns the {@link UserGroup} specified by the given {@code id}.
-     *
-     * @param id The ID of the {@link UserGroup} to find
-     * @return the {@link UserGroup} with the given {@code id}
-     */
-    UserGroup findOneById(long id);
 
     /**
-     * Finds and returns the first {@link UserGroup} found with the given {@code username}.
+     * Finds the user group entity with the specified name.
      *
-     * @param name The {@code name} of a {@link UserGroup} to find
-     * @return the {@link UserGroup} with the given {@code name}
+     * @param userGroupName the name of the user group entity to find
+     * @return the user group entity if found, {@link Optional#EMPTY} otherwise
      */
-    UserGroup findOneByName(String name);
+    Optional<UserGroup> findOneByName(String userGroupName);
 }
