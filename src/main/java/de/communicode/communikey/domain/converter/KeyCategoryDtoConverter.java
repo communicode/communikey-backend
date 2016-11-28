@@ -29,6 +29,10 @@ public class KeyCategoryDtoConverter implements KeyCategoryConverter {
     public KeyCategoryDto convert(final KeyCategory source)  {
         KeyCategoryDto keyCategoryDto = new KeyCategoryDto();
         keyCategoryDto.setId(source.getId());
+        keyCategoryDto.setChilds(source.getChilds().stream()
+            .mapToLong(KeyCategory::getId)
+            .toArray()
+        );
         keyCategoryDto.setCreatorId(source.getCreator().getId());
         if (source.getParent().isPresent()) {
             keyCategoryDto.setParentId(source.getParent().get().getId());
