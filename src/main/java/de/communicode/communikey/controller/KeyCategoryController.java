@@ -6,11 +6,10 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_KEY_CATEGORIES;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_VARIABLE_KEY_CATEGORY_ID;
+import static de.communicode.communikey.controller.RequestMapping.KEY_CATEGORIES;
+import static de.communicode.communikey.controller.RequestMapping.KEY_CATEGORY_ID;
 import static java.util.Objects.requireNonNull;
 
-import de.communicode.communikey.config.CommunikeyConstants;
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.KeyCategoryDto;
 import de.communicode.communikey.domain.converter.KeyCategoryDtoConverter;
@@ -30,13 +29,13 @@ import java.util.stream.Collectors;
 /**
  * The REST API controller to process {@link KeyCategory} entities.
  * <p>
- *     Mapped to the "{@value CommunikeyConstants#ENDPOINT_KEY_CATEGORIES}" endpoint.
+ *     Mapped to the "{@value de.communicode.communikey.controller.RequestMapping#KEY_CATEGORIES}" endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
 @RestController
-@RequestMapping(ENDPOINT_KEY_CATEGORIES)
+@RequestMapping(KEY_CATEGORIES)
 public class KeyCategoryController {
 
     private final KeyCategoryRestService keyCategoryService;
@@ -52,7 +51,7 @@ public class KeyCategoryController {
     /**
      * Gets all {@link KeyCategory} entities.
      * <p>
-     *     This endpoint is mapped to "{@value CommunikeyConstants#ENDPOINT_KEY_CATEGORIES}".
+     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#KEY_CATEGORIES}".
      *
      * @param limit the amount of key category data transfer objects to include in the response
      * @param creatorUserId the ID of the user to get all created key category entities of
@@ -77,13 +76,13 @@ public class KeyCategoryController {
     /**
      * Gets the {@link KeyCategory} entity with the specified ID.
      * <p>
-     *     This endpoint is mapped to "{@value CommunikeyConstants#ENDPOINT_KEY_CATEGORIES}{@value CommunikeyConstants#REQUEST_VARIABLE_KEY_CATEGORY_ID}".
+     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#KEY_CATEGORIES}{@value de.communicode.communikey.controller.RequestMapping#KEY_CATEGORY_ID}".
      *
      * @param keyCategoryId the ID of the key category entity to get
      * @return the key category data transfer object
      * @throws KeyCategoryNotFoundException if the key category entity with the specified ID has not been found
      */
-    @GetMapping(value = REQUEST_VARIABLE_KEY_CATEGORY_ID)
+    @GetMapping(value = KEY_CATEGORY_ID)
     KeyCategoryDto get(@PathVariable long keyCategoryId) throws KeyCategoryNotFoundException {
         return convertToDto(keyCategoryService.getById(keyCategoryId));
     }

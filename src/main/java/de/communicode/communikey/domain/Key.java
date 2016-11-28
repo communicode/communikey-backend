@@ -6,10 +6,10 @@
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_KEYS;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_KEYS_COLUMN_CREATOR_USER_ID;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_KEYS_COLUMN_KEY_CATEGORY_ID;
-import static de.communicode.communikey.config.CommunikeyConstants.TABLE_KEYS_COLUMN_KEY_ID;
+import static de.communicode.communikey.config.constant.DataSource.KEYS;
+import static de.communicode.communikey.config.constant.DataSource.CREATOR_USER_ID;
+import static de.communicode.communikey.config.constant.DataSource.KEY_CATEGORY_ID;
+import static de.communicode.communikey.config.constant.DataSource.KEY_ID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,19 +30,19 @@ import java.util.Calendar;
  * @since 0.1.0
  */
 @Entity
-@Table(name = TABLE_KEYS)
+@Table(name = KEYS)
 public class Key {
     @Id
-    @Column(name = TABLE_KEYS_COLUMN_KEY_ID, nullable = false)
+    @Column(name = KEY_ID, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = TABLE_KEYS_COLUMN_CREATOR_USER_ID, nullable = false)
+    @JoinColumn(name = CREATOR_USER_ID, nullable = false)
     private User creator;
 
     @ManyToOne
-    @JoinColumn(name = TABLE_KEYS_COLUMN_KEY_CATEGORY_ID)
+    @JoinColumn(name = KEY_CATEGORY_ID)
     private KeyCategory category;
 
     private Timestamp creationTimestamp;

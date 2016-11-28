@@ -6,11 +6,10 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_KEYS;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_VARIABLE_KEY_ID;
+import static de.communicode.communikey.controller.RequestMapping.KEYS;
+import static de.communicode.communikey.controller.RequestMapping.KEY_ID;
 import static java.util.Objects.requireNonNull;
 
-import de.communicode.communikey.config.CommunikeyConstants;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyDto;
 import de.communicode.communikey.domain.converter.KeyDtoConverter;
@@ -30,13 +29,13 @@ import java.util.stream.Collectors;
 /**
  * The REST API controller to process {@link Key} entities.
  * <p>
- *     Mapped to the "{@value de.communicode.communikey.config.CommunikeyConstants#ENDPOINT_KEYS}" endpoint.
+ *     Mapped to the "{@value de.communicode.communikey.controller.RequestMapping#KEYS}" endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
  */
 @RestController
-@RequestMapping(ENDPOINT_KEYS)
+@RequestMapping(KEYS)
 public class KeyController {
 
     private final KeyRestService keyService;
@@ -52,7 +51,7 @@ public class KeyController {
     /**
      * Gets all {@link Key} entities.
      * <p>
-     *     This endpoint is mapped to "{@value CommunikeyConstants#ENDPOINT_KEYS}".
+     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#KEYS}".
      *
      * @param limit the amount of key data transfer objects to include in the response
      * @param userId the ID of the user to get all key entities of
@@ -71,13 +70,13 @@ public class KeyController {
     /**
      * Gets the {@link Key} entity with the specified ID.
      * <p>
-     *     This endpoint is mapped to "{@value CommunikeyConstants#ENDPOINT_KEYS}{@value CommunikeyConstants#REQUEST_VARIABLE_KEY_ID}".
+     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#KEYS}{@value de.communicode.communikey.controller.RequestMapping#KEY_ID}".
      *
      * @param keyId the ID of the key entity to get
      * @return the key data transfer object
      * @throws KeyNotFoundException if the key entity with the specified ID has not been found
      */
-    @GetMapping(value = REQUEST_VARIABLE_KEY_ID)
+    @GetMapping(value = KEY_ID)
     KeyDto get(@PathVariable long keyId) throws KeyNotFoundException {
         return convertToDto(keyService.getById(keyId));
     }
