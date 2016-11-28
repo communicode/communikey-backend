@@ -7,139 +7,101 @@
 package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_KEYS;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_KEY_DELETE;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_KEY_EDIT;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_KEY_NEW;
-import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_KEY_EDIT;
-import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_KEY_NEW;
+import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_VARIABLE_KEY_ID;
 import static java.util.Objects.requireNonNull;
 
+import de.communicode.communikey.config.CommunikeyConstants;
 import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.form.EditKeyForm;
-import de.communicode.communikey.form.NewKeyForm;
-import de.communicode.communikey.repository.KeyRepository;
-import de.communicode.communikey.service.KeyService;
+import de.communicode.communikey.domain.KeyDto;
+import de.communicode.communikey.domain.converter.KeyDtoConverter;
+import de.communicode.communikey.exception.KeyNotFoundException;
+import de.communicode.communikey.service.KeyRestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
- * The controller for all key endpoints.
+ * The REST API controller to process {@link Key} entities.
+ * <p>
+ *     Mapped to the "{@value de.communicode.communikey.config.CommunikeyConstants#ENDPOINT_KEYS}" endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
  */
-@Controller
+@RestController
+@RequestMapping(ENDPOINT_KEYS)
 public class KeyController {
 
-    private final KeyRepository keyRepository;
-    private final KeyService keyService;
+    private final KeyRestService keyService;
+
+    private final KeyDtoConverter keyConverter;
 
     @Autowired
-    public KeyController(KeyService keyService, KeyRepository keyRepository) {
+    public KeyController(KeyRestService keyService, KeyDtoConverter keyConverter) {
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
-        this.keyRepository = requireNonNull(keyRepository, "keyService must not be null!");
+        this.keyConverter = requireNonNull(keyConverter, "keyConverter must not be null!");
     }
 
     /**
-     * Endpoint to list all {@link Key} entities.
-     *
-     * @param model the model holding the attributes
-     * @return the string to the endpoint
-     */
-    @GetMapping(value = ENDPOINT_KEYS)
-    String listKeys(Model model) {
-        model.addAttribute("keys", keyRepository.findAll());
-        return ENDPOINT_KEYS;
-    }
-
-    /**
-     * Endpoint to delete a {@link Key} entity.
-     *
-     * @param id the ID of the {@link Key} to delete
-     * @return the string to the endpoint redirection
-     */
-    @GetMapping(value = REQUEST_KEY_DELETE)
-    String deleteKey(@PathVariable long id) {
-        keyRepository.delete(id);
-        return asRedirect(ENDPOINT_KEYS);
-    }
-
-    /**
-     * Endpoint to the form to edit a {@link Key} entity.
-     *
+     * Gets all {@link Key} entities.
      * <p>
-     *   This is used to process the data entered by the user into the form.
-     * </p>
+     *     This endpoint is mapped to "{@value CommunikeyConstants#ENDPOINT_KEYS}".
      *
-     * @param id the ID of the {@link Key} to edit
-     * @param model the model holding the attributes
-     * @return the string to the endpoint
+     * @param limit the amount of key data transfer objects to include in the response
+     * @param userId the ID of the user to get all key entities of
+     * @return a collection of {@link Key} data transfer objects
+     * @since 0.2.0
      */
-    @GetMapping(value = REQUEST_KEY_EDIT)
-    String editKeyForm(@PathVariable long id, Model model) {
-        if (keyRepository.findOne(id) == null) {
-            return asRedirect(ENDPOINT_KEYS);
-        } else {
-            Key key = keyRepository.findOne(id);
-            EditKeyForm editKeyForm = new EditKeyForm();
-            editKeyForm.setValue(key.getValue());
-            model.addAttribute("key", key);
-            model.addAttribute("editKeyForm", editKeyForm);
-            return TEMPLATE_KEY_EDIT;
-        }
+    @GetMapping
+    Set<KeyDto> getAll(@RequestParam(required = false) Long limit, @RequestParam(name = "user", required = false) Long userId) {
+        return keyService.getAll().stream()
+            .filter(key -> userId == null || userId.equals(key.getCreator().getId()))
+            .limit(Optional.ofNullable(limit).orElse(Long.MAX_VALUE))
+            .map(keyConverter)
+            .collect(Collectors.toSet());
     }
 
     /**
-     * Endpoint to edit a {@link Key} entity.
-     *
-     * @param id the ID of the {@link Key} to edit
-     * @param editKeyForm the {@link EditKeyForm} as named {@link Model} attribute
-     * @return the string to the endpoint redirection
-     */
-    @PostMapping(value = REQUEST_KEY_EDIT)
-    String editKey(@PathVariable long id, @ModelAttribute("editKeyForm") EditKeyForm editKeyForm) {
-        Key key = keyRepository.findOne(id);
-        key.setValue(editKeyForm.getValue());
-        keyService.modifyKeyValue(keyRepository.findOne(id), editKeyForm.getValue());
-        keyRepository.save(key);
-        return asRedirect(ENDPOINT_KEYS);
-    }
-
-    /**
-     * Endpoint to the form to create a new {@link Key} entity.
-     *
+     * Gets the {@link Key} entity with the specified ID.
      * <p>
-     *   This is used to process the data entered by the user into the form.
-     * </p>
+     *     This endpoint is mapped to "{@value CommunikeyConstants#ENDPOINT_KEYS}{@value CommunikeyConstants#REQUEST_VARIABLE_KEY_ID}".
      *
-     * @param newKey the new {@link Key} entity
-     * @param model the {@link Model} holding the attributes
-     * @return the string to the endpoint
+     * @param keyId the ID of the key entity to get
+     * @return the key data transfer object
+     * @throws KeyNotFoundException if the key entity with the specified ID has not been found
      */
-    @GetMapping(value = REQUEST_KEY_NEW)
-    String newKeyForm(Key newKey, Model model) {
-        model.addAttribute("key", newKey);
-        model.addAttribute("newKeyForm", new NewKeyForm());
-        return TEMPLATE_KEY_NEW;
+    @GetMapping(value = REQUEST_VARIABLE_KEY_ID)
+    KeyDto get(@PathVariable long keyId) throws KeyNotFoundException {
+        return convertToDto(keyService.getById(keyId));
     }
 
     /**
-     * Endpoint to create a new {@link Key} entity.
+     * Converts a key entity to the associated key data transfer object.
      *
-     * @param newKeyForm the {@link NewKeyForm} as named {@link Model} attribute
-     * @return the string to the endpoint redirection
+     * @param key the key entity to convert
+     * @return the converted key data transfer object
+     * @since 0.2.0
      */
-    @PostMapping(value = REQUEST_KEY_NEW)
-    String newKey(@ModelAttribute("newKeyForm") NewKeyForm newKeyForm) {
-        Key key = new Key(newKeyForm.getValue());
-        keyRepository.save(key);
-        return asRedirect(ENDPOINT_KEYS);
+    private KeyDto convertToDto(Key key) {
+        return keyConverter.convert(key);
+    }
+
+    /**
+     * Converts a key data transfer object to the associated key entity.
+     *
+     * @param keyDto the key data transfer object to convert
+     * @return the converted key entity
+     * @throws KeyNotFoundException if the associated key entity of the key data transfer object has not been found
+     * @since 0.2.0
+     */
+    private Key convertToEntity(KeyDto keyDto) throws KeyNotFoundException {
+        return keyService.getById(keyDto.getId());
     }
 }

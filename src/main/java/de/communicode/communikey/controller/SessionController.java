@@ -15,6 +15,7 @@ import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
 import static de.communicode.communikey.util.CommunikeyConstantsUtil.withParameters;
 
 import de.communicode.communikey.config.CommunikeyConstants;
+import de.communicode.communikey.domain.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -34,7 +35,9 @@ import javax.servlet.http.HttpServletResponse;
 public class SessionController {
 
     /**
-     * Endpoint to the HTTP status code 403 error page for unprivileged {@link de.communicode.communikey.domain.User}.
+     * Endpoint to the HTTP status code 403 error page for unprivileged {@link User}.
+     * <p>
+     *     Mapped to the "{@value CommunikeyConstants#ENDPOINT_HTTP_STATUS_CODE_403}" endpoint.
      *
      * @return the string to the endpoint
      */
@@ -44,7 +47,9 @@ public class SessionController {
     }
 
     /**
-     * Endpoint to the {@link de.communicode.communikey.domain.User} login.
+     * Endpoint to the {@link User} login.
+     * <p>
+     *     Mapped to the "{@value CommunikeyConstants#ENDPOINT_LOGIN}" endpoint.
      *
      * @return the string to the endpoint
      */
@@ -54,10 +59,9 @@ public class SessionController {
     }
 
     /**
-     * Endpoint to logout a {@link de.communicode.communikey.domain.User}.
-     *
+     * Endpoint to the {@link User} logout.
      * <p>
-     *     Redirects to the {@value CommunikeyConstants#ENDPOINT_LOGIN} endpoint.
+     *     Redirects to the {@value CommunikeyConstants#ENDPOINT_LOGOUT} endpoint.
      *
      * @param request the HTTP request information
      * @param response the HTTP response information
