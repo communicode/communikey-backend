@@ -6,11 +6,8 @@
  */
 package de.communicode.communikey.domain.converter;
 
-import static java.util.Objects.requireNonNull;
-
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyDto;
-import de.communicode.communikey.exception.KeyNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,15 +20,13 @@ import org.springframework.stereotype.Service;
 public class KeyDtoConverter implements KeyConverter {
 
     /**
+     * Converts the given source key entity entity into the associated key data transfer object.
      *
-     * @param source the source {@link Key} entity to convert
-     * @return the converted {@link KeyDto} data transfer object
-     * @throws KeyNotFoundException if the given {@code source} entity has not been found
+     * @param source the source key entity to convert
+     * @return the converted key data transfer object
      */
     @Override
-    public KeyDto convert(final Key source) throws KeyNotFoundException { //TODO: exception
-        requireNonNull(source, "source must not be null");
-
+    public KeyDto convert(final Key source) {
         KeyDto keyDto = new KeyDto();
         keyDto.setId(source.getId());
         keyDto.setCategoryId(source.getCategory().getId());

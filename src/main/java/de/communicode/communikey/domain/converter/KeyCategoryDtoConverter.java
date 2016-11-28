@@ -6,11 +6,8 @@
  */
 package de.communicode.communikey.domain.converter;
 
-import static java.util.Objects.requireNonNull;
-
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.KeyCategoryDto;
-import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,15 +20,13 @@ import org.springframework.stereotype.Service;
 public class KeyCategoryDtoConverter implements KeyCategoryConverter {
 
     /**
+     * Converts the given source key category entity entity into the associated key category data transfer object.
      *
-     * @param source the source {@link KeyCategory} entity to convert
-     * @return the converted {@link KeyCategoryDto} data transfer object
-     * @throws KeyCategoryNotFoundException if the given {@code source} entity has not been found
+     * @param source the source source key category entity to convert
+     * @return the converted key category data transfer object
      */
     @Override
-    public KeyCategoryDto convert(final KeyCategory source) throws KeyCategoryNotFoundException { //TODO: exception
-        requireNonNull(source, "source must not be null");
-
+    public KeyCategoryDto convert(final KeyCategory source)  {
         KeyCategoryDto keyCategoryDto = new KeyCategoryDto();
         keyCategoryDto.setId(source.getId());
         keyCategoryDto.setCreatorId(source.getCreator().getId());
