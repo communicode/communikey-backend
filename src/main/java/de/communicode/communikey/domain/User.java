@@ -6,14 +6,15 @@
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.config.constant.DataSource.USERS_TO_GROUPS;
-import static de.communicode.communikey.config.constant.DataSource.USERS;
-import static de.communicode.communikey.config.constant.DataSource.USER_ENABLED;
-import static de.communicode.communikey.config.constant.DataSource.USER_ID;
-import static de.communicode.communikey.config.constant.DataSource.USER_GROUP_ID;
+import static de.communicode.communikey.config.DataSourceConfig.ROLE_ID;
+import static de.communicode.communikey.config.DataSourceConfig.USERS_GROUPS;
+import static de.communicode.communikey.config.DataSourceConfig.USERS;
+import static de.communicode.communikey.config.DataSourceConfig.USERS_ROLES;
+import static de.communicode.communikey.config.DataSourceConfig.USER_ENABLED;
+import static de.communicode.communikey.config.DataSourceConfig.USER_ID;
+import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.communicode.communikey.type.UserRoleType;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -56,21 +57,9 @@ public class User {
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
-        name = USERS_TO_GROUPS,
-        joinColumns = {
-            @JoinColumn(
-                name = USER_ID,
-                nullable = false,
-                updatable = false
-            )
-        },
-        inverseJoinColumns = {
-            @JoinColumn(
-                name = USER_GROUP_ID,
-                nullable = false
-            )
-        }
-    )
+        name = USERS_GROUPS,
+        joinColumns = @JoinColumn(name = USER_ID, nullable = false, updatable = false),
+        inverseJoinColumns = @JoinColumn(name = USER_GROUP_ID, nullable = false))
     private Set<UserGroup> groups;
 
     @Column(name = USER_ENABLED, nullable = false)
@@ -83,47 +72,24 @@ public class User {
     @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false)
-    private String role;
+    @ManyToMany
+    @JoinTable(
+        name = USERS_ROLES,
+        joinColumns = @JoinColumn(name = USER_ID, referencedColumnName = USER_ID),
+        inverseJoinColumns = @JoinColumn(name = ROLE_ID, referencedColumnName = "id"))
+    private Set<Role> roles;
 
     private User() {}
 
     /**
-     * Constructs a new user entity with the given attributes, an auto-generated ID, the default user role {@link UserRoleType#ROLE_USER} and no
-     * assigned user groups.
+     * Constructs a new user entity with the specified username and password.
      *
      * @param username the name of the user
      * @param password the password of the user
      */
     public User(String username, String password) {
-        this(username, password, UserRoleType.ROLE_USER, new HashSet<>(0));
-    }
-
-    /**
-     * Constructs a new user entity with the given attributes, an auto-generated ID and no assigned user groups.
-     *
-     * @param username the name of the user
-     * @param password the password of the user
-     * @param role the user role type of the user
-     */
-    public User(String username, String password, UserRoleType role) {
-        this(username, password, role, new HashSet<>(0));
-    }
-
-    /**
-     * Constructs a new user entity with the given attributes and an auto-generated ID.
-     *
-     * @param username the name of the user
-     * @param password the password of the user
-     * @param role the user role type of the user
-     * @param groups a collection of user groups to assign the user to
-     */
-    public User(String username, String password, UserRoleType role, Set<UserGroup> groups) {
-        this.groups = new HashSet<>(groups);
-        isEnabled = true;
-        this.password = password;
         this.username = username;
-        this.role = role.name();
+        this.password = password;
     }
 
     public Set<UserGroup> getGroups() {
@@ -150,8 +116,8 @@ public class User {
         return responsibleKeyCategories;
     }
 
-    public String getRole() {
-        return role;
+    public Set<Role> getRoles() {
+        return roles;
     }
 
     public String getUsername() {
@@ -186,8 +152,8 @@ public class User {
         this.responsibleKeyCategories = responsibleKeyCategories;
     }
 
-    public void setRole(UserRoleType role) {
-        this.role = role.name();
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 
     public void setUsername(String username) {

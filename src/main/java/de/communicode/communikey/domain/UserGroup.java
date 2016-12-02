@@ -6,9 +6,9 @@
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.config.constant.DataSource.USER_GROUPS;
-import static de.communicode.communikey.config.constant.DataSource.USER_GROUP_NAME;
-import static de.communicode.communikey.config.constant.DataSource.USER_GROUP_ID;
+import static de.communicode.communikey.config.DataSourceConfig.USER_GROUPS;
+import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_NAME;
+import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

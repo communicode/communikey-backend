@@ -6,10 +6,10 @@
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.config.constant.DataSource.KEYS;
-import static de.communicode.communikey.config.constant.DataSource.CREATOR_USER_ID;
-import static de.communicode.communikey.config.constant.DataSource.KEY_CATEGORY_ID;
-import static de.communicode.communikey.config.constant.DataSource.KEY_ID;
+import static de.communicode.communikey.config.DataSourceConfig.KEYS;
+import static de.communicode.communikey.config.DataSourceConfig.CREATOR_USER_ID;
+import static de.communicode.communikey.config.DataSourceConfig.KEY_CATEGORY_ID;
+import static de.communicode.communikey.config.DataSourceConfig.KEY_ID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
