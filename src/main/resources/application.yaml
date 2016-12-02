@@ -8,5 +8,8 @@ spring:
     hibernate:
       dialect: org.hibernate.dialect.MySQLInnoDBDialect
       ddl-auto: create-drop
-  thymeleaf:
-    cache: false
+cckey:
+  security:
+    oauth2:
+      access_token_validity: 604800
+      refresh_token_validity: 604800
