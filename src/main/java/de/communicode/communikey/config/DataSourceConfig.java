@@ -9,7 +9,13 @@ package de.communicode.communikey.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
+import org.springframework.jdbc.datasource.init.DatabasePopulator;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+
+import javax.sql.DataSource;
 
 /**
  * Configures Spring Security for the {@link de.communicode.communikey.domain.User} authentication.
@@ -22,6 +28,10 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
  */
 @Configuration
 public class AuthenticationProviderConfig {
+
+    @Value("classpath:schema.sql")
+    private Resource schemaScript;
+
     @Value("${spring.datasource.driverClassName}")
     private String databaseDriverClassName;
     @Value("${spring.datasource.url}")
@@ -44,5 +54,19 @@ public class AuthenticationProviderConfig {
         driverManagerDataSource.setUsername(databaseUsername);
         driverManagerDataSource.setPassword(databasePassword);
         return driverManagerDataSource;
+    }
+
+    @Bean
+    public DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
+        DataSourceInitializer initializer = new DataSourceInitializer();
+        initializer.setDataSource(dataSource);
+        initializer.setDatabasePopulator(databasePopulator());
+        return initializer;
+    }
+
+    private DatabasePopulator databasePopulator() {
+        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.addScript(schemaScript);
+        return populator;
     }
 }

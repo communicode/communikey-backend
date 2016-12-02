@@ -50,7 +50,6 @@ public class UserDtoConverter implements UserConverter {
         );
         userDto.setEnabled(source.isEnabled());
         userDto.setUsername(source.getUsername());
-        userDto.setRole(source.getRole());
         return userDto;
     }
 }

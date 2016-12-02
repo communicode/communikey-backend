@@ -27,4 +27,13 @@ public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(long userId) {
         super("could not find user with ID " + userId);
     }
+
+    /**
+     * Constructs an {@code UserNotFoundException} with the specified {@link User} name applied to the message.
+     *
+     * @param username the name of the user entity that has not been found
+     */
+    public UserNotFoundException(String username) {
+        super("could not find user with name " + username);
+    }
 }

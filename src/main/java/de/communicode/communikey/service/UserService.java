@@ -9,7 +9,6 @@ package de.communicode.communikey.service;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.exception.UserConflictException;
 import de.communicode.communikey.exception.UserNotFoundException;
-import de.communicode.communikey.type.UserRoleType;
 
 import java.util.Optional;
 import java.util.Set;
@@ -84,7 +83,7 @@ public interface UserService {
      * @param newRole the new role type
      * @throws UserNotFoundException if the specified {@code user} has not been found
      */
-    void modifyRole(long userId, UserRoleType newRole) throws UserNotFoundException;
+    //void modifyRole(long userId, UserRoleType newRole) throws UserNotFoundException;
 
     /**
      * Saves the specified user.

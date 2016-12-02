@@ -6,22 +6,22 @@
  */
 package de.communicode.communikey.type;
 
-import de.communicode.communikey.domain.User;
+import de.communicode.communikey.domain.Role;
 
 /**
- * Provides {@link User} role types.
+ * Provides {@link Role} types.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-public enum UserRoleType {
+public enum RoleType {
     /**
-     * The user role with administrative permissions.
+     * The role with administrative permissions.
      */
     ROLE_ADMIN,
 
     /**
      * The default user role.
      */
-    ROLE_USER;
+    ROLE_USER
 }

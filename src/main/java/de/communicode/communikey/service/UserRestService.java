@@ -8,14 +8,16 @@ package de.communicode.communikey.service;
 
 import static java.util.Objects.requireNonNull;
 
+import de.communicode.communikey.domain.Role;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.exception.UserConflictException;
 import de.communicode.communikey.exception.UserNotFoundException;
+import de.communicode.communikey.repository.RoleRepository;
 import de.communicode.communikey.repository.UserRepository;
-import de.communicode.communikey.type.UserRoleType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,10 +32,12 @@ import java.util.stream.StreamSupport;
 @Service
 public class UserRestService implements UserService {
 
+    private final RoleRepository roleRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public UserRestService(UserRepository userRepository) {
+    public UserRestService(UserRepository userRepository, RoleRepository roleRepository) {
+        this.roleRepository = requireNonNull(roleRepository, "roleRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
     }
 
@@ -45,7 +49,12 @@ public class UserRestService implements UserService {
 
         Optional.of(userRepository.findOneByUsername(username)).orElseThrow(() -> new UserConflictException(
             "User with username \"" + username + "\"already " + "exists!"));
-        return userRepository.save(new User(username, password));
+
+        User user = new User(username, password);
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleRepository.findOneByName("ROLE_USER"));
+        user.setRoles(roles);
+        return userRepository.save(user);
     }
 
     @Override
@@ -82,13 +91,6 @@ public class UserRestService implements UserService {
             "User with username \"" + newUsername + "\"already " + "exists!"));
         User user = validate(userId);
         user.setUsername(newUsername);
-        userRepository.save(user);
-    }
-
-    @Override
-    public void modifyRole(long userId, UserRoleType newRole) throws UserNotFoundException {
-        User user = validate(userId);
-        user.setRole(newRole);
         userRepository.save(user);
     }
 
