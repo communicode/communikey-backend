@@ -6,8 +6,8 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.controller.RequestMapping.KEYS;
-import static de.communicode.communikey.controller.RequestMapping.KEY_ID;
+import static de.communicode.communikey.controller.RequestMappings.KEYS;
+import static de.communicode.communikey.controller.RequestMappings.KEY_ID;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Key;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * The REST API controller to process {@link Key} entities.
  * <p>
- *     Mapped to the "{@value de.communicode.communikey.controller.RequestMapping#KEYS}" endpoint.
+ *     Mapped to the "{@value RequestMappings#KEYS}" endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
@@ -51,7 +51,7 @@ public class KeyController {
     /**
      * Gets all {@link Key} entities.
      * <p>
-     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#KEYS}".
+     *     This endpoint is mapped to "{@value RequestMappings#KEYS}".
      *
      * @param limit the amount of key data transfer objects to include in the response
      * @param userId the ID of the user to get all key entities of
@@ -70,7 +70,7 @@ public class KeyController {
     /**
      * Gets the {@link Key} entity with the specified ID.
      * <p>
-     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#KEYS}{@value de.communicode.communikey.controller.RequestMapping#KEY_ID}".
+     *     This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEY_ID}".
      *
      * @param keyId the ID of the key entity to get
      * @return the key data transfer object

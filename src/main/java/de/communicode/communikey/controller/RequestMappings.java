@@ -17,9 +17,9 @@ import de.communicode.communikey.domain.UserGroup;
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-public final class RequestMapping {
+public final class RequestMappings {
 
-    private RequestMapping() {}
+    private RequestMappings() {}
 
     /**
      * The endpoint for the HTTP status code {@code 403}.

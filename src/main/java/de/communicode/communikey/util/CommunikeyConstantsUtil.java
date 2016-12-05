@@ -6,7 +6,7 @@
  */
 package de.communicode.communikey.util;
 
-import static de.communicode.communikey.controller.RequestMapping.HTTP_STATUS_CODE_404;
+import static de.communicode.communikey.controller.RequestMappings.HTTP_STATUS_CODE_404;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.joining;
 

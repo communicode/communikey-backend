@@ -6,8 +6,8 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.controller.RequestMapping.USER_GROUPS;
-import static de.communicode.communikey.controller.RequestMapping.USER_GROUP_ID;
+import static de.communicode.communikey.controller.RequestMappings.USER_GROUPS;
+import static de.communicode.communikey.controller.RequestMappings.USER_GROUP_ID;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.UserGroup;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * The REST API controller to process {@link UserGroup} entities.
  * <p>
- *     Mapped to the {@value de.communicode.communikey.controller.RequestMapping#USER_GROUPS} endpoint.
+ *     Mapped to the {@value RequestMappings#USER_GROUPS} endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -51,7 +51,7 @@ public class UserGroupController {
     /**
      * Gets all {@link UserGroup} entities.
      * <p>
-     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#USER_GROUPS}{@value de.communicode.communikey.controller.RequestMapping#USER_GROUP_ID}".
+     *     This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUP_ID}".
      *
      * @param limit the amount of user group  data transfer objects to include in the response
      * @return a collection of user group data transfer objects
@@ -67,7 +67,7 @@ public class UserGroupController {
     /**
      * Gets the {@link UserGroup} entity with the specified ID.
      * <p>
-     *     This endpoint is mapped to "{@value de.communicode.communikey.controller.RequestMapping#USER_GROUPS}{@value de.communicode.communikey.controller.RequestMapping#USER_GROUP_ID}".
+     *     This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUP_ID}".
      *
      * @param userGroupId the ID of the user group entity to get
      * @return the user group data transfer object

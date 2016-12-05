@@ -6,9 +6,9 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.controller.RequestMapping.HTTP_STATUS_CODE_403;
-import static de.communicode.communikey.controller.RequestMapping.LOGIN;
-import static de.communicode.communikey.controller.RequestMapping.LOGOUT;
+import static de.communicode.communikey.controller.RequestMappings.HTTP_STATUS_CODE_403;
+import static de.communicode.communikey.controller.RequestMappings.LOGIN;
+import static de.communicode.communikey.controller.RequestMappings.LOGOUT;
 import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
 
 import de.communicode.communikey.domain.User;
@@ -33,7 +33,7 @@ public class SessionController {
     /**
      * Endpoint to the HTTP status code 403 error page for unprivileged {@link User}.
      * <p>
-     *     Mapped to the "{@value RequestMapping#HTTP_STATUS_CODE_403}" endpoint.
+     *     Mapped to the "{@value RequestMappings#HTTP_STATUS_CODE_403}" endpoint.
      *
      * @return the string to the endpoint
      */
@@ -45,7 +45,7 @@ public class SessionController {
     /**
      * Endpoint to the {@link User} login.
      * <p>
-     *     Mapped to the "{@value RequestMapping#LOGIN}" endpoint.
+     *     Mapped to the "{@value RequestMappings#LOGIN}" endpoint.
      *
      * @return the string to the endpoint
      */
@@ -57,7 +57,7 @@ public class SessionController {
     /**
      * Endpoint to the {@link User} logout.
      * <p>
-     *     Redirects to the {@value RequestMapping#LOGOUT} endpoint.
+     *     Redirects to the {@value RequestMappings#LOGOUT} endpoint.
      *
      * @param request the HTTP request information
      * @param response the HTTP response information

@@ -6,8 +6,8 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.controller.RequestMapping.KEYS;
-import static de.communicode.communikey.controller.RequestMapping.ROOT;
+import static de.communicode.communikey.controller.RequestMappings.KEYS;
+import static de.communicode.communikey.controller.RequestMappings.ROOT;
 import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * The controller for the root endpoint which represents the main endpoint of this application.
  * <p>
- *     Mapped to the "{@value de.communicode.communikey.controller.RequestMapping#ROOT}" endpoint.
+ *     Mapped to the "{@value RequestMappings#ROOT}" endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -27,7 +27,7 @@ public class RootController {
     /**
      * The root endpoint without any parameters.
      * <p>
-     *     Defaults to the "{@value de.communicode.communikey.controller.RequestMapping#KEYS}" endpoint.
+     *     Defaults to the "{@value RequestMappings#KEYS}" endpoint.
      *
      * @return the string to the endpoint redirection
      */
