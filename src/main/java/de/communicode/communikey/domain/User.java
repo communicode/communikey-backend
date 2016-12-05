@@ -16,6 +16,8 @@ import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -82,7 +84,8 @@ public class User {
         name = USERS_ROLES,
         joinColumns = @JoinColumn(name = USER_ID, referencedColumnName = USER_ID),
         inverseJoinColumns = @JoinColumn(name = ROLE_ID, referencedColumnName = "id"))
-    @JsonBackReference
+    @JsonManagedReference
+    @JsonIgnoreProperties("privileges")
     private Set<Role> roles;
 
     private User() {}
