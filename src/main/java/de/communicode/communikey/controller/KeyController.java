@@ -53,16 +53,14 @@ public class KeyController {
      * <p>
      *     This endpoint is mapped to "{@value RequestMappings#KEYS}".
      *
-     * @param limit the amount of key data transfer objects to include in the response
      * @param userId the ID of the user to get all key entities of
      * @return a collection of {@link Key} data transfer objects
      * @since 0.2.0
      */
     @GetMapping
-    Set<KeyDto> getAll(@RequestParam(required = false) Long limit, @RequestParam(name = "user", required = false) Long userId) {
+    Set<KeyDto> getAll(@RequestParam(name = "user", required = false) Long userId) {
         return keyService.getAll().stream()
             .filter(key -> userId == null || userId.equals(key.getCreator().getId()))
-            .limit(Optional.ofNullable(limit).orElse(Long.MAX_VALUE))
             .map(keyConverter)
             .collect(Collectors.toSet());
     }

@@ -53,13 +53,11 @@ public class UserGroupController {
      * <p>
      *     This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUP_ID}".
      *
-     * @param limit the amount of user group  data transfer objects to include in the response
      * @return a collection of user group data transfer objects
      */
     @GetMapping
-    Set<UserGroupDto> getAll(@RequestParam(required = false) Long limit) {
+    Set<UserGroupDto> getAll() {
         return userGroupService.getAll().stream()
-            .limit(Optional.ofNullable(limit).orElse(Long.MAX_VALUE))
             .map(userGroupConverter)
             .collect(Collectors.toSet());
     }

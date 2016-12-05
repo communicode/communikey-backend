@@ -53,16 +53,13 @@ public class UserController {
      * <p>
      *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USER_ID}".
      *
-     * @param limit the amount of user data transfer objects to include in the response
      * @param username the name of the user entities to get
      * @return a collection of user data transfer objects
      */
     @GetMapping
-    Set<UserDto> getAll(@RequestParam(required = false) Long limit,
-                        @RequestParam(name = "username", required = false) String username) {
+    Set<UserDto> getAll(@RequestParam(name = "username", required = false) String username) {
         return userService.getAll().stream()
             .filter(user -> username == null || username.equalsIgnoreCase(user.getUsername()))
-            .limit(Optional.ofNullable(limit).orElse(Long.MAX_VALUE))
             .map(userConverter)
             .collect(Collectors.toSet());
     }

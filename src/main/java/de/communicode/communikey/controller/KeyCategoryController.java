@@ -53,22 +53,19 @@ public class KeyCategoryController {
      * <p>
      *     This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}".
      *
-     * @param limit the amount of key category data transfer objects to include in the response
      * @param creatorUserId the ID of the user to get all created key category entities of
      * @param responsibleUserId the ID of the responsible user to get all key category entities of
      * @param name the name of the key category entities to get
      * @return a collection of {@link KeyCategoryDto} data transfer objects
      */
     @GetMapping
-    Set<KeyCategoryDto> getAll(@RequestParam(required = false) Long limit,
-                               @RequestParam(name = "creator", required = false) Long creatorUserId,
+    Set<KeyCategoryDto> getAll(@RequestParam(name = "creator", required = false) Long creatorUserId,
                                @RequestParam(name = "responsible", required = false) Long responsibleUserId,
                                @RequestParam(name = "name", required = false) String name) {
         return keyCategoryService.getAll().stream()
             .filter(keyCategory -> creatorUserId == null || creatorUserId.equals(keyCategory.getCreator().getId()))
             .filter(keyCategory -> responsibleUserId == null || responsibleUserId.equals(keyCategory.getResponsible().getId()))
             .filter(keyCategory -> name == null || name.equalsIgnoreCase(keyCategory.getName()))
-            .limit(Optional.ofNullable(limit).orElse(Long.MAX_VALUE))
             .map(keyCategoryConverter)
             .collect(Collectors.toSet());
     }
