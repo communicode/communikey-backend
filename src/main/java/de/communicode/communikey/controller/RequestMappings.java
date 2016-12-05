@@ -8,6 +8,7 @@ package de.communicode.communikey.controller;
 
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
+import de.communicode.communikey.domain.Role;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
 
@@ -70,6 +71,11 @@ public final class RequestMappings {
      * The endpoint for {@link User} entities.
      */
     public static final String USERS = "/users";
+
+    /**
+     * The endpoint for {@link Role} entities.
+     */
+    public static final String ROLES = USERS + "/roles";
 
     /**
      * The endpoint for {@link UserGroup} entities.
