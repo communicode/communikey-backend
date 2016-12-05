@@ -30,7 +30,8 @@ public class KeyDtoConverter implements KeyConverter {
         KeyDto keyDto = new KeyDto();
         keyDto.setId(source.getId());
         keyDto.setCategoryId(source.getCategory().getId());
-        keyDto.setCreatorId(source.getCreator().getId());
+        //keyDto.setCreatorId(source.getCreator().getId());
+        keyDto.setCreator(source.getCreator());
         keyDto.setCreationTimestamp(source.getCreationTimestamp());
         keyDto.setValue(source.getValue());
         return keyDto;

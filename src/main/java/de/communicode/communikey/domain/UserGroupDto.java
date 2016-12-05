@@ -6,6 +6,8 @@
  */
 package de.communicode.communikey.domain;
 
+import java.util.Set;
+
 /**
  * A data transfer object for a {@link UserGroup} entity.
  *
@@ -18,7 +20,7 @@ public class UserGroupDto {
 
     private String name;
 
-    private long[] users;
+    private Set<User> users;
 
     public long getId() {
         return id;
@@ -28,7 +30,7 @@ public class UserGroupDto {
         return name;
     }
 
-    public long[] getUsers() {
+    public Set<User> getUsers() {
         return users;
     }
 
@@ -40,7 +42,7 @@ public class UserGroupDto {
         this.name = name;
     }
 
-    public void setUsers(long[] users) {
+    public void setUsers(Set<User> users) {
         this.users = users;
     }
 }

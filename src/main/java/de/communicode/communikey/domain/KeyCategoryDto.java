@@ -6,6 +6,8 @@
  */
 package de.communicode.communikey.domain;
 
+import java.util.Set;
+
 /**
  * A data transfer object for a {@link KeyCategory} entity.
  *
@@ -15,7 +17,7 @@ package de.communicode.communikey.domain;
 public class KeyCategoryDto {
     private long id;
 
-    private long[] childs;
+    private Set<KeyCategory> childs;
 
     private long creatorId;
 
@@ -29,7 +31,7 @@ public class KeyCategoryDto {
         return id;
     }
 
-    public long[] getChilds() {
+    public Set<KeyCategory> getChilds() {
         return childs;
     }
 
@@ -53,7 +55,7 @@ public class KeyCategoryDto {
         this.id = id;
     }
 
-    public void setChilds(long[] childs) {
+    public void setChilds(Set<KeyCategory> childs) {
         this.childs = childs;
     }
 

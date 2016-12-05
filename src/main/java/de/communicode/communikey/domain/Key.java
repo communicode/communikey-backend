@@ -11,6 +11,8 @@ import static de.communicode.communikey.config.DataSourceConfig.CREATOR_USER_ID;
 import static de.communicode.communikey.config.DataSourceConfig.KEY_CATEGORY_ID;
 import static de.communicode.communikey.config.DataSourceConfig.KEY_ID;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GenerationType;
@@ -39,10 +41,12 @@ public class Key {
 
     @ManyToOne
     @JoinColumn(name = CREATOR_USER_ID, nullable = false)
+    @JsonManagedReference
     private User creator;
 
     @ManyToOne
     @JoinColumn(name = KEY_CATEGORY_ID)
+    @JsonManagedReference
     private KeyCategory category;
 
     private Timestamp creationTimestamp;

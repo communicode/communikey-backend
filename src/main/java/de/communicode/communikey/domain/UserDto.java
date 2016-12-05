@@ -6,6 +6,8 @@
  */
 package de.communicode.communikey.domain;
 
+import java.util.Set;
+
 /**
  * A data transfer object for a {@link User} entity.
  *
@@ -16,13 +18,13 @@ public class UserDto {
 
     private long id;
 
-    private long[] keys;
+    private Set<Key> keys;
 
-    private long[] keyCategories;
+    private Set<KeyCategory> keyCategories;
 
-    private long[] responsibleKeyCategories;
+    private Set<KeyCategory> responsibleKeyCategories;
 
-    private long[] groups;
+    private Set<UserGroup> groups;
 
     private boolean isEnabled;
 
@@ -34,19 +36,19 @@ public class UserDto {
         return id;
     }
 
-    public long[] getKeys() {
+    public Set<Key> getKeys() {
         return keys;
     }
 
-    public long[] getKeyCategories() {
+    public Set<KeyCategory> getKeyCategories() {
         return keyCategories;
     }
 
-    public long[] getResponsibleKeyCategories() {
+    public Set<KeyCategory> getResponsibleKeyCategories() {
         return responsibleKeyCategories;
     }
 
-    public long[] getGroups() {
+    public Set<UserGroup> getGroups() {
         return groups;
     }
 
@@ -66,19 +68,19 @@ public class UserDto {
         this.id = id;
     }
 
-    public void setKeys(long[] keys) {
+    public void setKeys(Set<Key> keys) {
         this.keys = keys;
     }
 
-    public void setKeyCategories(long[] keyCategories) {
+    public void setKeyCategories(Set<KeyCategory> keyCategories) {
         this.keyCategories = keyCategories;
     }
 
-    public void setResponsibleKeyCategories(long[] responsibleKeyCategories) {
+    public void setResponsibleKeyCategories(Set<KeyCategory> responsibleKeyCategories) {
         this.responsibleKeyCategories = responsibleKeyCategories;
     }
 
-    public void setGroups(long[] groups) {
+    public void setGroups(Set<UserGroup> groups) {
         this.groups = groups;
     }
 

@@ -14,6 +14,7 @@ import static de.communicode.communikey.config.DataSourceConfig.USER_ENABLED;
 import static de.communicode.communikey.config.DataSourceConfig.USER_ID;
 import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.CascadeType;
@@ -47,12 +48,15 @@ public class User {
     private long id;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator")
+    @JsonBackReference
     private Set<Key> keys;
 
     @OneToMany(mappedBy = "creator")
+    @JsonBackReference
     private Set<KeyCategory> keyCategories;
 
     @OneToMany(mappedBy = "responsible")
+    @JsonBackReference
     private Set<KeyCategory> responsibleKeyCategories;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -60,6 +64,7 @@ public class User {
         name = USERS_GROUPS,
         joinColumns = @JoinColumn(name = USER_ID, nullable = false, updatable = false),
         inverseJoinColumns = @JoinColumn(name = USER_GROUP_ID, nullable = false))
+    @JsonBackReference
     private Set<UserGroup> groups;
 
     @Column(name = USER_ENABLED, nullable = false)
@@ -77,6 +82,7 @@ public class User {
         name = USERS_ROLES,
         joinColumns = @JoinColumn(name = USER_ID, referencedColumnName = USER_ID),
         inverseJoinColumns = @JoinColumn(name = ROLE_ID, referencedColumnName = "id"))
+    @JsonBackReference
     private Set<Role> roles;
 
     private User() {}

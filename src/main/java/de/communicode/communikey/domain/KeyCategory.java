@@ -11,6 +11,9 @@ import static de.communicode.communikey.config.DataSourceConfig.CREATOR_USER_ID;
 import static de.communicode.communikey.config.DataSourceConfig.KEY_CATEGORY_ID;
 import static de.communicode.communikey.config.DataSourceConfig.RESPONSIBLE_USER_ID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,23 +43,28 @@ public class KeyCategory {
     private long id;
 
     @OneToMany(mappedBy = "parent")
+    @JsonBackReference
     private Set<KeyCategory> childs;
 
     @ManyToOne
     @JoinColumn(name = CREATOR_USER_ID, nullable = false)
+    @JsonManagedReference
     private User creator;
 
     @ManyToOne
     @JoinColumn(name = RESPONSIBLE_USER_ID, nullable = false)
+    @JsonManagedReference
     private User responsible;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "category")
+    @JsonBackReference
     private Set<Key> keys;
 
     private String name;
 
     @ManyToOne
     @JoinColumn
+    @JsonManagedReference
     private KeyCategory parent;
 
     private KeyCategory() {}

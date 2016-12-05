@@ -19,7 +19,7 @@ public class KeyDto {
 
     private long categoryId;
 
-    private long creatorId;
+    private User creator;
 
     private Timestamp creationTimestamp;
 
@@ -33,8 +33,8 @@ public class KeyDto {
         return creationTimestamp;
     }
 
-    public long getCreatorId() {
-        return creatorId;
+    public User getCreatorId() {
+        return creator;
     }
 
     public long getId() {
@@ -53,8 +53,8 @@ public class KeyDto {
         this.creationTimestamp = creationTimestamp;
     }
 
-    public void setCreatorId(long creatorId) {
-        this.creatorId = creatorId;
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
     public void setId(long id) {

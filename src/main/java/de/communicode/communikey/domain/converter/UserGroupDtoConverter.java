@@ -31,10 +31,7 @@ public class UserGroupDtoConverter implements UserGroupConverter {
         UserGroupDto userGroupDto = new UserGroupDto();
         userGroupDto.setId(source.getId());
         userGroupDto.setName(source.getName());
-        userGroupDto.setUsers(source.getUsers().stream()
-            .mapToLong(User::getId)
-            .toArray()
-        );
+        userGroupDto.setUsers(source.getUsers());
         return userGroupDto;
     }
 }

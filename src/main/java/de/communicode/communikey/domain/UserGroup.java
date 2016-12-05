@@ -10,6 +10,9 @@ import static de.communicode.communikey.config.DataSourceConfig.USER_GROUPS;
 import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_NAME;
 import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -39,6 +42,7 @@ public class UserGroup {
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")
+    @JsonManagedReference
     private Set<User> users;
 
     private UserGroup() {}

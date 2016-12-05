@@ -32,22 +32,14 @@ public class UserDtoConverter implements UserConverter {
     public UserDto convert(final User source) {
         UserDto userDto = new UserDto();
         userDto.setId(source.getId());
-        userDto.setKeys(source.getKeys().stream()
+/*        userDto.setKeys(source.getKeys().stream()
             .mapToLong(Key::getId)
             .toArray()
-        );
-        userDto.setKeyCategories(source.getKeyCategories().stream()
-            .mapToLong(KeyCategory::getId)
-            .toArray()
-        );
-        userDto.setResponsibleKeyCategories(source.getResponsibleKeyCategories().stream()
-            .mapToLong(KeyCategory::getId)
-            .toArray()
-        );
-        userDto.setGroups(source.getGroups().stream()
-            .mapToLong(UserGroup::getId)
-            .toArray()
-        );
+        );*/
+        userDto.setKeys(source.getKeys());
+        userDto.setKeyCategories(source.getKeyCategories());
+        userDto.setResponsibleKeyCategories(source.getResponsibleKeyCategories());
+        userDto.setGroups(source.getGroups());
         userDto.setEnabled(source.isEnabled());
         userDto.setUsername(source.getUsername());
         return userDto;

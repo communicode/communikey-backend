@@ -10,6 +10,9 @@ import static de.communicode.communikey.config.DataSourceConfig.PRIVILEGE_ID;
 import static de.communicode.communikey.config.DataSourceConfig.ROLES_PRIVILEGES;
 import static de.communicode.communikey.config.DataSourceConfig.ROLE_ID;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -34,6 +37,7 @@ public class Role {
     private long id;
 
     @ManyToMany(mappedBy = "roles")
+    @JsonManagedReference
     private Set<User> users;
 
     @ManyToMany
@@ -42,6 +46,7 @@ public class Role {
         joinColumns = @JoinColumn(name = ROLE_ID, referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = PRIVILEGE_ID, referencedColumnName = "id")
     )
+    @JsonBackReference
     private Set<Privilege> privileges;
 
     private String name;
