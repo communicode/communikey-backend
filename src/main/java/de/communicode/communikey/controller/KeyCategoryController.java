@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,14 +58,13 @@ public class KeyCategoryController {
      * @return a collection of {@link KeyCategoryDto} data transfer objects
      */
     @GetMapping
-    Set<KeyCategoryDto> getAll(@RequestParam(name = "creator", required = false) Long creatorUserId,
+    Set<KeyCategory> getAll(@RequestParam(name = "creator", required = false) Long creatorUserId,
                                @RequestParam(name = "responsible", required = false) Long responsibleUserId,
                                @RequestParam(name = "name", required = false) String name) {
         return keyCategoryService.getAll().stream()
             .filter(keyCategory -> creatorUserId == null || creatorUserId.equals(keyCategory.getCreator().getId()))
             .filter(keyCategory -> responsibleUserId == null || responsibleUserId.equals(keyCategory.getResponsible().getId()))
             .filter(keyCategory -> name == null || name.equalsIgnoreCase(keyCategory.getName()))
-            .map(keyCategoryConverter)
             .collect(Collectors.toSet());
     }
 
@@ -80,8 +78,8 @@ public class KeyCategoryController {
      * @throws KeyCategoryNotFoundException if the key category entity with the specified ID has not been found
      */
     @GetMapping(value = KEY_CATEGORY_ID)
-    KeyCategoryDto get(@PathVariable long keyCategoryId) throws KeyCategoryNotFoundException {
-        return convertToDto(keyCategoryService.getById(keyCategoryId));
+    KeyCategory get(@PathVariable long keyCategoryId) throws KeyCategoryNotFoundException {
+        return keyCategoryService.getById(keyCategoryId);
     }
 
     /**

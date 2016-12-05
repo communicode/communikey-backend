@@ -19,10 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,9 +54,8 @@ public class UserGroupController {
      * @return a collection of user group data transfer objects
      */
     @GetMapping
-    Set<UserGroupDto> getAll() {
+    Set<UserGroup> getAll() {
         return userGroupService.getAll().stream()
-            .map(userGroupConverter)
             .collect(Collectors.toSet());
     }
 
@@ -72,8 +69,8 @@ public class UserGroupController {
      * @throws UserGroupNotFoundException if the user group entity with the specified ID has not been found
      */
     @GetMapping(value = USER_GROUP_ID)
-    UserGroupDto get(@PathVariable long userGroupId) throws UserGroupNotFoundException {
-        return convertToDto(userGroupService.getById(userGroupId));
+    UserGroup get(@PathVariable long userGroupId) throws UserGroupNotFoundException {
+        return userGroupService.getById(userGroupId);
     }
 
     /**

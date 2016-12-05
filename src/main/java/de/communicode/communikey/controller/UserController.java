@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -57,10 +56,9 @@ public class UserController {
      * @return a collection of user data transfer objects
      */
     @GetMapping
-    Set<UserDto> getAll(@RequestParam(name = "username", required = false) String username) {
+    Set<User> getAll(@RequestParam(name = "username", required = false) String username) {
         return userService.getAll().stream()
             .filter(user -> username == null || username.equalsIgnoreCase(user.getUsername()))
-            .map(userConverter)
             .collect(Collectors.toSet());
     }
 
@@ -74,8 +72,8 @@ public class UserController {
      * @throws UserNotFoundException if the user entity with the specified ID has not been found
      */
     @GetMapping(value = USER_ID)
-    UserDto get(@PathVariable long userId) throws UserNotFoundException {
-        return convertToDto(userService.getById(userId));
+    User get(@PathVariable long userId) throws UserNotFoundException {
+        return userService.getById(userId);
     }
 
     /**

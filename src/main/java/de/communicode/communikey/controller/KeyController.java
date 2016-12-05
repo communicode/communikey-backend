@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,10 +57,9 @@ public class KeyController {
      * @since 0.2.0
      */
     @GetMapping
-    Set<KeyDto> getAll(@RequestParam(name = "user", required = false) Long userId) {
+    Set<Key> getAll(@RequestParam(name = "user", required = false) Long userId) {
         return keyService.getAll().stream()
             .filter(key -> userId == null || userId.equals(key.getCreator().getId()))
-            .map(keyConverter)
             .collect(Collectors.toSet());
     }
 
@@ -75,8 +73,8 @@ public class KeyController {
      * @throws KeyNotFoundException if the key entity with the specified ID has not been found
      */
     @GetMapping(value = KEY_ID)
-    KeyDto get(@PathVariable long keyId) throws KeyNotFoundException {
-        return convertToDto(keyService.getById(keyId));
+    Key get(@PathVariable long keyId) throws KeyNotFoundException {
+        return keyService.getById(keyId);
     }
 
     /**
