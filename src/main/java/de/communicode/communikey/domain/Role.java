@@ -37,7 +37,7 @@ public class Role {
     private long id;
 
     @ManyToMany(mappedBy = "roles")
-    @JsonManagedReference
+    @JsonBackReference
     private Set<User> users;
 
     @ManyToMany
@@ -46,7 +46,7 @@ public class Role {
         joinColumns = @JoinColumn(name = ROLE_ID, referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = PRIVILEGE_ID, referencedColumnName = "id")
     )
-    @JsonBackReference
+    @JsonManagedReference
     private Set<Privilege> privileges;
 
     private String name;

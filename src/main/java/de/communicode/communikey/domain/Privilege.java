@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.Entity;
@@ -32,7 +33,7 @@ public class Privilege {
     private String name;
 
     @ManyToMany(mappedBy = "privileges")
-    @JsonManagedReference
+    @JsonBackReference
     private Set<Role> roles;
 
     private Privilege() {}
