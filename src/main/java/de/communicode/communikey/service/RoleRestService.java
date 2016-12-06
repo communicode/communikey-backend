@@ -42,7 +42,7 @@ public class RoleRestService implements RoleService {
             throw new IllegalArgumentException("name must not be empty!");
         }
 
-        Optional.of(roleRepository.findOneByName(name)).orElseThrow(() -> new RoleConflictException( "Role with name \"" + name + "\"already " + "exists!"));
+        Optional.of(roleRepository.findOneByName(name)).orElseThrow(() -> new RoleConflictException("Role with name \"" + name + "\"already " + "exists!"));
         return roleRepository.save(new Role(name));
     }
 
