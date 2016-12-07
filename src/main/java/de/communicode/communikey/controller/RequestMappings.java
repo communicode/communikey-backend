@@ -24,6 +24,11 @@ public final class RequestMappings {
     private RequestMappings() {}
 
     /**
+     * The root endpoint.
+     */
+    public static final String ROOT = "/";
+
+    /**
      * The endpoint for the HTTP status code {@code 403}.
      */
     public static final String HTTP_STATUS_CODE_403 = "/error/403";
@@ -36,7 +41,7 @@ public final class RequestMappings {
     /**
      * The endpoint for {@link Key} entities.
      */
-    public static final String KEYS = "/keys";
+    public static final String KEYS = ROOT + "keys";
 
     /**
      * The endpoint for {@link KeyCategory} entities.
@@ -64,14 +69,9 @@ public final class RequestMappings {
     public static final String LOGOUT = "/logout";
 
     /**
-     * The root endpoint.
-     */
-    public static final String ROOT = "/";
-
-    /**
      * The endpoint for {@link User} entities.
      */
-    public static final String USERS = "/users";
+    public static final String USERS = ROOT + "users";
 
     /**
      * The endpoint for {@link Role} entities.
