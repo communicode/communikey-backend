@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.servlet.http.HttpServletRequest;
+
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
@@ -40,11 +42,12 @@ public class GlobalControllerExceptionHandler {
      * @return the error response entity
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeException(MethodArgumentTypeMismatchException exception) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeException(MethodArgumentTypeMismatchException exception, HttpServletRequest request) {
         return createErrorResponse(
             HttpStatus.BAD_REQUEST,
             new Timestamp(Calendar.getInstance().getTimeInMillis()),
-            String.format("%s should be of type %s", exception.getName(), exception.getRequiredType().getName())
+            String.format("%s should be of type %s", exception.getName(), exception.getRequiredType().getName()),
+            request
         );
     }
 
@@ -58,8 +61,9 @@ public class GlobalControllerExceptionHandler {
      * @param description the description about the error
      * @return the error response
      */
-    ResponseEntity<ErrorResponse> createErrorResponse(final HttpStatus status, final Timestamp timestamp, final String description) {
-        final ErrorResponse errorResponse = new ErrorResponse(status, timestamp, description);
+    ResponseEntity<ErrorResponse> createErrorResponse(final HttpStatus status, final Timestamp timestamp, final String description,
+                                                      HttpServletRequest request) {
+        final ErrorResponse errorResponse = new ErrorResponse(status, timestamp, description, request);
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_JSON);
         return new ResponseEntity<>(errorResponse, headers, status);
