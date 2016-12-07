@@ -6,15 +6,16 @@
  */
 package de.communicode.communikey.exception;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 import org.springframework.boot.autoconfigure.web.DefaultErrorAttributes;
 import org.springframework.boot.autoconfigure.web.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -24,31 +25,45 @@ import java.util.Calendar;
 import java.util.Map;
 
 /**
- * The global exception handler that provides centralized exception handling for all controllers.
+ * The global exception handler that provides a method to create {@link ErrorResponse} entities.
  * <p>
- * Returns wrapped custom {@link ErrorResponse} entities.
+ *     Exceptions for each controller are handled by the specific controller exception handler.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-@ControllerAdvice
 public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
      * Handles all mismatched type arguments.
      *
-     * @param ex the exception to handle
-     * @return the REST response entity
+     * @param exception the exception to handle
+     * @return the error response entity
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        String errorMessage = ex.getName() + " should be of type " + ex.getRequiredType().getName();
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeException(MethodArgumentTypeMismatchException exception) {
+        return createErrorResponse(
+            HttpStatus.BAD_REQUEST,
+            new Timestamp(Calendar.getInstance().getTimeInMillis()),
+            String.format("%s should be of type %s", exception.getName(), exception.getRequiredType().getName())
+        );
+    }
 
-        return new ResponseEntity<>(
-            new ErrorResponse(HttpStatus.BAD_REQUEST.value(), new Timestamp(Calendar.getInstance().getTimeInMillis()), errorMessage),
-            new HttpHeaders(),
-            HttpStatus.BAD_REQUEST);
+    /**
+     * Creates a new error response with {@link MediaType#APPLICATION_JSON}.
+     * <p>
+     *     Used by all controller exception handlers.
+     *
+     * @param status the HTTP status of the error
+     * @param timestamp the timestamp of the error
+     * @param description the description about the error
+     * @return the error response
+     */
+    ResponseEntity<ErrorResponse> createErrorResponse(final HttpStatus status, final Timestamp timestamp, final String description) {
+        final ErrorResponse errorResponse = new ErrorResponse(status, timestamp, description);
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(APPLICATION_JSON);
+        return new ResponseEntity<>(errorResponse, headers, status);
     }
 
     /**
@@ -67,5 +82,4 @@ public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHan
             }
         };
     }
-
 }
