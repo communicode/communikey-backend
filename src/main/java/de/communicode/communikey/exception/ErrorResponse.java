@@ -18,7 +18,7 @@ import java.sql.Timestamp;
  * @since 0.2.0
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class ErrorRestResponse {
+class ErrorResponse {
 
     private Timestamp timestamp;
     private int status;
@@ -31,7 +31,7 @@ class ErrorRestResponse {
      * @param timestamp the timestamp of the error
      * @param errorMessage the message about this error
      */
-    ErrorRestResponse(int status, Timestamp timestamp, String errorMessage) {
+    ErrorResponse(int status, Timestamp timestamp, String errorMessage) {
         this.status =status;
         this.timestamp = timestamp;
         this.errorMessage = errorMessage;

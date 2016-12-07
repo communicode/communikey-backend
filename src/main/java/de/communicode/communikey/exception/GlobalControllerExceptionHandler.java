@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * The global exception handler that provides centralized exception handling for all controllers.
  * <p>
- * Returns wrapped custom {@link ErrorRestResponse} entities.
+ * Returns wrapped custom {@link ErrorResponse} entities.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -46,7 +46,7 @@ public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHan
         String errorMessage = ex.getName() + " should be of type " + ex.getRequiredType().getName();
 
         return new ResponseEntity<>(
-            new ErrorRestResponse(HttpStatus.BAD_REQUEST.value(), new Timestamp(Calendar.getInstance().getTimeInMillis()), errorMessage),
+            new ErrorResponse(HttpStatus.BAD_REQUEST.value(), new Timestamp(Calendar.getInstance().getTimeInMillis()), errorMessage),
             new HttpHeaders(),
             HttpStatus.BAD_REQUEST);
     }
