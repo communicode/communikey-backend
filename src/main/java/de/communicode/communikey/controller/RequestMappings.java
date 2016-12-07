@@ -40,7 +40,7 @@ public final class RequestMappings {
     /**
      * The endpoint for {@link KeyCategory} entities.
      */
-    public static final String KEY_CATEGORIES = "/categories";
+    public static final String KEY_CATEGORIES = KEYS + "/categories";
 
     /**
      * The request parameter for a {@link KeyCategory} entity ID.
