@@ -6,58 +6,66 @@
  */
 package de.communicode.communikey.exception;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 
 import java.sql.Timestamp;
 
 /**
- * Represents a entity for error REST responses.
+ * Represents a error response.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-class ErrorResponse {
+public class ErrorResponse {
 
     private Timestamp timestamp;
     private int status;
-    private String errorMessage;
+    private String reason;
+    private String description;
 
     /**
-     * Constructs a new error REST response with the specified {@link HttpStatus} value, the timestamp of the error and error message.
+     * Constructs a new error  response with the specified {@link HttpStatus}, the timestamp of the error and error description.
      *
-     * @param status the HTTP status value
+     * @param httpStatus the HTTP status of the error
      * @param timestamp the timestamp of the error
-     * @param errorMessage the message about this error
+     * @param description the description about this error
      */
-    ErrorResponse(int status, Timestamp timestamp, String errorMessage) {
-        this.status =status;
+    public ErrorResponse(HttpStatus httpStatus, Timestamp timestamp, String description) {
+        this.status = httpStatus.value();
+        this.reason = httpStatus.getReasonPhrase();
         this.timestamp = timestamp;
-        this.errorMessage = errorMessage;
+        this.description = description;
     }
 
-    Object getErrorMessage() {
-        return errorMessage;
+    public Object getDescription() {
+        return description;
     }
 
-    int getStatus() {
+    public String getReason() {
+        return reason;
+    }
+
+    public int getStatus() {
         return status;
     }
 
-    Timestamp getTimestamp() {
+    public Timestamp getTimestamp() {
         return timestamp;
     }
 
-    void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    void setStatus(int status) {
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public void setStatus(int status) {
         this.status = status;
     }
 
-    void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 }
