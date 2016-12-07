@@ -13,12 +13,14 @@ import de.communicode.communikey.exception.PrivilegeConflictException;
 import de.communicode.communikey.exception.PrivilegeNotFoundException;
 import de.communicode.communikey.repository.PrivilegeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Service
 public class PrivilegeRestService implements PrivilegeService {
 
     private final PrivilegeRepository privilegeRepository;
