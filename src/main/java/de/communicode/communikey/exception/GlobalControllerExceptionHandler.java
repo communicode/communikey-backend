@@ -76,7 +76,7 @@ public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHan
         return new DefaultErrorAttributes() {
             @Override
             public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
-                Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, includeStackTrace);
+                Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, false);
                 errorAttributes.remove("exception");
                 return errorAttributes;
             }
