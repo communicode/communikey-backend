@@ -8,8 +8,6 @@ package de.communicode.communikey.exception;
 
 
 import de.communicode.communikey.domain.Role;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Thrown to indicate that a method has been passed an not existing {@link Role} entity.
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-@ResponseStatus(HttpStatus.NOT_FOUND)
 public class RoleNotFoundException extends RuntimeException {
 
     /**

@@ -7,8 +7,6 @@
 package de.communicode.communikey.exception;
 
 import de.communicode.communikey.domain.Role;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Thrown to indicate that a method has been passed conflicting {@link Role} entity data.
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-@ResponseStatus(HttpStatus.CONFLICT)
 public class RoleConflictException extends RuntimeException {
 
     /**
