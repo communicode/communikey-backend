@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -32,7 +31,7 @@ import java.util.Map;
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalControllerExceptionHandler {
 
     /**
      * Handles all mismatched type arguments.
