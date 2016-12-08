@@ -10,6 +10,8 @@ import static de.communicode.communikey.config.DataSourceConfig.CATEGORIES;
 import static de.communicode.communikey.config.DataSourceConfig.CREATOR_USER_ID;
 import static de.communicode.communikey.config.DataSourceConfig.KEY_CATEGORY_ID;
 import static de.communicode.communikey.config.DataSourceConfig.RESPONSIBLE_USER_ID;
+import static de.communicode.communikey.config.DataSourceConfig.USER_GROUPS_KEY_CATEGORIES;
+import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -17,10 +19,13 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -67,6 +72,14 @@ public class KeyCategory {
     @JsonManagedReference
     private KeyCategory parent;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = USER_GROUPS_KEY_CATEGORIES,
+        joinColumns = @JoinColumn(name = KEY_CATEGORY_ID, nullable = false, updatable = false),
+        inverseJoinColumns = @JoinColumn(name = USER_GROUP_ID, nullable = false))
+    @JsonBackReference
+    private Set<UserGroup> userGroups;
+
     private KeyCategory() {}
 
     /**
@@ -108,6 +121,10 @@ public class KeyCategory {
         return responsible;
     }
 
+    public Set<UserGroup> getUserGroups() {
+        return userGroups;
+    }
+
     public void setChilds(Set<KeyCategory> childs) {
         this.childs = childs;
     }
@@ -134,5 +151,9 @@ public class KeyCategory {
 
     public void setResponsible(User responsible) {
         this.responsible = responsible;
+    }
+
+    public void setUserGroups(Set<UserGroup> userGroups) {
+        this.userGroups = userGroups;
     }
 }

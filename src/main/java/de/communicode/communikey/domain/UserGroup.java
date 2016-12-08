@@ -10,7 +10,6 @@ import static de.communicode.communikey.config.DataSourceConfig.USER_GROUPS;
 import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_NAME;
 import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.Column;
@@ -45,6 +44,10 @@ public class UserGroup {
     @JsonManagedReference
     private Set<User> users;
 
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "userGroups")
+    @JsonManagedReference
+    private Set<KeyCategory> categories;
+
     private UserGroup() {}
 
     /**
@@ -54,6 +57,10 @@ public class UserGroup {
      */
     public UserGroup(String name) {
         this.name = name;
+    }
+
+    public Set<KeyCategory> getCategories() {
+        return categories;
     }
 
     public long getId() {
@@ -66,6 +73,10 @@ public class UserGroup {
 
     public Set<User> getUsers() {
         return users;
+    }
+
+    public void setCategories(Set<KeyCategory> categories) {
+        this.categories = categories;
     }
 
     public void setName(String name) {

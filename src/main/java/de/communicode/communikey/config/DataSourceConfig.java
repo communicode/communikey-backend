@@ -111,6 +111,11 @@ public class DataSourceConfig {
     public static final String USERS_GROUPS = "users_groups";
 
     /**
+     * The name of the table for the relation of {@link UserGroup}- to {@link KeyCategory} entities.
+     */
+    public static final String USER_GROUPS_KEY_CATEGORIES = "user_groups_key_categories";
+
+    /**
      * The name of the column for {@link User} entity IDs.
      */
     public static final String USER_ID = "user_id";
