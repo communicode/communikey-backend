@@ -83,8 +83,7 @@ public class UserGroupRestService implements UserGroupService {
 
     @Override
     public UserGroup save(UserGroup userGroup) throws NullPointerException {
-        requireNonNull(userGroup, "userGroup must not be null!");
-        return userGroupRepository.save(validate(userGroup.getId()));
+        return requireNonNull(userGroupRepository.save(userGroup), "userGroup must not be null!");
     }
 
     @Override

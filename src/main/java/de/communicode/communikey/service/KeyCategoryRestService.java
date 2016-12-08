@@ -126,8 +126,7 @@ public class KeyCategoryRestService implements KeyCategoryService {
 
     @Override
     public KeyCategory save(KeyCategory category) throws NullPointerException {
-        requireNonNull(category, "category must not be null!");
-        return keyCategoryRepository.save(category);
+        return requireNonNull(keyCategoryRepository.save(category), "category must not be null!");
     }
 
     @Override
