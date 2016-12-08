@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
@@ -52,13 +51,11 @@ public class UserController {
      * <p>
      *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USER_ID}".
      *
-     * @param username the name of the user entities to get
-     * @return a collection of user data transfer objects
+     * @return a collection of all user entities
      */
     @GetMapping
-    Set<User> getAll(@RequestParam(name = "username", required = false) String username) {
+    Set<User> getAll() {
         return userService.getAll().stream()
-            .filter(user -> username == null || username.equalsIgnoreCase(user.getUsername()))
             .collect(Collectors.toSet());
     }
 
