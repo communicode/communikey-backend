@@ -79,9 +79,19 @@ public final class RequestMappings {
     public static final String ROLES = USERS + "/roles";
 
     /**
+     * The request parameter for a {@link Role} entity ID.
+     */
+    public static final String ROLE_ID = "/{roleId}";
+
+    /**
      * The endpoint for {@link Privilege} entities.
      */
     public static final String PRIVILEGES = ROLES + "/privileges";
+
+    /**
+     * The request parameter for a {@link Privilege} entity ID.
+     */
+    public static final String PRIVILEGE_ID = "/{privilegeId}";
 
     /**
      * The endpoint for {@link UserGroup} entities.

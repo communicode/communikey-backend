@@ -7,12 +7,15 @@
 package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.controller.RequestMappings.ROLES;
+import static de.communicode.communikey.controller.RequestMappings.ROLE_ID;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Role;
+import de.communicode.communikey.exception.RoleNotFoundException;
 import de.communicode.communikey.service.RoleRestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,5 +52,19 @@ public class RoleController {
     Set<Role> getAll() {
         return roleService.getAll().stream()
             .collect(Collectors.toSet());
+    }
+
+    /**
+     * Gets the {@link Role} entity with the specified ID.
+     * <p>
+     *     This endpoint is mapped to "{@value RequestMappings#ROLES}{@value RequestMappings#ROLE_ID}".
+     *
+     * @param roleId the ID of the role entity to get
+     * @return the role entity
+     * @throws RoleNotFoundException if the role entity with the specified ID has not been found
+     */
+    @GetMapping(value = ROLE_ID)
+    Role get(@PathVariable long roleId) throws RoleNotFoundException {
+        return roleService.getById(roleId);
     }
 }

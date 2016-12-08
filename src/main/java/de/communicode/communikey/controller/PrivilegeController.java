@@ -7,12 +7,15 @@
 package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.controller.RequestMappings.PRIVILEGES;
+import static de.communicode.communikey.controller.RequestMappings.PRIVILEGE_ID;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Privilege;
+import de.communicode.communikey.exception.PrivilegeNotFoundException;
 import de.communicode.communikey.service.PrivilegeRestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,5 +52,19 @@ public class PrivilegeController {
     Set<Privilege> getAll() {
         return privilegeRestService.getAll().stream()
             .collect(Collectors.toSet());
+    }
+
+    /**
+     * Gets the {@link Privilege} entity with the specified ID.
+     * <p>
+     *     This endpoint is mapped to "{@value RequestMappings#PRIVILEGES}{@value RequestMappings#PRIVILEGE_ID}".
+     *
+     * @param privilegeId the ID of the privilege entity to get
+     * @return the privilege entity
+     * @throws PrivilegeNotFoundException if the privilege entity with the specified ID has not been found
+     */
+    @GetMapping(value = PRIVILEGE_ID)
+    Privilege get(@PathVariable long privilegeId) throws PrivilegeNotFoundException {
+        return privilegeRestService.getById(privilegeId);
     }
 }
