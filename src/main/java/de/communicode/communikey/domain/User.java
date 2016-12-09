@@ -77,7 +77,7 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private String username;
+    private String email;
 
     @ManyToMany
     @JoinTable(
@@ -91,14 +91,18 @@ public class User {
     private User() {}
 
     /**
-     * Constructs a new user entity with the specified username and password.
+     * Constructs a new user entity with the specified email and password.
      *
-     * @param username the name of the user
+     * @param email the email of the user
      * @param password the password of the user
      */
-    public User(String username, String password) {
-        this.username = username;
+    public User(String email, String password) {
+        this.email = email;
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public Set<UserGroup> getGroups() {
@@ -129,12 +133,12 @@ public class User {
         return roles;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
     public boolean isEnabled() {
         return isEnabled;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setEnabled(boolean enabled) {
@@ -163,9 +167,5 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 }

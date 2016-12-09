@@ -52,10 +52,10 @@ public class AuthenticationConfig extends GlobalAuthenticationConfigurerAdapter 
      */
     @Bean
     public UserDetailsService userDetailsService() {
-        return (username) -> userRestService.getByUsername(username)
-            .map(user -> new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), true, true, true, true,
+        return (email) -> userRestService.getByEmail(email)
+            .map(user -> new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), true, true, true, true,
                 AuthorityUtils.createAuthorityList(ROLE_USER.name())))
-            .orElseThrow(() -> new UserNotFoundException(username));
+            .orElseThrow(() -> new UserNotFoundException(email));
     }
 
     /**

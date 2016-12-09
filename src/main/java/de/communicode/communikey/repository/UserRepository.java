@@ -22,10 +22,10 @@ import java.util.Optional;
 public interface UserRepository extends CrudRepository<User, Long> {
 
     /**
-     * Finds the user entity with the specified username.
+     * Finds the user entity with the specified email.
      *
-     * @param username the username of the user to find
+     * @param email the email of the user to find
      * @return the optional user entity
      */
-    Optional<User> findOneByUsername(String username);
+    Optional<User> findOneByEmail(String email);
 }

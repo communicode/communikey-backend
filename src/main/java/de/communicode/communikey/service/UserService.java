@@ -24,13 +24,13 @@ public interface UserService {
     /**
      * Creates a new user.
      *
-     * @param username the username of the user entity to create
+     * @param email the email of the user entity to create
      * @param password the password of the user entity to create
      * @return the created user entity
      * @throws UserConflictException if a user entity with the specified username already exists
      * @throws IllegalArgumentException if the specified username or password is empty
      */
-    User create(String username, String password) throws UserConflictException, IllegalArgumentException;
+    User create(String email, String password) throws UserConflictException, IllegalArgumentException;
 
     /**
      * Deletes the specified user.
@@ -48,6 +48,15 @@ public interface UserService {
     Set<User> getAll();
 
     /**
+     * Gets the user with the specified email.
+     *
+     * @param email the email to find the user entity of
+     * @return the user entity with the specified email if found, {@link Optional#EMPTY} otherwise
+     * @throws IllegalArgumentException if the specified email is empty
+     */
+    Optional<User> getByEmail(String email) throws IllegalArgumentException;
+
+    /**
      * Gets the user with the specified ID.
      *
      * @param userId the ID of the user entity to get
@@ -57,24 +66,15 @@ public interface UserService {
     User getById(long userId) throws UserNotFoundException;
 
     /**
-     * Gets the user with the specified username.
+     * Modifies the email of the specified user.
      *
-     * @param username the username to find the user entity of
-     * @return the user entity with the specified username if found, {@link Optional#EMPTY} otherwise
-     * @throws IllegalArgumentException if the specified username is empty
-     */
-    Optional<User> getByUsername(String username) throws IllegalArgumentException;
-
-    /**
-     * Modifies the username of the specified user.
-     *
-     * @param userId the ID of the user entity to modify the username of
-     * @param newUsername the new username for the specified user entity
+     * @param userId the ID of the user entity to modify the email of
+     * @param newEmail the new email for the specified user entity
      * @throws UserNotFoundException if the user with the specified ID has not been found
-     * @throws UserConflictException if a user entity with the specified new username already exists
-     * @throws IllegalArgumentException if the specified new username is empty
+     * @throws UserConflictException if a user entity with the specified new email already exists
+     * @throws IllegalArgumentException if the specified new email is empty
      */
-    void modifyUsername(long userId, String newUsername) throws UserNotFoundException, UserConflictException, IllegalArgumentException;
+    void modifyEmail(long userId, String newEmail) throws UserNotFoundException, UserConflictException, IllegalArgumentException;
 
     /**
      * Modifies the role of the specified user.

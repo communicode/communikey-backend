@@ -42,15 +42,15 @@ public class UserRestService implements UserService {
     }
 
     @Override
-    public User create(String username, String password) throws UserConflictException, IllegalArgumentException {
-        if (username.trim().isEmpty() || password.trim().isEmpty()) {
-            throw new IllegalArgumentException("username or password must not be empty!");
+    public User create(String email, String password) throws UserConflictException, IllegalArgumentException {
+        if (email.trim().isEmpty() || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("email or password must not be empty!");
         }
 
-        Optional.of(userRepository.findOneByUsername(username)).orElseThrow(() -> new UserConflictException(
-            "User with username \"" + username + "\"already " + "exists!"));
+        Optional.of(userRepository.findOneByEmail(email)).orElseThrow(() -> new UserConflictException(
+            "User with email \"" + email + "\"already " + "exists!"));
 
-        User user = new User(username, password);
+        User user = new User(email, password);
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findOneByName("ROLE_USER"));
         user.setRoles(roles);
@@ -70,27 +70,27 @@ public class UserRestService implements UserService {
     }
 
     @Override
+    public Optional<User> getByEmail(String email) throws IllegalArgumentException {
+        if (email.trim().isEmpty()) {
+            throw new IllegalArgumentException("email must not be empty!");
+        }
+        return userRepository.findOneByEmail(email);
+    }
+
+    @Override
     public User getById(long userId) throws UserNotFoundException {
         return validate(userId);
     }
 
     @Override
-    public Optional<User> getByUsername(String username) throws IllegalArgumentException {
-        if (username.trim().isEmpty()) {
-            throw new IllegalArgumentException("username must not be empty!");
+    public void modifyEmail(long userId, String newEmail) throws UserNotFoundException, UserConflictException, IllegalArgumentException {
+        if (newEmail.trim().isEmpty()) {
+            throw new IllegalArgumentException("new email must not be empty!");
         }
-        return userRepository.findOneByUsername(username);
-    }
-
-    @Override
-    public void modifyUsername(long userId, String newUsername) throws UserNotFoundException, UserConflictException, IllegalArgumentException {
-        if (newUsername.trim().isEmpty()) {
-            throw new IllegalArgumentException("new username must not be empty!");
-        }
-        Optional.of(userRepository.findOneByUsername(newUsername)).orElseThrow(() -> new UserConflictException(
-            "User with username \"" + newUsername + "\"already " + "exists!"));
+        Optional.of(userRepository.findOneByEmail(newEmail)).orElseThrow(() -> new UserConflictException(
+            "User with email \"" + newEmail + "\"already " + "exists!"));
         User user = validate(userId);
-        user.setUsername(newUsername);
+        user.setEmail(newEmail);
         userRepository.save(user);
     }
 
