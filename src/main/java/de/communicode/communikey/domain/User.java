@@ -10,14 +10,15 @@ import static de.communicode.communikey.config.DataSourceConfig.ROLE_ID;
 import static de.communicode.communikey.config.DataSourceConfig.USERS_GROUPS;
 import static de.communicode.communikey.config.DataSourceConfig.USERS;
 import static de.communicode.communikey.config.DataSourceConfig.USERS_ROLES;
-import static de.communicode.communikey.config.DataSourceConfig.USER_ENABLED;
 import static de.communicode.communikey.config.DataSourceConfig.USER_ID;
 import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,7 +33,10 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -43,7 +47,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = USERS)
-public class User {
+public class User implements UserDetails {
     @Id
     @Column(name = USER_ID, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -69,8 +73,17 @@ public class User {
     @JsonBackReference
     private Set<UserGroup> groups;
 
-    @Column(name = USER_ENABLED, nullable = false)
+    @Column(nullable = false)
     private boolean isEnabled;
+
+    @Column(nullable = false)
+    private boolean isAccountNonExpired;
+
+    @Column(nullable = false)
+    private boolean isAccountNonLocked;
+
+    @Column(nullable = false)
+    private boolean isCredentialsNonExpired;
 
     @JsonIgnore
     @Column(nullable = false)
@@ -79,13 +92,13 @@ public class User {
     @Column(nullable = false)
     private String email;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = USERS_ROLES,
         joinColumns = @JoinColumn(name = USER_ID, referencedColumnName = USER_ID),
         inverseJoinColumns = @JoinColumn(name = ROLE_ID, referencedColumnName = "id"))
     @JsonManagedReference
-    @JsonIgnoreProperties("privileges")
+    //@JsonIgnoreProperties("privileges")
     private Set<Role> roles;
 
     private User() {}
@@ -99,6 +112,10 @@ public class User {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+        isEnabled = false;
+        isAccountNonExpired = true;
+        isAccountNonLocked = true;
+        isCredentialsNonExpired = true;
     }
 
     public String getEmail() {
@@ -121,8 +138,36 @@ public class User {
         return keys;
     }
 
+    @Override
+    @JsonIgnore
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getGrantedAuthorities(getPrivileges(roles));
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    private List<String> getPrivileges(Collection<Role> roles) {
+        List<String> privileges = new ArrayList<>();
+        List<Privilege> collection = new ArrayList<>();
+
+        for (Role role : roles) {
+            collection.addAll(role.getPrivileges());
+        }
+        for (Privilege privilege : collection) {
+            privileges.add(privilege.getName());
+        }
+        return privileges;
+    }
+
+    private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        for (String privilege : privileges) {
+            authorities.add(new SimpleGrantedAuthority(privilege));
+        }
+        return authorities;
     }
 
     public Set<KeyCategory> getResponsibleKeyCategories() {
@@ -131,6 +176,21 @@ public class User {
 
     public Set<Role> getRoles() {
         return roles;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
     public boolean isEnabled() {
@@ -147,6 +207,26 @@ public class User {
 
     public void setGroups(Set<UserGroup> groups) {
         this.groups = new HashSet<>(groups);
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    public User setAccountNonExpired(boolean accountNonExpired) {
+        isAccountNonExpired = accountNonExpired;
+        return this;
+    }
+
+    public User setAccountNonLocked(boolean accountNonLocked) {
+        isAccountNonLocked = accountNonLocked;
+        return this;
+    }
+
+    public User setCredentialsNonExpired(boolean credentialsNonExpired) {
+        isCredentialsNonExpired = credentialsNonExpired;
+        return this;
     }
 
     public void setKeyCategories(Set<KeyCategory> keyCategories) {

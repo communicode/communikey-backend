@@ -86,11 +86,6 @@ public class DataSourceConfig {
     public static final String USERS = "users";
 
     /**
-     * The name of the column for {@link User} entity activation statuses.
-     */
-    public static final String USER_ENABLED = "enabled";
-
-    /**
      * The name of the column for {@link UserGroup} entity IDs.
      */
     public static final String USER_GROUP_ID = "user_group_id";
