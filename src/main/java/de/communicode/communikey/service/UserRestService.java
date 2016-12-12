@@ -70,11 +70,11 @@ public class UserRestService implements UserService {
     }
 
     @Override
-    public Optional<User> getByEmail(String email) throws IllegalArgumentException {
+    public User getByEmail(String email) throws UserNotFoundException, IllegalArgumentException {
         if (email.trim().isEmpty()) {
             throw new IllegalArgumentException("email must not be empty!");
         }
-        return userRepository.findOneByEmail(email);
+        return Optional.ofNullable(userRepository.findOneByEmail(email)).orElseThrow(() -> new UserNotFoundException(email));
     }
 
     @Override

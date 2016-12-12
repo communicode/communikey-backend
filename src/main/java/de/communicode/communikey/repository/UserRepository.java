@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.repository;
 
+import de.communicode.communikey.exception.UserNotFoundException;
 import org.springframework.data.repository.CrudRepository;
 import de.communicode.communikey.domain.User;
 import org.springframework.stereotype.Repository;
@@ -25,7 +26,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * Finds the user entity with the specified email.
      *
      * @param email the email of the user to find
-     * @return the optional user entity
+     * @return the found user entity
+     * @throws UserNotFoundException if the user entity with the specified email has not been found
      */
-    Optional<User> findOneByEmail(String email);
+    User findOneByEmail(String email) throws UserNotFoundException;
 }

@@ -51,10 +51,11 @@ public interface UserService {
      * Gets the user with the specified email.
      *
      * @param email the email to find the user entity of
-     * @return the user entity with the specified email if found, {@link Optional#EMPTY} otherwise
+     * @return the user entity with the specified email if found
+     * @throws UserNotFoundException if the user entity with the specified email has not been found
      * @throws IllegalArgumentException if the specified email is empty
      */
-    Optional<User> getByEmail(String email) throws IllegalArgumentException;
+    User getByEmail(String email) throws UserNotFoundException, IllegalArgumentException;
 
     /**
      * Gets the user with the specified ID.
