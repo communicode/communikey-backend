@@ -21,6 +21,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class CommunikeyApplication {
 
+    /**
+     * The ID of the application for the REST API and OAuth2 security flow.
+     *
+     * @since 0.2.0
+     */
+    public static final String APP_ID = "communikey";
+
     public static void main(String[] args) {
         SpringApplication.run(CommunikeyApplication.class, args);
     }
