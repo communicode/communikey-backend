@@ -12,8 +12,10 @@ import static de.communicode.communikey.config.DataSourceConfig.ROLE_ID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,6 +23,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -40,7 +43,7 @@ public class Role {
     @JsonBackReference
     private Set<User> users;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = ROLES_PRIVILEGES,
         joinColumns = @JoinColumn(name = ROLE_ID, referencedColumnName = "id"),
@@ -59,7 +62,6 @@ public class Role {
      * @param name the name of the role
      */
     public Role(final String name) {
-        super();
         this.name = name;
     }
 
