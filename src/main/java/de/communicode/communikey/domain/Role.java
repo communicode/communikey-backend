@@ -33,7 +33,7 @@ import java.util.Set;
  * @since 0.2.0
  */
 @Entity
-public class Role {
+public class Role implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

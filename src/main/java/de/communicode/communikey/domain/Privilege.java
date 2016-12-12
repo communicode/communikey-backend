@@ -14,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -23,7 +24,7 @@ import java.util.Set;
  * @since 0.2.0
  */
 @Entity
-public class Privilege {
+public class Privilege implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
