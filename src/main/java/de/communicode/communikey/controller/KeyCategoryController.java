@@ -11,8 +11,6 @@ import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.KeyCategory;
-import de.communicode.communikey.domain.KeyCategoryDto;
-import de.communicode.communikey.domain.converter.KeyCategoryDtoConverter;
 import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import de.communicode.communikey.service.KeyCategoryRestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,23 +37,20 @@ public class KeyCategoryController {
 
     private final KeyCategoryRestService keyCategoryService;
 
-    private final KeyCategoryDtoConverter keyCategoryConverter;
-
     @Autowired
-    public KeyCategoryController(KeyCategoryRestService keyCategoryService, KeyCategoryDtoConverter keyCategoryConverter) {
+    public KeyCategoryController(KeyCategoryRestService keyCategoryService) {
         this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
-        this.keyCategoryConverter = requireNonNull(keyCategoryConverter, "keyCategoryConverter must not be null!");
     }
 
     /**
-     * Gets all {@link KeyCategory} entities.
+     * Gets all key category entities.
      * <p>
      *     This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}".
      *
      * @param creatorUserId the ID of the user to get all created key category entities of
      * @param responsibleUserId the ID of the responsible user to get all key category entities of
      * @param name the name of the key category entities to get
-     * @return a collection of {@link KeyCategoryDto} data transfer objects
+     * @return a collection of key categories
      */
     @GetMapping
     Set<KeyCategory> getAll(@RequestParam(name = "creator", required = false) Long creatorUserId,
@@ -74,32 +69,11 @@ public class KeyCategoryController {
      *     This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_ID}".
      *
      * @param keyCategoryId the ID of the key category entity to get
-     * @return the key category data transfer object
+     * @return the key category entity
      * @throws KeyCategoryNotFoundException if the key category entity with the specified ID has not been found
      */
     @GetMapping(value = KEY_CATEGORY_ID)
     KeyCategory get(@PathVariable long keyCategoryId) throws KeyCategoryNotFoundException {
         return keyCategoryService.getById(keyCategoryId);
-    }
-
-    /**
-     * Converts a key category entity to the associated key category data transfer object.
-     *
-     * @param keyCategory the key category entity to convert
-     * @return the converted key category data transfer object
-     */
-    private KeyCategoryDto convertToDto(KeyCategory keyCategory) {
-        return keyCategoryConverter.convert(keyCategory);
-    }
-
-    /**
-     * Converts a key category data transfer object to the associated key category entity.
-     *
-     * @param keyCategoryDto the key category data transfer object to convert
-     * @return the converted key category entity
-     * @throws KeyCategoryNotFoundException if the associated key category entity of the key category data transfer object has not been found
-     */
-    private KeyCategory convertToEntity(KeyCategoryDto keyCategoryDto) throws KeyCategoryNotFoundException {
-        return keyCategoryService.getById(keyCategoryDto.getId());
     }
 }

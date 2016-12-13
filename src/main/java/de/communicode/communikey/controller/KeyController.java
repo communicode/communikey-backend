@@ -11,8 +11,7 @@ import static de.communicode.communikey.controller.RequestMappings.KEY_ID;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.domain.KeyDto;
-import de.communicode.communikey.domain.converter.KeyDtoConverter;
+import de.communicode.communikey.domain.User;
 import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.service.KeyRestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +38,9 @@ public class KeyController {
 
     private final KeyRestService keyService;
 
-    private final KeyDtoConverter keyConverter;
-
     @Autowired
-    public KeyController(KeyRestService keyService, KeyDtoConverter keyConverter) {
+    public KeyController(KeyRestService keyService) {
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
-        this.keyConverter = requireNonNull(keyConverter, "keyConverter must not be null!");
     }
 
     /**
@@ -75,28 +71,5 @@ public class KeyController {
     @GetMapping(value = KEY_ID)
     Key get(@PathVariable long keyId) throws KeyNotFoundException {
         return keyService.getById(keyId);
-    }
-
-    /**
-     * Converts a key entity to the associated key data transfer object.
-     *
-     * @param key the key entity to convert
-     * @return the converted key data transfer object
-     * @since 0.2.0
-     */
-    private KeyDto convertToDto(Key key) {
-        return keyConverter.convert(key);
-    }
-
-    /**
-     * Converts a key data transfer object to the associated key entity.
-     *
-     * @param keyDto the key data transfer object to convert
-     * @return the converted key entity
-     * @throws KeyNotFoundException if the associated key entity of the key data transfer object has not been found
-     * @since 0.2.0
-     */
-    private Key convertToEntity(KeyDto keyDto) throws KeyNotFoundException {
-        return keyService.getById(keyDto.getId());
     }
 }

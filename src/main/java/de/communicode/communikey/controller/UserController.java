@@ -11,8 +11,6 @@ import static de.communicode.communikey.controller.RequestMappings.USER_ID;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.User;
-import de.communicode.communikey.domain.UserDto;
-import de.communicode.communikey.domain.converter.UserDtoConverter;
 import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.service.UserRestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +36,9 @@ public class UserController {
 
     private final UserRestService userService;
 
-    private final UserDtoConverter userConverter;
-
     @Autowired
-    public UserController(UserRestService userService, UserDtoConverter userConverter) {
+    public UserController(UserRestService userService) {
         this.userService = requireNonNull(userService, "userService must not be null!");
-        this.userConverter = requireNonNull(userConverter, "userConverter must not be null!");
     }
 
     /**
@@ -71,26 +66,5 @@ public class UserController {
     @GetMapping(value = USER_ID)
     User get(@PathVariable long userId) throws UserNotFoundException {
         return userService.getById(userId);
-    }
-
-    /**
-     * Converts a user entity to the associated user data transfer object.
-     *
-     * @param user the user entity to convert
-     * @return the converted user data transfer object
-     */
-    private UserDto convertToDto(User user) {
-        return userConverter.convert(user);
-    }
-
-    /**
-     * Converts a user data transfer object to the associated user entity.
-     *
-     * @param userDto the user data transfer object to convert
-     * @return the converted user entity
-     * @throws UserNotFoundException if the associated user entity of the user data transfer object has not been found
-     */
-    private User convertToEntity(UserDto userDto) throws UserNotFoundException {
-        return userService.getById(userDto.getId());
     }
 }
