@@ -124,7 +124,7 @@ public class User implements UserDetails {
     }
 
     public Set<UserGroup> getGroups() {
-        return new HashSet<>(groups);
+        return groups;
     }
 
     public long getId() {
