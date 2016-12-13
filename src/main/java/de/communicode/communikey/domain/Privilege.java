@@ -6,7 +6,7 @@
  */
 package de.communicode.communikey.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,7 +33,7 @@ public class Privilege implements Serializable {
     private String name;
 
     @ManyToMany(mappedBy = "privileges")
-    @JsonBackReference
+    @JsonIgnoreProperties("privileges")
     private Set<Role> roles;
 
     private Privilege() {}

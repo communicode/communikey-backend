@@ -10,7 +10,7 @@ import static de.communicode.communikey.config.DataSourceConfig.USER_GROUPS;
 import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_NAME;
 import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,11 +41,11 @@ public class UserGroup {
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")
-    @JsonManagedReference
+    @JsonIgnoreProperties(value = {"groups", "roles", "credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled"})
     private Set<User> users;
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "userGroups")
-    @JsonManagedReference
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")
+    @JsonIgnoreProperties(value = {"groups", "creator", "responsible", "parent"})
     private Set<KeyCategory> categories;
 
     private UserGroup() {}

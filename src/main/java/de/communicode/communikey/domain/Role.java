@@ -11,8 +11,7 @@ import static de.communicode.communikey.config.DataSourceConfig.ROLES_PRIVILEGES
 import static de.communicode.communikey.config.DataSourceConfig.ROLE_ID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import org.springframework.security.core.GrantedAuthority;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -49,7 +48,7 @@ public class Role implements Serializable {
         joinColumns = @JoinColumn(name = ROLE_ID, referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = PRIVILEGE_ID, referencedColumnName = "id")
     )
-    @JsonManagedReference
+    @JsonIgnoreProperties("roles")
     private Set<Privilege> privileges;
 
     private String name;

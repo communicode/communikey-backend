@@ -14,6 +14,7 @@ import static de.communicode.communikey.config.DataSourceConfig.USER_GROUPS_KEY_
 import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.CascadeType;
@@ -54,11 +55,13 @@ public class KeyCategory {
     @ManyToOne
     @JoinColumn(name = CREATOR_USER_ID, nullable = false)
     @JsonManagedReference
+    @JsonIgnoreProperties(value = {"roles", "groups", "credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled"})
     private User creator;
 
     @ManyToOne
     @JoinColumn(name = RESPONSIBLE_USER_ID, nullable = false)
     @JsonManagedReference
+    @JsonIgnoreProperties(value = {"roles", "groups", "credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled"})
     private User responsible;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "category")
@@ -77,8 +80,8 @@ public class KeyCategory {
         name = USER_GROUPS_KEY_CATEGORIES,
         joinColumns = @JoinColumn(name = KEY_CATEGORY_ID, nullable = false, updatable = false),
         inverseJoinColumns = @JoinColumn(name = USER_GROUP_ID, nullable = false))
-    @JsonBackReference
-    private Set<UserGroup> userGroups;
+    @JsonIgnoreProperties(value = {"categories", "users"})
+    private Set<UserGroup> groups;
 
     private KeyCategory() {}
 
@@ -121,8 +124,8 @@ public class KeyCategory {
         return responsible;
     }
 
-    public Set<UserGroup> getUserGroups() {
-        return userGroups;
+    public Set<UserGroup> getGroups() {
+        return groups;
     }
 
     public void setChilds(Set<KeyCategory> childs) {
@@ -153,7 +156,7 @@ public class KeyCategory {
         this.responsible = responsible;
     }
 
-    public void setUserGroups(Set<UserGroup> userGroups) {
-        this.userGroups = userGroups;
+    public void setGroups(Set<UserGroup> groups) {
+        this.groups = groups;
     }
 }

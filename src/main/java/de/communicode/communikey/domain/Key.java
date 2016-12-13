@@ -11,6 +11,7 @@ import static de.communicode.communikey.config.DataSourceConfig.CREATOR_USER_ID;
 import static de.communicode.communikey.config.DataSourceConfig.KEY_CATEGORY_ID;
 import static de.communicode.communikey.config.DataSourceConfig.KEY_ID;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.Column;
@@ -42,11 +43,13 @@ public class Key {
     @ManyToOne
     @JoinColumn(name = CREATOR_USER_ID, nullable = false)
     @JsonManagedReference
+    @JsonIgnoreProperties(value = {"roles", "groups", "credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled"})
     private User creator;
 
     @ManyToOne
     @JoinColumn(name = KEY_CATEGORY_ID)
     @JsonManagedReference
+    @JsonIgnoreProperties(value = {"creator", "responsible", "parent", "groups"})
     private KeyCategory category;
 
     private Timestamp creationTimestamp;

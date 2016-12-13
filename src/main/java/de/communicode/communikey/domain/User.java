@@ -15,6 +15,7 @@ import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -70,7 +71,7 @@ public class User implements UserDetails {
         name = USERS_GROUPS,
         joinColumns = @JoinColumn(name = USER_ID, nullable = false, updatable = false),
         inverseJoinColumns = @JoinColumn(name = USER_GROUP_ID, nullable = false))
-    @JsonBackReference
+    @JsonIgnoreProperties(value = {"users", "categories"})
     private Set<UserGroup> groups;
 
     @Column(nullable = false)
@@ -98,7 +99,7 @@ public class User implements UserDetails {
         joinColumns = @JoinColumn(name = USER_ID, referencedColumnName = USER_ID),
         inverseJoinColumns = @JoinColumn(name = ROLE_ID, referencedColumnName = "id"))
     @JsonManagedReference
-    //@JsonIgnoreProperties("privileges")
+    @JsonIgnoreProperties("privileges")
     private Set<Role> roles;
 
     private User() {}
