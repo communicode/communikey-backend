@@ -10,7 +10,7 @@ import de.communicode.communikey.domain.User;
 import de.communicode.communikey.exception.UserConflictException;
 import de.communicode.communikey.exception.UserNotFoundException;
 
-import java.util.Optional;
+import java.security.Principal;
 import java.util.Set;
 
 /**
@@ -33,12 +33,12 @@ public interface UserService {
     User create(String email, String password) throws UserConflictException, IllegalArgumentException;
 
     /**
-     * Deletes the specified user.
+     * Deletes the user.
      *
-     * @param userId the ID of the user entity to delete
-     * @throws UserNotFoundException if the user with the specified ID has not been found
+     * @param principal the principal that represents the user entity to delete
+     * @throws UserNotFoundException if the user has not been found
      */
-    void delete(long userId) throws UserNotFoundException;
+    void delete(Principal principal) throws UserNotFoundException;
 
     /**
      * Gets all user entities.
@@ -58,24 +58,24 @@ public interface UserService {
     User getByEmail(String email) throws UserNotFoundException, IllegalArgumentException;
 
     /**
-     * Gets the user with the specified ID.
+     * Gets the user entity.
      *
      * @param userId the ID of the user entity to get
-     * @return the user entity with the specified ID
-     * @throws UserNotFoundException if the user with the specified ID has not been found
+     * @return the user entity if found
+     * @throws UserNotFoundException if the user has not been found
      */
     User getById(long userId) throws UserNotFoundException;
 
     /**
-     * Modifies the email of the specified user.
+     * Modifies the email of the user.
      *
-     * @param userId the ID of the user entity to modify the email of
-     * @param newEmail the new email for the specified user entity
-     * @throws UserNotFoundException if the user with the specified ID has not been found
+     * @param principal the principal that represents the user entity to modify the email of
+     * @param newEmail the new email
+     * @throws UserNotFoundException if the user entity has not been found
      * @throws UserConflictException if a user entity with the specified new email already exists
      * @throws IllegalArgumentException if the specified new email is empty
      */
-    void modifyEmail(long userId, String newEmail) throws UserNotFoundException, UserConflictException, IllegalArgumentException;
+    void modifyEmail(Principal principal, String newEmail) throws UserNotFoundException, UserConflictException, IllegalArgumentException;
 
     /**
      * Modifies the role of the specified user.
@@ -98,18 +98,18 @@ public interface UserService {
     /**
      * Sets the activation status of the specified user.
      *
-     * @param userId the ID of the user entity to set the activation status of
+     * @param principal the principal that represents the user entity to set the activation status of
      * @param isEnabled the new activation status
-     * @throws UserNotFoundException if the user entity with the specified ID has not been found
+     * @throws UserNotFoundException if the user entity has not been found
      */
-    void setEnabled(long userId, boolean isEnabled) throws UserNotFoundException;
+    void setEnabled(Principal principal, boolean isEnabled) throws UserNotFoundException;
 
     /**
-     * Validates the specified {@link User} entity.
+     * Validates the user entity represented by the specified principal entity.
      *
-     * @param userId the ID of the user entity to validate
+     * @param principal the principal that represents the user entity to validate
      * @return the user entity if validated
-     * @throws UserNotFoundException if the user entity with the specified ID has not been found
+     * @throws UserNotFoundException if the user entity has not been found
      */
-    User validate(long userId) throws UserNotFoundException;
+    User validate(Principal principal) throws UserNotFoundException;
 }

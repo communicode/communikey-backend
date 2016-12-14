@@ -13,3 +13,7 @@ cckey:
     oauth2:
       access_token_validity: 604800
       refresh_token_validity: 604800
+server:
+  compression:
+    enabled: true
+    mime-types: application/json

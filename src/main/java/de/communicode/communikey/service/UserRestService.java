@@ -17,6 +17,7 @@ import de.communicode.communikey.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -58,15 +59,14 @@ public class UserRestService implements UserService {
     }
 
     @Override
-    public void delete(long userId) throws UserNotFoundException {
-        userRepository.delete(validate(userId));
+    public void delete(Principal principal) throws UserNotFoundException {
+        userRepository.delete(validate(principal));
     }
 
     @Override
     public Set<User> getAll() {
         return StreamSupport.stream(userRepository.findAll().spliterator(), false)
             .collect(Collectors.toSet());
-
     }
 
     @Override
@@ -79,17 +79,17 @@ public class UserRestService implements UserService {
 
     @Override
     public User getById(long userId) throws UserNotFoundException {
-        return validate(userId);
+        return Optional.ofNullable(userRepository.findOne(userId)).orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     @Override
-    public void modifyEmail(long userId, String newEmail) throws UserNotFoundException, UserConflictException, IllegalArgumentException {
+    public void modifyEmail(Principal principal, String newEmail) throws UserNotFoundException, UserConflictException, IllegalArgumentException {
         if (newEmail.trim().isEmpty()) {
             throw new IllegalArgumentException("new email must not be empty!");
         }
         Optional.of(userRepository.findOneByEmail(newEmail)).orElseThrow(() -> new UserConflictException(
             "User with email \"" + newEmail + "\"already " + "exists!"));
-        User user = validate(userId);
+        User user = validate(principal);
         user.setEmail(newEmail);
         userRepository.save(user);
     }
@@ -100,14 +100,14 @@ public class UserRestService implements UserService {
     }
 
     @Override
-    public void setEnabled(long userId, boolean isEnabled) throws UserNotFoundException {
-        User user = validate(userId);
+    public void setEnabled(Principal principal, boolean isEnabled) throws UserNotFoundException {
+        User user = validate(principal);
         user.setEnabled(isEnabled);
         userRepository.save(user);
     }
 
     @Override
-    public User validate(long userId) throws UserNotFoundException {
-        return Optional.ofNullable(userRepository.findOne(userId)).orElseThrow(() -> new UserNotFoundException(userId));
+    public User validate(Principal principal) throws UserNotFoundException {
+        return Optional.ofNullable(userRepository.findOneByEmail(principal.getName())).orElseThrow(() -> new UserNotFoundException(principal.getName()));
     }
 }

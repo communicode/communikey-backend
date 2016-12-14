@@ -11,8 +11,6 @@ import org.springframework.data.repository.CrudRepository;
 import de.communicode.communikey.domain.User;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 /**
  * A repository for {@link User} entities.
  *
