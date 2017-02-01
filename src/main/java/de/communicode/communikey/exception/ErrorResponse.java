@@ -2,16 +2,15 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.exception;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 
-import javax.servlet.http.HttpServletRequest;
-
 import java.sql.Timestamp;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Represents a error response.
@@ -19,41 +18,49 @@ import java.util.Map;
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
 
     private Timestamp timestamp;
     private int status;
     private String reason;
-    private String description;
-    private String path;
-    private Map<String, String[]> parameters;
+    private String error;
+    private List<String> errors;
 
     /**
-     * Constructs a new error  response with the specified {@link HttpStatus}, the timestamp of the error and error description.
+     * Constructs a new error response with the specified {@link HttpStatus} an a timestamp.
      *
      * @param httpStatus the HTTP status of the error
      * @param timestamp the timestamp of the error
-     * @param description the description about this error
+     * @param error the error about this error
      */
-    public ErrorResponse(HttpStatus httpStatus, Timestamp timestamp, String description, HttpServletRequest request) {
+    public ErrorResponse(HttpStatus httpStatus, Timestamp timestamp, String error) {
         status = httpStatus.value();
         reason = httpStatus.getReasonPhrase();
         this.timestamp = timestamp;
-        this.description = description;
-        path = request.getRequestURI();
-        this.parameters = request.getParameterMap();
+        this.error = error;
     }
 
-    public String getDescription() {
-        return description;
+    /**
+     * Constructs a new error response with the specified {@link HttpStatus}, a timestamp and a list of all errors.
+     *
+     * @param httpStatus the HTTP status of the error
+     * @param timestamp the timestamp of the error
+     * @param errors the list of errors
+     */
+    public ErrorResponse(HttpStatus httpStatus, Timestamp timestamp, List<String> errors) {
+        status = httpStatus.value();
+        reason = httpStatus.getReasonPhrase();
+        this.timestamp = timestamp;
+        this.errors = errors;
     }
 
-    public Map<String, String[]> getParameters() {
-        return parameters;
+    public String getError() {
+        return error;
     }
 
-    public String getPath() {
-        return path;
+    public List<String> getErrors() {
+        return errors;
     }
 
     public String getReason() {
@@ -68,16 +75,12 @@ public class ErrorResponse {
         return timestamp;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setError(String error) {
+        this.error = error;
     }
 
-    public void setParameters(Map<String, String[]> parameters) {
-        this.parameters = parameters;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
     }
 
     public void setReason(String reason) {
