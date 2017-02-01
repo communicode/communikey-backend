@@ -2,24 +2,24 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.service;
 
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.exception.KeyNotFoundException;
-import de.communicode.communikey.exception.UserNotFoundException;
+import de.communicode.communikey.domain.User;
+import de.communicode.communikey.domain.request.KeyRequest;
+import de.communicode.communikey.exception.key.KeyNotFoundException;
 import de.communicode.communikey.repository.KeyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
+import java.security.Principal;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * The REST API service to process {@link Key} entities via a {@link KeyRepository}.
@@ -31,53 +31,50 @@ import java.util.stream.StreamSupport;
 public class KeyRestService implements KeyService {
 
     private final KeyRepository keyRepository;
-    private final UserRestService userRestService;
+    private final UserRestService userService;
+    private final KeyCategoryRestService keyCategoryService;
 
     @Autowired
-    public KeyRestService(KeyRepository keyRepository, UserRestService userRestService) {
+    public KeyRestService(KeyRepository keyRepository, UserRestService userRestService, KeyCategoryRestService keyCategoryService) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
-        this.userRestService = requireNonNull(userRestService, "userRestService must not be null!");
+        this.userService = requireNonNull(userRestService, "userService must not be null!");
+        this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
     }
 
     @Override
-    public void delete(long keyId) throws KeyNotFoundException {
+    public Key create(KeyRequest payload, Principal principal) {
+        User user = userService.validate(principal);
+        Key key = new Key(payload.getName(), payload.getValue(), userService.getByEmail(principal.getName()));
+        key.setCreator(user);
+        return keyRepository.save(key);
+    }
+
+    @Override
+    public void delete(Long keyId) throws KeyNotFoundException {
         keyRepository.delete(validate(keyId));
     }
 
     @Override
-    public Set<Key> getAll() {
-        return StreamSupport.stream(keyRepository.findAll().spliterator(), false)
-            .collect(Collectors.toSet());
+    public Set<Key> getAll(Principal principal) {
+        Set<Key> keyPool = new HashSet<>();
+        keyPool.addAll(keyRepository.findAllByCreator(userService.validate(principal)));
+        keyCategoryService.getAll(principal).stream()
+            .flatMap(keyCategory -> keyCategory.getKeys().stream())
+            .forEach(keyPool::add);
+        return keyPool;
     }
 
     @Override
-    public Set<Key> getAllByCreationTimestamp(Timestamp timestamp) {
-        return keyRepository.findAllByCreationTimestamp(timestamp);
-    }
-
-    @Override
-    public Set<Key> getAllByCreator(long creatorUserId) throws UserNotFoundException {
-        return keyRepository.findAllByCreatorId(userRestService.validate(creatorUserId).getId());
-    }
-
-    @Override
-    public Set<Key> getAllByValue(String value) {
-        return keyRepository.findAllByValue(value);
-    }
-
-    @Override
-    public Key getById(long keyId) throws KeyNotFoundException {
+    public Key getById(Long keyId) throws KeyNotFoundException {
         return validate(keyId);
     }
 
     @Override
-    public void modifyValue(long keyId, String newValue) {
-        if (newValue.trim().isEmpty()) {
-            throw new IllegalArgumentException("new value can not be empty!");
-        }
-        Key key = validate(keyId);
-        key.setValue(newValue);
-        keyRepository.save(key);
+    public Key update(Long keyId, KeyRequest payload) {
+        Key key = keyRepository.findOne(keyId);
+        key.setName(payload.getName());
+        key.setValue(payload.getValue());
+        return keyRepository.save(key);
     }
 
     @Override
@@ -86,7 +83,7 @@ public class KeyRestService implements KeyService {
     }
 
     @Override
-    public Key validate(long keyId) throws KeyNotFoundException {
+    public Key validate(Long keyId) throws KeyNotFoundException {
         return Optional.ofNullable(keyRepository.findOne(keyId)).orElseThrow(() -> new KeyNotFoundException(keyId));
     }
 }

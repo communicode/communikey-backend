@@ -2,15 +2,15 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.service;
 
 import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.exception.KeyNotFoundException;
-import de.communicode.communikey.exception.UserNotFoundException;
+import de.communicode.communikey.domain.request.KeyRequest;
+import de.communicode.communikey.exception.key.KeyNotFoundException;
 
-import java.sql.Timestamp;
+import java.security.Principal;
 import java.util.Set;
 
 /**
@@ -22,47 +22,28 @@ import java.util.Set;
 public interface KeyService {
 
     /**
-     * Deletes the specified key.
+     * Creates a new key.
+     *
+     * @param payload the key request payload
+     * @param principal the principal that represents the user to create a new key for
+     */
+    Key create(KeyRequest payload, Principal principal);
+
+    /**
+     * Deletes the key with the specified ID.
      *
      * @param keyId the ID of the key entity to delete
      * @throws KeyNotFoundException if the specified key has not been found
      */
-    void delete(long keyId) throws KeyNotFoundException;
+    void delete(Long keyId) throws KeyNotFoundException;
 
     /**
-     * Gets all key entities.
+     * Gets all key entities the principal is authorized to.
      *
+     * @param principal the principal that represents the user to get all key entities of
      * @return a collection of all key entities
      */
-    Set<Key> getAll();
-
-    /**
-     * Gets all key entities with the specified creation timestamp.
-     *
-     * @param timestamp the creation timestamp from which all key are to be found
-     * @return a collection of found key entities
-     * @since 0.2.0
-     */
-    Set<Key> getAllByCreationTimestamp(Timestamp timestamp);
-
-    /**
-     * Gets all key entities created by the specified user.
-     *
-     * @param creatorUserId the ID of the user entity to find all created key entities of
-     * @return a collection of found key entities
-     * @throws UserNotFoundException if the user entity with the specified ID has not been found
-     * @since 0.2.0
-     */
-    Set<Key> getAllByCreator(long creatorUserId) throws UserNotFoundException;
-
-    /**
-     * Gets all key entities with the specified value.
-     *
-     * @param value the value from which all key entity are to be found
-     * @return a collection of found key entities
-     * @since 0.2.0
-     */
-    Set<Key> getAllByValue(String value);
+    Set<Key> getAll(Principal principal);
 
     /**
      * Gets the key with the specified ID.
@@ -71,20 +52,20 @@ public interface KeyService {
      * @return the key entity with the specified ID
      * @throws KeyNotFoundException if no key with the specified ID has been found
      */
-    Key getById(long keyId) throws KeyNotFoundException;
+    Key getById(Long keyId) throws KeyNotFoundException;
 
     /**
-     * Modifies the value of the specified key.
+     * Updates a key with the specified payload.
      *
-     * @param keyId the ID of the key entity to modify the value of
-     * @param newValue the new value for the specified key entity
-     * @throws KeyNotFoundException if no key with the specified ID has been found
-     * @throws IllegalArgumentException if the specified new value is empty
+     * @param keyId the ID of the key entity to update
+     * @param payload the key request payload to update the key with
+     * @return the updated key entity
+     * @since 0.2.0
      */
-    void modifyValue(long keyId, String newValue) throws KeyNotFoundException, IllegalArgumentException;
+    Key update(Long keyId, KeyRequest payload);
 
     /**
-     * Saves the specified key entity.
+     * Saves a key.
      *
      * @param key the key entity to save
      * @return the saved key entity
@@ -93,11 +74,11 @@ public interface KeyService {
     Key save(Key key) throws NullPointerException;
 
     /**
-     * Validates the specified {@link Key} entity.
+     * Validates a key.
      *
      * @param keyId the ID of the key entity to validate
      * @return the key entity if validated
      * @throws KeyNotFoundException if no key entity with the specified ID has been found
      */
-    Key validate(long keyId) throws KeyNotFoundException;
+    Key validate(Long keyId) throws KeyNotFoundException;
 }

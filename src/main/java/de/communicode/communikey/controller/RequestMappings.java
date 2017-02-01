@@ -2,7 +2,7 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.controller;
 
@@ -46,7 +46,7 @@ public final class RequestMappings {
     /**
      * The endpoint for {@link KeyCategory} entities.
      */
-    public static final String KEY_CATEGORIES = KEYS + "/categories";
+    public static final String KEY_CATEGORIES = "/categories";
 
     /**
      * The request parameter for a {@link KeyCategory} entity ID.
