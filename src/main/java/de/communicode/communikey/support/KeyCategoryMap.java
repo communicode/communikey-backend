@@ -74,11 +74,11 @@ public class KeyCategoryMap {
      * @param parent the key category entity to add all direct- and indirect children of
      */
     private Set<Long> addChildrenRecursively(KeyCategory parent) {
-        if(parent.getChilds().isEmpty()) {
+        if(parent.getChildren().isEmpty()) {
             return Sets.newConcurrentHashSet();
         } else {
             Set<Long> leafChildren = Sets.newConcurrentHashSet();
-            for (KeyCategory child : parent.getChilds()) {
+            for (KeyCategory child : parent.getChildren()) {
                 leafChildren.add(child.getId());
                 leafChildren.addAll(addChildrenRecursively(child));
             }
