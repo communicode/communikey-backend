@@ -6,7 +6,7 @@
  */
 package de.communicode.communikey.config;
 
-//import de.communicode.communikey.service.UserDetailsRestService;
+import de.communicode.communikey.service.UserDetailsRestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,6 +70,7 @@ public class OAuth2Config {
         @Qualifier("authenticationManagerBean")
         private final AuthenticationManager authenticationManager;
 
+        private UserDetailsRestService userDetailsRestService;
         private final DataSourceConfig dataSourceConfig;
 
         @Value("${cckey.security.oauth2.access_token_validity}")
@@ -79,15 +80,18 @@ public class OAuth2Config {
         private int refresh_token_validity;
 
         @Autowired
-        public AuthorizationServerConfiguration(AuthenticationManager authenticationManager, DataSourceConfig dataSourceConfig) {
+        public AuthorizationServerConfiguration(AuthenticationManager authenticationManager, DataSourceConfig dataSourceConfig,
+                                                UserDetailsRestService userDetailsRestService) {
             this.authenticationManager = requireNonNull(authenticationManager, "authenticationManager must not be null!");
             this.dataSourceConfig = requireNonNull(dataSourceConfig, "dataSourceConfig must not be null!");
+            this.userDetailsRestService = requireNonNull(userDetailsRestService, "userDetailsRestService must not be null!");
         }
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
             endpoints
                 .authenticationManager(authenticationManager)
+                .userDetailsService(userDetailsRestService)
                 .tokenStore(tokenStore());
         }
 
