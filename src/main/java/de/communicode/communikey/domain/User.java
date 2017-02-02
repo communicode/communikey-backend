@@ -2,7 +2,7 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.domain;
 
@@ -34,6 +34,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -48,7 +49,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = USERS)
-public class User implements UserDetails {
+public class User implements UserDetails, Serializable {
     @Id
     @Column(name = USER_ID, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -21,6 +21,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -31,7 +32,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = USER_GROUPS)
-public class UserGroup {
+public class UserGroup implements Serializable {
     @Id
     @Column(name = USER_GROUP_ID, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)

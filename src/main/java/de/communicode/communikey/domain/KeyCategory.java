@@ -2,7 +2,7 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.domain;
 
@@ -42,7 +42,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = CATEGORIES)
-public class KeyCategory {
+public class KeyCategory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = KEY_CATEGORY_ID, nullable = false)

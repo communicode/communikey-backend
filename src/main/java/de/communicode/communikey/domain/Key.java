@@ -26,6 +26,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
@@ -36,7 +37,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = KEYS)
-public class Key {
+public class Key implements Serializable {
     @Id
     @Column(name = KEY_ID, nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
