@@ -71,7 +71,7 @@ public class KeyRestService implements KeyService {
 
     @Override
     public Key update(Long keyId, KeyRequest payload) {
-        Key key = keyRepository.findOne(keyId);
+        Key key = validate(keyId);
         key.setName(payload.getName());
         key.setValue(payload.getValue());
         return keyRepository.save(key);
