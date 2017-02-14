@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -91,11 +92,20 @@ public class GlobalControllerExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException exception) {
         return createErrorResponse(
-            HttpStatus.BAD_REQUEST,
+            HttpStatus.PRECONDITION_FAILED,
             new Timestamp(Calendar.getInstance().getTimeInMillis()),
             exception.getConstraintViolations().stream()
                 .map(constraintViolation -> constraintViolation.getPropertyPath().toString() + " " + constraintViolation.getMessage())
                 .collect(Collectors.toList())
+        );
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception) {
+        return createErrorResponse(
+            HttpStatus.BAD_REQUEST,
+            new Timestamp(Calendar.getInstance().getTimeInMillis()),
+            exception.getMessage()
         );
     }
 
@@ -109,7 +119,7 @@ public class GlobalControllerExceptionHandler {
      * @param error the error reason
      * @return the error as response entity
      */
-    protected ResponseEntity<ErrorResponse> createErrorResponse(HttpStatus status, Timestamp timestamp, String error) {
+    ResponseEntity<ErrorResponse> createErrorResponse(HttpStatus status, Timestamp timestamp, String error) {
         final ErrorResponse errorResponse = new ErrorResponse(status, timestamp, error);
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_JSON);
@@ -126,7 +136,7 @@ public class GlobalControllerExceptionHandler {
      * @param errors the list of error reasons
      * @return the error as response entity
      */
-    protected ResponseEntity<ErrorResponse> createErrorResponse(HttpStatus status, Timestamp timestamp, List<String> errors) {
+    private ResponseEntity<ErrorResponse> createErrorResponse(HttpStatus status, Timestamp timestamp, List<String> errors) {
         final ErrorResponse errorResponse = new ErrorResponse(status, timestamp, errors);
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_JSON);
@@ -145,8 +155,10 @@ public class GlobalControllerExceptionHandler {
             public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
                 Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, false);
                 errorAttributes.remove("exception");
-                errorAttributes.remove("message");
                 errorAttributes.remove("path");
+                if (errorAttributes.containsKey("message")) {
+                    errorAttributes.remove("message");
+                }
                 return errorAttributes;
             }
         };
