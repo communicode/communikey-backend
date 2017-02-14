@@ -2,7 +2,7 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.config;
 
@@ -19,7 +19,7 @@ import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecur
  * @since 0.2.0
  */
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     @Override
