@@ -2,7 +2,7 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.exception;
 
@@ -19,9 +19,9 @@ public class UserConflictException extends RuntimeException {
     /**
      * Constructs an {@code UserConflictException} with the detailed conflict message.
      *
-     * @param conflictMessage the detailed message about the conflict
+     * @param message the detailed message about the conflict
      */
-    public UserConflictException(String conflictMessage) {
-        super(conflictMessage);
+    public UserConflictException(String message) {
+        super(message);
     }
 }

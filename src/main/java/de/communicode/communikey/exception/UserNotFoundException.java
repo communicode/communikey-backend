@@ -2,14 +2,14 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.exception;
 
 import de.communicode.communikey.domain.User;
 
 /**
- * Thrown to indicate that a method has been passed an not existing {@link User} entity.
+ * Thrown to indicate that a method has been passed a not existing {@link User}.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -17,20 +17,11 @@ import de.communicode.communikey.domain.User;
 public class UserNotFoundException extends RuntimeException {
 
     /**
-     * Constructs an {@code UserNotFoundException} with the specified {@link User} ID applied to the message.
+     * Constructs an {@code UserNotFoundException} for the specified {@link User} login.
      *
-     * @param userId the ID of the user entity that has not been found
+     * @param userLogin the login of the user that has not been found
      */
-    public UserNotFoundException(long userId) {
-        super("could not find user with ID " + userId);
-    }
-
-    /**
-     * Constructs an {@code UserNotFoundException} with the specified {@link User} email applied to the message.
-     *
-     * @param email the email of the user entity that has not been found
-     */
-    public UserNotFoundException(String email) {
-        super("could not find user with email " + email);
+    public UserNotFoundException(String userLogin) {
+        super("could not find user " + userLogin);
     }
 }
