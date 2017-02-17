@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
 
     public static final String APP_ID = "communikey";
-    public static final String EMAIL_REGEX = "^([^-_.@0-9]){1,}([a-z._-]{1,})@communicode\\.de$";
+    public static final String EMAIL_REGEX = "^([^-_.@\\s0-9]){1,}([a-z._-]{1,})@communicode\\.de$";
 
     @Autowired
     public SecurityConfig(AuthenticationManagerBuilder authenticationManagerBuilder, UserDetailsService userDetailsService) {
