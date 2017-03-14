@@ -22,6 +22,7 @@ public class UserPasswordResetPayload {
     @NotBlank
     @Size(min = 8)
     private String password;
+
     @NotBlank
     @Size(max = 20)
     private String resetKey;
@@ -34,5 +35,13 @@ public class UserPasswordResetPayload {
 
     public String getResetKey() {
         return resetKey;
+    }
+
+    @Override
+    public String toString() {
+        return "UserPasswordResetPayload{" +
+            "password='" + password + '\'' +
+            ", resetKey='" + resetKey + '\'' +
+            '}';
     }
 }

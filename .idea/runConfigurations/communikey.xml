@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="communikey" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="de.communicode.communikey.CommunikeyApplication" />
+    <option name="VM_PARAMETERS" value="-ea -Dspring.profiles.active=dev" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <module name="communikey" />
+    <envs />
+    <method />
+  </configuration>
+</component>

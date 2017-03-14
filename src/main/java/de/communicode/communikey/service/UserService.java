@@ -2,114 +2,368 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.service;
 
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
+
+import com.google.common.collect.ImmutableMap;
+import de.communicode.communikey.domain.Authority;
+import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
+import de.communicode.communikey.exception.ActivationKeyNotFoundException;
+import de.communicode.communikey.exception.ResetKeyNotFoundException;
 import de.communicode.communikey.exception.UserConflictException;
 import de.communicode.communikey.exception.UserNotFoundException;
+import de.communicode.communikey.repository.AuthorityRepository;
+import de.communicode.communikey.repository.UserRepository;
+import de.communicode.communikey.security.AuthoritiesConstants;
+import de.communicode.communikey.security.SecurityUtils;
+import de.communicode.communikey.service.payload.UserPayload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
- * A service to process {@link User} entities.
+ * The REST API service to process {@link User} via a {@link UserRepository}.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-public interface UserService {
+@Service
+public class UserService {
+
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private final UserRepository userRepository;
+    private final AuthorityRepository authorityRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public final JdbcTokenStore jdbcTokenStore;
+
+    @Autowired
+    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder, JdbcTokenStore jdbcTokenStore) {
+        this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
+        this.authorityRepository = requireNonNull(authorityRepository, "authorityRepository must not be null!");
+        this.passwordEncoder = requireNonNull(passwordEncoder, "passwordEncoder must not be null!");
+        this.jdbcTokenStore = requireNonNull(jdbcTokenStore, "jdbcTokenStore must not be null!");
+    }
+
+    /**
+     * Activates the user for the specified activation key.
+     *
+     * @param activationKey the activation key
+     * @return the activated user
+     * @throws ActivationKeyNotFoundException if the specified activation key has not been found
+     */
+    public User activate(String activationKey) throws ActivationKeyNotFoundException {
+        return ofNullable(userRepository.findOneByActivationKey(activationKey))
+            .map(user -> {
+                user.setActivated(true);
+                user.setActivationKey(null);
+                userRepository.save(user);
+                log.debug("Activated user {} with activation key {}", user.getLogin(), activationKey);
+                return user;
+            }).orElseThrow(() -> new ActivationKeyNotFoundException(activationKey));
+    }
+
+    /**
+     * Adds the key to the user with the specified login.
+     *
+     * @param userLogin the login of the user the key will be added to
+     * @param key the key to be added
+     * @return the updated user
+     * @throws UserNotFoundException if the user with the specified login has not been found
+     */
+    public User addKey(String userLogin, Key key) {
+        User user = validate(userLogin);
+        user.getKeys().add(key);
+        return userRepository.save(user);
+    }
+
+    /**
+     * Adds the responsible key category to the user with the specified login.
+     *
+     * @param userLogin the login of the user to be set as the responsible of the key category
+     * @param keyCategory the key category to be added
+     * @return the updated user
+     * @throws UserNotFoundException if the user with the specified login has not been found
+     */
+    public User addResponsibleKeyCategory(String userLogin, KeyCategory keyCategory) {
+        User user = validate(userLogin);
+        user.getResponsibleKeyCategories().add(keyCategory);
+        return userRepository.save(user);
+    }
 
     /**
      * Creates a new user.
      *
-     * @param email the email of the user entity to create
-     * @param password the password of the user entity to create
-     * @return the created user entity
-     * @throws UserConflictException if a user entity with the specified username already exists
-     * @throws IllegalArgumentException if the specified username or password is empty
+     * @param payload the payload for the new user
+     * @return the created user
+     * @throws UserConflictException if a user with the specified email already exists
      */
-    User create(String email, String password) throws UserConflictException, IllegalArgumentException;
+    public User create(UserPayload payload) throws UserConflictException {
+        validateUniqueEmail(payload.getEmail());
+
+        User user = new User();
+        Set<Authority> authorities = new HashSet<>();
+        Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
+
+        user.setEmail(payload.getEmail().toLowerCase(Locale.ENGLISH));
+        user.setLogin(extractLoginFromEmail(payload.getEmail()));
+        user.setFirstName(payload.getFirstName());
+        user.setLastName(payload.getLastName());
+        user.setPassword(passwordEncoder.encode(payload.getPassword()));
+        user.setActivationKey(SecurityUtils.generateRandomActivationKey());
+        user.setActivated(true);
+        authorities.add(authority);
+        user.setAuthorities(authorities);
+
+        userRepository.save(user);
+        log.debug("Created new user: {}", user);
+        return user;
+    }
 
     /**
-     * Deletes the user.
+     * Deactivates the user with the specified login.
      *
-     * @param principal the principal that represents the user entity to delete
-     * @throws UserNotFoundException if the user has not been found
+     * @param login the login of the user to deactivate
+     * @return the deactivated user
+     * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    void delete(Principal principal) throws UserNotFoundException;
+    public User deactivate(String login) throws UserNotFoundException {
+        return ofNullable(userRepository.findOneByLogin(login))
+            .map(user -> {
+                user.setActivated(false);
+                user.setActivationKey(SecurityUtils.generateRandomActivationKey());
+                log.debug("Generated new activation key {} for user {}", user.getActivationKey(), user.getLogin());
+                deleteOauth2AccessTokens(login);
+                userRepository.save(user);
+                log.debug("Deactivated user {}", login);
+                return user;
+            }).orElseThrow(() -> new UserNotFoundException(login));
+    }
 
     /**
-     * Gets all user entities.
+     * Deletes the user with the specified login.
      *
-     * @return a collection of all user entities
+     * @param login the login of the user to delete
+     * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    Set<User> getAll();
+    public void delete(String login) throws UserNotFoundException {
+        deleteOauth2AccessTokens(login);
+        userRepository.delete(ofNullable(validate(login)).orElseThrow(() -> new UserNotFoundException(login)));
+        log.debug("Deleted user with login {}", login);
+    }
 
     /**
-     * Gets the user with the specified email.
+     * Generates a random generated password reset key for a user specified by the email.
      *
-     * @param email the email to find the user entity of
-     * @return the user entity with the specified email if found
-     * @throws UserNotFoundException if the user entity with the specified email has not been found
-     * @throws IllegalArgumentException if the specified email is empty
+     * @param email the email of the user to generate a password reset key for
+     * @return the generated reset key
      */
-    User getByEmail(String email) throws UserNotFoundException, IllegalArgumentException;
+    public Map<String, String> generatePasswordResetKey(String email) {
+        return ofNullable(userRepository.findOneByEmail(email))
+            .filter(User::isActivated)
+            .map(user -> {
+                if (Objects.nonNull(user.getResetKey())) {
+                    log.debug("Rejected to generate already existing password reset key {}", user.getResetKey());
+                    throw new UserConflictException("password reset key has already been generated");
+                }
+                user.setResetKey(SecurityUtils.generateRandomResetKey());
+                user.setResetDate(ZonedDateTime.now());
+                userRepository.save(user);
+                log.debug("Generated reset key {} for user {}", user.getResetKey(), email);
+                return ImmutableMap.<String, String>builder().
+                    put("resetKey", user.getResetKey()).
+                    build();
+            }).orElseThrow(() -> new UserNotFoundException(email));
+    }
 
     /**
-     * Gets the user entity.
+     * Gets all users.
      *
-     * @param userId the ID of the user entity to get
-     * @return the user entity if found
-     * @throws UserNotFoundException if the user has not been found
+     * @return a collection of all user
      */
-    User getById(long userId) throws UserNotFoundException;
+    public Set<User> getAll() {
+        return new HashSet<>(userRepository.findAll());
+    }
 
     /**
-     * Modifies the email of the user.
+     * Gets all keys created by the user with the the specified login.
      *
-     * @param principal the principal that represents the user entity to modify the email of
-     * @param newEmail the new email
-     * @throws UserNotFoundException if the user entity has not been found
-     * @throws UserConflictException if a user entity with the specified new email already exists
-     * @throws IllegalArgumentException if the specified new email is empty
+     * @param login the login of the user to get all created keys of
+     * @return a collection of keys
      */
-    void modifyEmail(Principal principal, String newEmail) throws UserNotFoundException, UserConflictException, IllegalArgumentException;
+    public Set<Key> getCreatedKeys(String login) {
+        return validate(login).getKeys();
+    }
+
+    @Transactional(readOnly = true)
+    public User getWithAuthoritiesByEmail(String email) {
+        return userRepository.findOneWithAuthoritiesByEmail(email);
+    }
+
+    @Transactional(readOnly = true)
+    public User getWithAuthoritiesByLogin(String login) {
+        return validateWithAuthorities(login);
+    }
+
+    @Transactional(readOnly = true)
+    public User getWithAuthorities(Long id) {
+        return userRepository.findOneWithAuthoritiesById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public User getWithAuthorities() {
+        return Optional.ofNullable(userRepository.findOneWithAuthoritiesByEmail(SecurityUtils.getCurrentUserLogin())).orElse(null);
+    }
 
     /**
-     * Modifies the role of the specified user.
+     * Resets the password of a user for the specified reset key.
      *
-     * @param userId the ID of the user to modify the role of
-     * @param newRole the new role type
-     * @throws UserNotFoundException if the specified {@code user} has not been found
+     * @param newPassword the new password
+     * @param resetKey the reset key of a user to reset the password of
+     * @return {@code true} if the password has been reset, {@code false} otherwise
      */
-    //void modifyRole(long userId, UserRoleType newRole) throws UserNotFoundException;
+    public boolean resetPassword(String newPassword, String resetKey) {
+        return ofNullable(userRepository.findOneByResetKey(resetKey))
+            .map(user -> {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                user.setResetKey(null);
+                user.setResetDate(null);
+                userRepository.save(user);
+                log.debug("Reset password for user {} with reset key {}", user.getLogin(), resetKey);
+                return true;
+            }).orElseThrow(() -> new ResetKeyNotFoundException(resetKey));
+    }
 
     /**
-     * Saves the specified user.
+     * Updates the user with the specified payload.
      *
-     * @param user the user entity to save
-     * @return the saved user entity
-     * @throws NullPointerException if the specified user entity is null
+     * @param login the login of the user to update
+     * @param payload the payload to update the user with
+     * @return the updated user
+     * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    User save(User user) throws NullPointerException;
+    public User update(String login, UserPayload payload) throws UserNotFoundException {
+        return ofNullable(userRepository.findOneByLogin(login))
+            .map(user -> {
+                if (!user.getEmail().equals(payload.getEmail())) {
+                    user.setEmail(validateUniqueEmail(payload.getEmail()));
+                    user.setLogin(extractLoginFromEmail(payload.getEmail()));
+                    deactivate(login);
+                    deleteOauth2AccessTokens(login);
+                }
+                user.setFirstName(payload.getFirstName());
+                user.setLastName(payload.getLastName());
+                user.setPassword(passwordEncoder.encode(payload.getPassword()));
+
+                userRepository.save(user);
+                log.debug("Updated user: {}", user);
+                return user;
+            }).orElseThrow(() -> new UserNotFoundException(login));
+    }
 
     /**
-     * Sets the activation status of the specified user.
+     * Updates the authorities of a user with the specified login.
      *
-     * @param principal the principal that represents the user entity to set the activation status of
-     * @param isEnabled the new activation status
-     * @throws UserNotFoundException if the user entity has not been found
+     * @param login the login of the user to update
+     * @param payload the payload to update the user with
+     * @return the updated user
+     * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    void setEnabled(Principal principal, boolean isEnabled) throws UserNotFoundException;
+    public User updateAuthorities(String login, Set<String> payload) throws UserNotFoundException {
+        return ofNullable(userRepository.findOneByLogin(login))
+            .map(user -> {
+                Set<Authority> payloadAuthorities = payload.stream()
+                    .map(authorityRepository::findOne)
+                    .collect(Collectors.toSet());
+                if (!payloadAuthorities.equals(user.getAuthorities())) {
+                    user.getAuthorities().clear();
+                    payload.stream()
+                        .map(authorityRepository::findOne)
+                        .forEach(authority -> user.getAuthorities().add(authority));
+                }
+                deleteOauth2AccessTokens(login);
+                userRepository.save(user);
+                log.debug("Updated authorities of user {}: {}", user.getLogin(), user.getAuthorities());
+                return user;
+            }).orElseThrow(() -> new UserNotFoundException(login));
+    }
 
     /**
-     * Validates the user entity represented by the specified principal entity.
+     * Validates the user by the specified login.
      *
-     * @param principal the principal that represents the user entity to validate
-     * @return the user entity if validated
-     * @throws UserNotFoundException if the user entity has not been found
+     * @param login the login of the user to validate
+     * @return the user if validated
+     * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    User validate(Principal principal) throws UserNotFoundException;
+    public User validate(String login) throws UserNotFoundException {
+        return ofNullable(userRepository.findOneByLogin(login)).orElseThrow(() -> new UserNotFoundException(login));
+    }
+
+    /**
+     * Validates the user by the specified login.
+     *
+     * @param login the login of the user to validate
+     * @return the user if validated
+     * @throws UserNotFoundException if the user with the specified login has not been found
+     */
+    public User validateWithAuthorities(String login) throws UserNotFoundException {
+        return ofNullable(userRepository.findOneWithAuthoritiesByLogin(login)).orElseThrow(() -> new UserNotFoundException(login));
+    }
+
+    /**
+     * Deletes all OAuth2 access tokens of the user with the specified login.
+     *
+     * @param login the login of the user to delete the OAuth2 access token from
+     * @throws UserNotFoundException if the user with the specified login has not been found
+     */
+    private void deleteOauth2AccessTokens(String login) {
+        jdbcTokenStore.findTokensByUserName(login).forEach(accessToken -> {
+            jdbcTokenStore.removeAccessToken(accessToken);
+            log.debug("Removed OAuth2 access token {} of user {}", accessToken.getValue(), login);
+        });
+    }
+
+    /**
+     * Extracts the login of a user from the specified email.
+     *
+     * @param email the email to extract the login of
+     * @return the extracted login
+     */
+    private String extractLoginFromEmail(String email) {
+        return email.substring(0, email.indexOf('@')).toLowerCase(Locale.ENGLISH);
+    }
+
+    /**
+     * Validates that the specified email is unique.
+     *
+     * @param email the email to validate
+     * @return the validated email if unique
+     * @throws UserConflictException if the specified email is not unique
+     */
+    private String validateUniqueEmail(String email) throws UserConflictException {
+        if (Optional.ofNullable(userRepository.findOneByEmail(email)).isPresent()) {
+            throw new UserConflictException("email '" + email + "' already exists");
+        }
+        return email;
+    }
 }

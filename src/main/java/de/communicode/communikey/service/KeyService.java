@@ -6,79 +6,127 @@
  */
 package de.communicode.communikey.service;
 
-import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.domain.request.KeyRequest;
-import de.communicode.communikey.exception.key.KeyNotFoundException;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 
-import java.security.Principal;
+import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.security.SecurityUtils;
+import de.communicode.communikey.service.payload.KeyPayload;
+import de.communicode.communikey.exception.KeyNotFoundException;
+import de.communicode.communikey.repository.KeyRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A service to process {@link Key} entities.
+ * The REST API service to process {@link Key} entities via a {@link KeyRepository}.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
  */
-public interface KeyService {
+@Service
+public class KeyService {
+
+    private final Logger log = LoggerFactory.getLogger(KeyService.class);
+    private final KeyRepository keyRepository;
+    private final UserService userService;
+
+    @Autowired
+    public KeyService(KeyRepository keyRepository, UserService userRestService) {
+        this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
+        this.userService = requireNonNull(userRestService, "userService must not be null!");
+    }
 
     /**
      * Creates a new key.
      *
-     * @param payload the key request payload
-     * @param principal the principal that represents the user to create a new key for
+     * @param payload the key payload
      */
-    Key create(KeyRequest payload, Principal principal);
+    public Key create(KeyPayload payload) {
+        Key key = new Key();
+        key.setName(payload.getName());
+        key.setPassword(payload.getPassword());
+        key.setCreator(userService.validate(SecurityUtils.getCurrentUserLogin()));
+        key = keyRepository.save(key);
+        userService.addKey(SecurityUtils.getCurrentUserLogin(), key);
+        log.debug("Created new key with ID '{}'", key.getId());
+        return key;
+    }
 
     /**
      * Deletes the key with the specified ID.
      *
-     * @param keyId the ID of the key entity to delete
-     * @throws KeyNotFoundException if the specified key has not been found
+     * @param keyId the ID of the key to delete
+     * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    void delete(Long keyId) throws KeyNotFoundException;
+    public void delete(Long keyId) throws KeyNotFoundException {
+        keyRepository.delete(validate(keyId));
+        log.debug("Deleted key with ID {}", keyId);
+    }
 
     /**
-     * Gets all key entities the principal is authorized to.
-     *
-     * @param principal the principal that represents the user to get all key entities of
-     * @return a collection of all key entities
+     * Deletes all keys.
      */
-    Set<Key> getAll(Principal principal);
+    public void deleteAll() {
+        keyRepository.deleteAll();
+        log.debug("Deleted all keys");
+    }
 
     /**
      * Gets the key with the specified ID.
      *
-     * @param keyId the ID of the key entity to get
-     * @return the key entity with the specified ID
-     * @throws KeyNotFoundException if no key with the specified ID has been found
+     * @param keyId the ID of the key to get
+     * @return the key
+     * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    Key getById(Long keyId) throws KeyNotFoundException;
+    public Key get(Long keyId) throws KeyNotFoundException {
+        return validate(keyId);
+    }
+
+    /**
+     * Gets all keys the current user is authorized to.
+     *
+     * @return a collection of all keys
+     */
+    public Set<Key> getAll() {
+        //Set<Key> keyPool = new HashSet<>();
+        //keyPool.addAll(keyRepository.findAllByCreator(userService.validate(SecurityUtils.getCurrentUserLogin())));
+/*        keyCategoryService.getAll().stream()
+            .flatMap(keyCategory -> keyCategory.getKeys().stream())
+            .forEach(keyPool::add);*/
+        //return keyPool;
+        return new HashSet<>(keyRepository.findAll());
+    }
 
     /**
      * Updates a key with the specified payload.
      *
-     * @param keyId the ID of the key entity to update
-     * @param payload the key request payload to update the key with
-     * @return the updated key entity
+     * @param keyId the ID of the key to update
+     * @param payload the payload to update the key with
+     * @return the updated key
      * @since 0.2.0
      */
-    Key update(Long keyId, KeyRequest payload);
-
-    /**
-     * Saves a key.
-     *
-     * @param key the key entity to save
-     * @return the saved key entity
-     * @throws NullPointerException if the specified key entity is null
-     */
-    Key save(Key key) throws NullPointerException;
+    public Key update(Long keyId, KeyPayload payload) {
+        Key key = validate(keyId);
+        key.setName(payload.getName());
+        key.setPassword(payload.getPassword());
+        key = keyRepository.save(key);
+        log.debug("Updated key with ID '{}'", key.getId());
+        return key;
+    }
 
     /**
      * Validates a key.
      *
-     * @param keyId the ID of the key entity to validate
-     * @return the key entity if validated
-     * @throws KeyNotFoundException if no key entity with the specified ID has been found
+     * @param keyId the ID of the key to validate
+     * @return the key if validated
+     * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    Key validate(Long keyId) throws KeyNotFoundException;
+    public Key validate(Long keyId) throws KeyNotFoundException {
+        return ofNullable(keyRepository.findOne(keyId)).orElseThrow(() -> new KeyNotFoundException(keyId));
+    }
 }

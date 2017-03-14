@@ -26,13 +26,18 @@ public class UserPayload {
     private String login;
     @NotBlank
     @Pattern(regexp = EMAIL_REGEX, message = "not a well-formed email address")
-    @Size(max = 100)
+    @Size(max = 115)
     private String email;
+
     @NotBlank
     @Size(min = 8)
     private String password;
+
+    @NotBlank
     @Size(max = 50)
     private String firstName;
+
+    @NotBlank
     @Size(max = 50)
     private String lastName;
 
@@ -64,7 +69,7 @@ public class UserPayload {
     }
 
     public String getEmail() {
-        return email;
+        return email.trim();
     }
 
     public String getPassword() {
@@ -72,11 +77,11 @@ public class UserPayload {
     }
 
     public String getFirstName() {
-        return firstName;
+        return firstName.trim();
     }
 
     public String getLastName() {
-        return lastName;
+        return lastName.trim();
     }
 
     @Override

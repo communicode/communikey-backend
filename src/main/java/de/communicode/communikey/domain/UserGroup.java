@@ -2,15 +2,14 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.config.DataSourceConfig.USER_GROUPS;
-import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_NAME;
-import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
+import de.communicode.communikey.service.view.AuthoritiesRestView;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,70 +17,68 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Represents a user group entity.
+ * Represents a user group.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
 @Entity
-@Table(name = USER_GROUPS)
-public class UserGroup implements Serializable {
-    @Id
-    @Column(name = USER_GROUP_ID, nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+@Table(name = "user_groups")
+public class UserGroup extends AbstractEntity implements Serializable {
 
-    @Column(name = USER_GROUP_NAME, nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private Long id;
+
+    @NotBlank
+    @Size(max = 100)
+    @Column(length = 100, unique = true, nullable = false)
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")
-    @JsonIgnoreProperties(value = {"groups", "roles", "credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled"})
-    private Set<User> users;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "groups_users",
+        joinColumns = @JoinColumn(name = "user_group_id", referencedColumnName = "id"),
+        inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")})
+    @JsonIgnoreProperties(value = {
+        "groups", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate", "authorities"})
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private Set<User> users = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")
-    @JsonIgnoreProperties(value = {"groups", "creator", "responsible", "parent"})
-    private Set<KeyCategory> categories;
+/*    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")
+    @JsonIgnoreProperties(value = {"groups", "responsible", "parent", "children"})
+    private Set<KeyCategory> categories = new HashSet<>();*/
 
-    private UserGroup() {}
-
-    /**
-     * Constructs a new user group entity with the specified attributes and an auto-generated ID with no {@link User} assigned to.
-     *
-     * @param name the name of the user group
-     */
-    public UserGroup(String name) {
-        this.name = name;
+    public Long getId() {
+        return id;
     }
 
-    public Set<KeyCategory> getCategories() {
-        return categories;
-    }
-
-    public long getId() {
-        return this.id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
-        return this.name;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setCategories(Set<KeyCategory> categories) {
-        this.categories = categories;
+        return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<User> getUsers() {
+        return users;
     }
 
     public void setUsers(Set<User> users) {

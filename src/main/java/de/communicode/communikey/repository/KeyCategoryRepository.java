@@ -2,15 +2,18 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.repository;
 
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
+import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.exception.KeyCategoryConflictException;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -23,34 +26,30 @@ import java.util.Set;
 public interface KeyCategoryRepository extends CrudRepository<KeyCategory, Long> {
 
     /**
-     * Finds all key category entities created by the specified {@link User} ID.
+     * Finds all key category entities created by the specified user.
      *
-     * @param creatorUserId the ID of the user to get all created key categories entities of
+     * @param user the user to get all created key categories of
      * @return a collection of found key category entities
      */
-    Set<KeyCategory> findAllByCreator(long creatorUserId);
+    Set<KeyCategory> findAllByCreator(User user); // TODO: Check if this method is necessary
 
     /**
-     * Finds all key category entities with the specified name.
+     * Finds all key category entities the specified user is responsible for.
      *
-     * @param name the name of the key category entities to find
+     * @param user the responsible user to get all key category entities of
      * @return a collection of found key category entities
      */
-    Set<KeyCategory> findAllByName(String name);
+    //Set<KeyCategory> findAllByResponsible(User user); // TODO: Check if this method is necessary; should be better resolvable through User reference
 
     /**
-     * Finds all key category entities owned by the specified parent {@link KeyCategory} ID.
+     * Finds all key category entities of the repository.
      *
-     * @param keyCategoryId the parent key category to get all child key category entities of
      * @return a collection of found key category entities
      */
-    Set<KeyCategory> findAllByParent(long keyCategoryId);
+    Set<KeyCategory> findAll();
 
-    /**
-     * Finds all key category entities the specified {@link User} is responsible for.
-     *
-     * @param responsibleUserId the ID of the responsible user to get all key category entities of
-     * @return a collection of found key category entities
-     */
-    Set<KeyCategory> findAllByResponsible(long responsibleUserId);
+
+    KeyCategory findOneByIdOrIdIsNull(Long id);
+
+    Set<KeyCategory> findAllByParentIsNull();
 }

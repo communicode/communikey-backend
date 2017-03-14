@@ -7,8 +7,7 @@
 package de.communicode.communikey.repository;
 
 import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.domain.User;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
@@ -20,13 +19,25 @@ import java.util.Set;
  * @since 0.1.0
  */
 @Repository
-public interface KeyRepository extends CrudRepository<Key, Long> {
-    /**
-     * Finds all key entities created by the specified user.
+public interface KeyRepository extends JpaRepository<Key, Long> {
+
+/**
+     * Finds all keys created by a user with the specified login.
      *
-     * @param user the user to find all created key entities of
-     * @return a collection of found key entities
+     * @param login the login of the user to find all created keys of
+     * @return a collection of keys
      * @since 0.2.0
      */
-    Set<Key> findAllByCreator(User user);
+    Set<Key> findAllByCreatedBy(String login);
+
+    /**
+     * Finds the key with the specified name.
+     *
+     * @param name the name of the key to find
+     * @return the key if found
+     * @since 0.2.0
+     */
+    Key findOneByName(String name);
+
+    Set<Key> findAllByCategoryIsNull();
 }

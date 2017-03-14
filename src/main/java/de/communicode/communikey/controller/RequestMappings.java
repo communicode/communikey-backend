@@ -6,10 +6,9 @@
  */
 package de.communicode.communikey.controller;
 
+import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
-import de.communicode.communikey.domain.Privilege;
-import de.communicode.communikey.domain.Role;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
 
@@ -21,90 +20,100 @@ import de.communicode.communikey.domain.UserGroup;
  */
 public final class RequestMappings {
 
-    private RequestMappings() {}
-
     /**
      * The root endpoint.
      */
-    public static final String ROOT = "/";
-
-    /**
-     * The endpoint for the HTTP status code {@code 403}.
-     */
-    public static final String HTTP_STATUS_CODE_403 = "/error/403";
-
-    /**
-     * The endpoint for the HTTP status code {@code 404}.
-     */
-    public static final String HTTP_STATUS_CODE_404 = "/error/404";
+    public static final String API = "/api";
 
     /**
      * The endpoint for {@link Key} entities.
      */
-    public static final String KEYS = ROOT + "keys";
+    public static final String KEYS = API + "/keys";
 
     /**
      * The endpoint for {@link KeyCategory} entities.
      */
-    public static final String KEY_CATEGORIES = "/categories";
+    public static final String KEY_CATEGORIES = API + "/categories";
 
     /**
-     * The request parameter for a {@link KeyCategory} entity ID.
+     * The request parameter for a {@link KeyCategory} ID.
      */
-    public static final String KEY_CATEGORY_ID = "/{keyCategoryId}";
+    public static final String KEY_CATEGORIES_ID = "/{keyCategoryId}";
+
+    /**
+     * The request mapping for {@link KeyCategory} children.
+     */
+    public static final String KEY_CATEGORY_CHILDREN = KEY_CATEGORIES_ID + "/children";
+
+    /**
+     * The request mapping for the {@link KeyCategory} {@link Key}s.
+     */
+    public static final String KEY_CATEGORY_KEYS = KEY_CATEGORIES_ID + "/keys";
+
+    /**
+     * The request mapping for the responsible {@link KeyCategory} user.
+     */
+    public static final String KEY_CATEGORY_RESPONSIBLE = KEY_CATEGORIES_ID + "/responsible";
 
     /**
      * The request parameter for a {@link Key} entity ID.
      */
-    public static final String KEY_ID = "/{keyId}";
-
-    /**
-     * The {@link User} login endpoint.
-     */
-    public static final String LOGIN = "/login";
-
-    /**
-     * The {@link User} logout endpoint.
-     */
-    public static final String LOGOUT = "/logout";
+    public static final String KEYS_ID = "/{keyId}";
 
     /**
      * The endpoint for {@link User} entities.
      */
-    public static final String USERS = ROOT + "users";
+    public static final String USERS = API + "/users";
 
     /**
-     * The endpoint for {@link Role} entities.
+     * The endpoint for {@link UserGroup}s.
      */
-    public static final String ROLES = USERS + "/roles";
+    public static final String USER_GROUPS = API + "/groups";
 
     /**
-     * The request parameter for a {@link Role} entity ID.
+     * The endpoint for {@link UserGroup}s.
      */
-    public static final String ROLE_ID = "/{roleId}";
+    public static final String USER_GROUPS_USERS = "/users";
 
     /**
-     * The endpoint for {@link Privilege} entities.
+     * The request parameter for a {@link UserGroup} name,
      */
-    public static final String PRIVILEGES = ROLES + "/privileges";
+    public static final String USER_GROUPS_NAME = "/{userGroupName}";
 
     /**
-     * The request parameter for a {@link Privilege} entity ID.
+     * The request parameter for a {@link User} login.
      */
-    public static final String PRIVILEGE_ID = "/{privilegeId}";
+    public static final String USERS_LOGIN = "/{login}";
 
     /**
-     * The endpoint for {@link UserGroup} entities.
+     * The endpoint to update the {@link Authority}s of a {@link User}.
      */
-    public static final String USER_GROUPS = USERS + "/groups";
+    public static final String USER_AUTHORITIES = USERS_LOGIN + "/authorities";
 
     /**
-     * The request parameter for a {@link UserGroup} entity ID.
+     * The endpoint to get {@link Key}s of a {@link User}.
      */
-    public static final String USER_GROUP_ID = "/{userGroupId}";
+    public static final String USER_KEYS = USERS_LOGIN + "/keys";
 
     /**
-     * The request parameter for a {@link User} entity ID.
+     * The endpoint to activate a {@link User}.
      */
-    public static final String USER_ID = "/{userId}";
+    public static final String USERS_ACTIVATE = "/activate";
+
+    /**
+     * The endpoint to deactivate a {@link User}.
+     */
+    public static final String USERS_DEACTIVATE = "/deactivate";
+
+    /**
+     * The endpoint to register a new {@link User}.
+     */
+    public static final String USERS_REGISTER = "/register";
+
+    /**
+     * The endpoint to reset a {@link User} password.
+     */
+    public static final String USERS_PASSWORD_RESET = "/reset_password";
+
+    private RequestMappings() {}
 }

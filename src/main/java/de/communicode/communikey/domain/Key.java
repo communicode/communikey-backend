@@ -6,16 +6,8 @@
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.config.DataSourceConfig.KEYS;
-import static de.communicode.communikey.config.DataSourceConfig.CREATOR_USER_ID;
-import static de.communicode.communikey.config.DataSourceConfig.KEY_CATEGORY_ID;
-import static de.communicode.communikey.config.DataSourceConfig.KEY_ID;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedBy;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,112 +17,92 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 
 /**
- * Represents a key entity.
+ * Represents a key.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
  */
 @Entity
-@Table(name = KEYS)
-public class Key implements Serializable {
+@Table(name = "\"keys\"")
+public class Key extends AbstractEntity implements Serializable {
+
     @Id
-    @Column(name = KEY_ID, nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = CREATOR_USER_ID, nullable = false)
-    @JsonIgnoreProperties(value = {"roles", "groups", "credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled", "keys", "keyCategories",
-        "responsibleKeyCategories"})
-    @CreatedBy
-    private User creator;
-
-    @ManyToOne
-    @JoinColumn(name = KEY_CATEGORY_ID)
-    @JsonIgnoreProperties(value = {"creator", "children", "responsible", "keys", "parent", "groups"})
-    private KeyCategory category;
-
+    @NotBlank
+    @Size(max = 100)
+    @Column(length = 100, nullable = false)
     private String name;
 
-    @JsonProperty("created")
-    @CreationTimestamp
-    private Timestamp creationTimestamp;
+    @ManyToOne
+    @JoinColumn(name = "key_category_id")
+    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible", "keys"})
+    private KeyCategory category;
 
-    @JsonProperty("updated")
-    @UpdateTimestamp
-    private Timestamp updateTimestamp;
+    @ManyToOne
+    @JoinColumn(name = "creator_user_id", nullable = false)
+    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
+        "authorities", "groups"})
+    private User creator;
 
-    private String value;
-
-    private Key() {}
-
-    /**
-     * Constructs a new key entity with the given attributes, an auto-generated ID and creation timestamp.
-     *
-     * @param name the name of the key
-     * @param value the value of the key
-     * @param creator the user who created this key
-     */
-    public Key(String name, String value, User creator) {
-        this.creator = creator;
-        this.value = value;
-        this.name = name.trim();
-    }
-
-    public KeyCategory getCategory() {
-        return this.category;
-    }
-
-    public Timestamp getCreationTimestamp() {
-        return creationTimestamp;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
+    @NotNull
+    @Column(nullable = false)
+    private String password;
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public Timestamp getUpdateTimestamp() {
-        return updateTimestamp;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getValue() {
-        return value;
+    public KeyCategory getCategory() {
+        return category;
     }
 
     public void setCategory(KeyCategory category) {
         this.category = category;
     }
 
-    public void setCreationTimestamp(Timestamp creationTimestamp) {
-        this.creationTimestamp = creationTimestamp;
+    public User getCreator() {
+        return creator;
     }
 
     public void setCreator(User creator) {
         this.creator = creator;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getPassword() {
+        return password;
     }
 
-    public void setUpdateTimestamp(Timestamp updateTimestamp) {
-        this.updateTimestamp = updateTimestamp;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    @Override
+    public String toString() {
+        return "Key{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", category=" + category +
+            ", creator=" + creator +
+            '}';
     }
 }

@@ -6,16 +6,8 @@
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.config.DataSourceConfig.CATEGORIES;
-import static de.communicode.communikey.config.DataSourceConfig.CREATOR_USER_ID;
-import static de.communicode.communikey.config.DataSourceConfig.KEY_CATEGORY_ID;
-import static de.communicode.communikey.config.DataSourceConfig.RESPONSIBLE_USER_ID;
-import static de.communicode.communikey.config.DataSourceConfig.USER_GROUPS_KEY_CATEGORIES;
-import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -30,133 +22,121 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
-import java.util.Optional;
+import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Represents a key category entity.
+ * Represents a key category.
  *
  * @author sgreb@communicode.de
+ * @see <a href="https://en.wikipedia.org/wiki/Tree_(data_structure)#Terminology_used_in_trees">Wikipedia - Terminology used in trees</a>
  * @since 0.2.0
  */
 @Entity
-@Table(name = CATEGORIES)
-public class KeyCategory implements Serializable {
+@Table(name = "key_categories")
+public class KeyCategory extends AbstractEntity implements Serializable {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = KEY_CATEGORY_ID, nullable = false)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @OneToMany(mappedBy = "parent")
-    @JsonBackReference
-    private Set<KeyCategory> childs;
-
-    @ManyToOne
-    @JoinColumn(name = CREATOR_USER_ID, nullable = false)
-    @JsonManagedReference
-    @JsonIgnoreProperties(value = {"roles", "groups", "credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled"})
-    private User creator;
-
-    @ManyToOne
-    @JoinColumn(name = RESPONSIBLE_USER_ID, nullable = false)
-    @JsonManagedReference
-    @JsonIgnoreProperties(value = {"roles", "groups", "credentialsNonExpired", "accountNonExpired", "accountNonLocked", "enabled"})
-    private User responsible;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "category")
-    @JsonBackReference
-    private Set<Key> keys;
-
+    @NotBlank
+    @Column(length = 100, nullable = false)
     private String name;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "category")
+    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "creator", "category"})
+    private Set<Key> keys = new HashSet<>();
 
     @ManyToOne
     @JoinColumn
-    @JsonManagedReference
-    private KeyCategory parent;
+    @JsonIgnoreProperties(value = {"groups", "children", "keys"})
+    private KeyCategory parent = null;
 
+    @NotNull
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, mappedBy = "parent")
+    @JsonIgnoreProperties(value = {"groups", "parent", "keys"})
+    private Set<KeyCategory> children = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "creator_user_id", nullable = false)
+    @JsonIgnoreProperties(value = {
+        "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
+        "authorities", "groups", "keyCategories", "responsibleKeyCategories"})
+    private User creator;
+
+/*    @NotNull
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = USER_GROUPS_KEY_CATEGORIES,
-        joinColumns = @JoinColumn(name = KEY_CATEGORY_ID, nullable = false, updatable = false),
-        inverseJoinColumns = @JoinColumn(name = USER_GROUP_ID, nullable = false))
+        name = "key_categories_user_groups",
+        joinColumns = {@JoinColumn(name = "key_category_id", referencedColumnName = "id")},
+        inverseJoinColumns = {@JoinColumn(name = "user_group_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"categories", "users"})
-    private Set<UserGroup> groups;
+    private Set<UserGroup> groups = new HashSet<>();*/
 
-    private KeyCategory() {}
+    @ManyToOne
+    @JoinColumn(name = "responsible_user_id")
+    @JsonIgnoreProperties(value = {
+        "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
+        "authorities", "groups", "keyCategories", "responsibleKeyCategories"})
+    private User responsible;
 
-    /**
-     * Constructs a new key category entity with the given value and an auto-generated ID.
-     *
-     * @param name the name of the key category
-     * @param creator the user who created this key category
-     */
-    public KeyCategory(String name, User creator) {
-        this.name = name;
-        this.creator = creator;
-    }
-
-    public Set<KeyCategory> getChilds() {
-        return childs;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public Set<Key> getKeys() {
-        return keys;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public Optional<KeyCategory> getParent() {
-        return Optional.ofNullable(parent);
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public User getResponsible() {
-        return responsible;
-    }
-
-    public Set<UserGroup> getGroups() {
-        return groups;
-    }
-
-    public void setChilds(Set<KeyCategory> childs) {
-        this.childs = childs;
-    }
-
-    public void setCreator(User creator) {
-        this.creator = creator;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public Set<Key> getKeys() {
+        return keys;
     }
 
     public void setKeys(Set<Key> keys) {
         this.keys = keys;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public KeyCategory getParent() {
+        return parent;
     }
 
     public void setParent(KeyCategory parent) {
         this.parent = parent;
     }
 
-    public void setResponsible(User responsible) {
-        this.responsible = responsible;
+    public Set<KeyCategory> getChildren() {
+        return children;
     }
 
-    public void setGroups(Set<UserGroup> groups) {
-        this.groups = groups;
+    public void setChildren(Set<KeyCategory> children) {
+        this.children = children;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    public User getResponsible() {
+        return responsible;
+    }
+
+    public void setResponsible(User responsible) {
+        this.responsible = responsible;
     }
 }

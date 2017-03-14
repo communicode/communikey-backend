@@ -6,22 +6,15 @@
  */
 package de.communicode.communikey.domain;
 
-import static de.communicode.communikey.config.DataSourceConfig.ROLE_ID;
-import static de.communicode.communikey.config.DataSourceConfig.USERS_GROUPS;
-import static de.communicode.communikey.config.DataSourceConfig.USERS;
-import static de.communicode.communikey.config.DataSourceConfig.USERS_ROLES;
-import static de.communicode.communikey.config.DataSourceConfig.USER_ID;
-import static de.communicode.communikey.config.DataSourceConfig.USER_GROUP_ID;
+import static de.communicode.communikey.config.SecurityConfig.EMAIL_REGEX;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.JsonView;
+import de.communicode.communikey.service.view.AuthoritiesRestView;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.validator.constraints.NotBlank;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -33,222 +26,222 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
- * Represents a user entity.
+ * Represents a user.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
 @Entity
-@Table(name = USERS)
-public class User implements UserDetails, Serializable {
+@Table(name = "users")
+public class User extends AbstractEntity implements Serializable {
+
     @Id
-    @Column(name = USER_ID, nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator")
-    @JsonBackReference
-    private Set<Key> keys;
+    @NotBlank
+    @Size(max = 100)
+    @Column(length = 100, unique = true, nullable = false)
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private String login;
 
-    @OneToMany(mappedBy = "creator")
-    @JsonBackReference
-    private Set<KeyCategory> keyCategories;
+    @NotBlank
+    @Pattern(regexp = EMAIL_REGEX, message = "not a well-formed email address")
+    @Size(max = 115)
+    @Column(length = 115, unique = true, nullable = false)
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private String email;
 
-    @OneToMany(mappedBy = "responsible")
-    @JsonBackReference
-    private Set<KeyCategory> responsibleKeyCategories;
-
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(
-        name = USERS_GROUPS,
-        joinColumns = @JoinColumn(name = USER_ID, nullable = false, updatable = false),
-        inverseJoinColumns = @JoinColumn(name = USER_GROUP_ID, nullable = false))
-    @JsonIgnoreProperties(value = {"users", "categories"})
-    private Set<UserGroup> groups;
-
-    @Column(nullable = false)
-    private boolean isEnabled;
-
-    @Column(nullable = false)
-    private boolean isAccountNonExpired;
-
-    @Column(nullable = false)
-    private boolean isAccountNonLocked;
-
-    @Column(nullable = false)
-    private boolean isCredentialsNonExpired;
-
+    @NotNull
+    @Size(min = 60, max = 60)
+    @Column(name = "password_hash", length = 60)
     @JsonIgnore
-    @Column(nullable = false)
     private String password;
 
+    @Size(max = 50)
+    @Column(name = "first_name", length = 50)
+    private String firstName;
+
+    @Size(max = 50)
+    @Column(name = "last_name", length = 50)
+    private String lastName;
+
+    @NotNull
     @Column(nullable = false)
-    private String email;
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private boolean activated = false;
+
+    @Size(max = 20)
+    @Column(name = "activation_key", length = 20)
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private String activationKey;
+
+    @Size(max = 20)
+    @Column(name = "reset_key", length = 20)
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private String resetKey;
+
+    @Column(name = "reset_date")
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private ZonedDateTime resetDate = null;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = USERS_ROLES,
-        joinColumns = @JoinColumn(name = USER_ID, referencedColumnName = USER_ID),
-        inverseJoinColumns = @JoinColumn(name = ROLE_ID, referencedColumnName = "id"))
-    @JsonManagedReference
-    @JsonIgnoreProperties("privileges")
-    private Set<Role> roles;
+        name = "users_authorities",
+        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+        inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
+    @BatchSize(size = 20)
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private Set<Authority> authorities = new HashSet<>();
 
-    private User() {}
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
+    @JsonIgnoreProperties(value = {"users", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate"})
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private Set<UserGroup> groups = new HashSet<>();
 
-    /**
-     * Constructs a new user entity with the specified email and password.
-     *
-     * @param email the email of the user
-     * @param password the password of the user
-     */
-    public User(String email, String password) {
-        this.email = email;
-        this.password = password;
-        isEnabled = false;
-        isAccountNonExpired = true;
-        isAccountNonLocked = true;
-        isCredentialsNonExpired = true;
+    @OneToMany(mappedBy = "creator")
+    @JsonIgnore
+    private Set<Key> keys = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
+    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible"})
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private Set<KeyCategory> keyCategories = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "responsible")
+    @JsonIgnoreProperties(value = {"children", "responsible", "keys", "parent", "groups", "creator", "createdBy", "createdDate", "lastModifiedBy",
+        "lastModifiedDate"})
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private Set<KeyCategory> responsibleKeyCategories = new HashSet<>();
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public Set<UserGroup> getGroups() {
-        return groups;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public Set<KeyCategory> getKeyCategories() {
-        return keyCategories;
-    }
-
-    public Set<Key> getKeys() {
-        return keys;
-    }
-
-    @Override
-    @JsonIgnore
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getGrantedAuthorities(getPrivileges(roles));
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
         return password;
     }
 
-    private List<String> getPrivileges(Collection<Role> roles) {
-        List<String> privileges = new ArrayList<>();
-        List<Privilege> collection = new ArrayList<>();
-
-        for (Role role : roles) {
-            collection.addAll(role.getPrivileges());
-        }
-        for (Privilege privilege : collection) {
-            privileges.add(privilege.getName());
-        }
-        return privileges;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
+    public String getFirstName() {
+        return firstName;
+    }
 
-        for (String privilege : privileges) {
-            authorities.add(new SimpleGrantedAuthority(privilege));
-        }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public boolean isActivated() {
+        return activated;
+    }
+
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
+
+    public String getActivationKey() {
+        return activationKey;
+    }
+
+    public void setActivationKey(String activationKey) {
+        this.activationKey = activationKey;
+    }
+
+    public String getResetKey() {
+        return resetKey;
+    }
+
+    public void setResetKey(String resetKey) {
+        this.resetKey = resetKey;
+    }
+
+    public ZonedDateTime getResetDate() {
+        return resetDate;
+    }
+
+    public void setResetDate(ZonedDateTime resetDate) {
+        this.resetDate = resetDate;
+    }
+
+    public Set<Authority> getAuthorities() {
         return authorities;
     }
 
-    public Set<KeyCategory> getResponsibleKeyCategories() {
-        return responsibleKeyCategories;
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+    public Set<UserGroup> getGroups() {
+        return groups;
     }
 
     public void setGroups(Set<UserGroup> groups) {
-        this.groups = new HashSet<>(groups);
+        this.groups = groups;
     }
 
-    @Override
-    @JsonIgnore
-    public String getUsername() {
-        return email;
-    }
-
-    public User setAccountNonExpired(boolean accountNonExpired) {
-        isAccountNonExpired = accountNonExpired;
-        return this;
-    }
-
-    public User setAccountNonLocked(boolean accountNonLocked) {
-        isAccountNonLocked = accountNonLocked;
-        return this;
-    }
-
-    public User setCredentialsNonExpired(boolean credentialsNonExpired) {
-        isCredentialsNonExpired = credentialsNonExpired;
-        return this;
-    }
-
-    public void setKeyCategories(Set<KeyCategory> keyCategories) {
-        this.keyCategories = keyCategories;
+    public Set<Key> getKeys() {
+        return keys;
     }
 
     public void setKeys(Set<Key> keys) {
         this.keys = keys;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public Set<KeyCategory> getKeyCategories() {
+        return keyCategories;
+    }
+
+    public void setKeyCategories(Set<KeyCategory> keyCategories) {
+        this.keyCategories = keyCategories;
+    }
+
+    public Set<KeyCategory> getResponsibleKeyCategories() {
+        return responsibleKeyCategories;
     }
 
     public void setResponsibleKeyCategories(Set<KeyCategory> responsibleKeyCategories) {
         this.responsibleKeyCategories = responsibleKeyCategories;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
     }
 }
