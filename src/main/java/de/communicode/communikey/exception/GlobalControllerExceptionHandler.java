@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * A global exception handler that provides methods to create {@link ErrorResponse} entities.
  * <p>
- *     Exceptions for each controller are handled by the specific controller exception handler.
+ * Exceptions for each controller are handled by the specific controller exception handler.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -112,7 +112,7 @@ public class GlobalControllerExceptionHandler {
     /**
      * Creates a new error response with the specified reason.
      * <p>
-     *     Used by all controller exception handlers.
+     * Used by all controller exception handlers.
      *
      * @param status the HTTP status of the error
      * @param timestamp the timestamp of the error
@@ -129,7 +129,7 @@ public class GlobalControllerExceptionHandler {
     /**
      * Creates a new error response with the specified  list of reasons.
      * <p>
-     *     Used by all controller exception handlers.
+     * Used by all controller exception handlers.
      *
      * @param status the HTTP status of the error
      * @param timestamp the timestamp of the error

@@ -8,7 +8,7 @@
  * A simple centralized, cross-platform credential manager.
  *
  * <p>
- *   The application entry point is the {@link de.communicode.communikey.CommunikeyApplication} boot class.
+ * The application entry point is the {@link de.communicode.communikey.CommunikeyApplication} boot class.
  *
  * @since 0.1.0
  */

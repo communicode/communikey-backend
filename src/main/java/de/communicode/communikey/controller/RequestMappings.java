@@ -76,7 +76,7 @@ public final class RequestMappings {
     public static final String USER_GROUPS_USERS = "/users";
 
     /**
-     * The request parameter for a {@link UserGroup} name,
+     * The request parameter for a {@link UserGroup} name.
      */
     public static final String USER_GROUPS_NAME = "/{userGroupName}";
 

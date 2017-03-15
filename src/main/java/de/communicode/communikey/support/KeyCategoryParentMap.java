@@ -18,13 +18,13 @@ import java.util.Set;
 /**
  * A reference map wrapper class for {@link KeyCategory} entities to track direct- and indirect parents of each key category.
  * <p>
- *     Each map key is a ID of a key category mapped to a unordered value list of unique key category IDs.
- *     Every value can either be a direct- or indirect key category parent.
- *     The map object can be accessed with the {@link #getMap()} method.
+ * Each map key is a ID of a key category mapped to a unordered value list of unique key category IDs.
+ * Every value can either be a direct- or indirect key category parent.
+ * The map object can be accessed with the {@link #getMap()} method.
  * <p>
- *     This class is a Singleton.
- *     The instance can be obtained via {@link #getInstance()}.
- *     The map object is baked by {@link MapMaker#makeMap()} to be thread-safe.
+ * This class is a Singleton.
+ * The instance can be obtained via {@link #getInstance()}.
+ * The map object is baked by {@link MapMaker#makeMap()} to be thread-safe.
  *
  * @author sgreb@communicode.de
  * @author fsanchez@communicode.de

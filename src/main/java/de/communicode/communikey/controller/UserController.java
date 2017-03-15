@@ -48,7 +48,7 @@ import java.util.Set;
 /**
  * The REST API controller to process {@link User}.
  * <p>
- *     Mapped to the {@value RequestMappings#USERS} endpoint.
+ * Mapped to the {@value RequestMappings#USERS} endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -69,11 +69,11 @@ public class UserController {
     /**
      * Activates the user with the specified activation key.
      * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_ACTIVATE}".
+     * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_ACTIVATE}".
      * <p>
-     *     Required parameter:
-     *     <ul>
-     *         <li>{@value PathVariables#USER_ACTIVATION_KEY}</li>
+     * Required parameter:
+     * <ul>
+     * <li>{@value PathVariables#USER_ACTIVATION_KEY}</li>
      *
      * @param activationKey the activation key of the user to activate
      * @return the response entity
@@ -87,11 +87,11 @@ public class UserController {
     /**
      * Deactivates the user with the specified login.
      * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_DEACTIVATE}".
+     * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_DEACTIVATE}".
      * <p>
-     *     Required parameter:
-     *     <ul>
-     *         <li>{@value RequestMappings#USERS_LOGIN}</li>
+     * Required parameter:
+     * <ul>
+     * <li>{@value RequestMappings#USERS_LOGIN}</li>
      *
      * @param login the login of the user to deactivate
      * @return the response entity
@@ -106,7 +106,7 @@ public class UserController {
     /**
      * Creates a new user.
      * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_REGISTER}".
+     * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_REGISTER}".
      *
      * @param payload the payload for the new user
      * @return the created user as response entity
@@ -119,7 +119,7 @@ public class UserController {
     /**
      * Deletes the user with the specified login.
      * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_LOGIN}".
+     * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_LOGIN}".
      *
      * @param login the login of the user to delete
      * @return the response entity
@@ -134,7 +134,7 @@ public class UserController {
     /**
      * Gets the user with the specified login.
      * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_LOGIN}".
+     * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_LOGIN}".
      *
      * @param login the login of the user to get
      * @return the user as response entity
@@ -158,7 +158,7 @@ public class UserController {
     /**
      * Gets all keys created by the user with the specified login.
      * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USER_KEYS}".
+     * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USER_KEYS}".
      *
      * @param login the login of the user to get all keys of
      * @return a collection of keys
@@ -171,11 +171,11 @@ public class UserController {
     /**
      * Gets a random generated user password reset key for the specified email.
      * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_PASSWORD_RESET}".
+     * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_PASSWORD_RESET}".
      * <p>
-     *     Required parameter:
-     *     <ul>
-     *         <li>{@code email}</li>
+     * Required parameter:
+     * <ul>
+     * <li>{@code email}</li>
      *
      * @param email the email of the user to generate a password reset key for
      * @return the random generated reset key
@@ -188,7 +188,7 @@ public class UserController {
     /**
      * Resets the password of a user.
      * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_PASSWORD_RESET}".
+     * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_PASSWORD_RESET}".
      *
      * @param payload the payload of the user
      * @return the random generated reset key
@@ -202,7 +202,7 @@ public class UserController {
     /**
      * Updates a user with the specified payload.
      * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_LOGIN}".
+     * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_LOGIN}".
      *
      * @param login the login of the user to update
      * @param payload the user payload to update the user entity with
@@ -217,7 +217,7 @@ public class UserController {
     /**
      * Updates the authorities of a user with the specified login.
      * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USER_AUTHORITIES}".
+     * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USER_AUTHORITIES}".
      *
      * @param login the login of the user to update
      * @param payload the payload as collection of authority names to update the user entity with
