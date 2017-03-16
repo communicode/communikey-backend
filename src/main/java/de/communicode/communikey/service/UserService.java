@@ -263,10 +263,11 @@ public class UserService {
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
     public User update(String login, UserPayload payload) throws UserNotFoundException {
+        validateUniqueEmail(payload.getEmail());
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
                 if (!user.getEmail().equals(payload.getEmail())) {
-                    user.setEmail(validateUniqueEmail(payload.getEmail()));
+                    user.setEmail(payload.getEmail());
                     user.setLogin(extractLoginFromEmail(payload.getEmail()));
                     deactivate(login);
                     deleteOauth2AccessTokens(login);
@@ -357,13 +358,11 @@ public class UserService {
      * Validates that the specified email is unique.
      *
      * @param email the email to validate
-     * @return the validated email if unique
      * @throws UserConflictException if the specified email is not unique
      */
-    private String validateUniqueEmail(String email) throws UserConflictException {
+    private void validateUniqueEmail(String email) throws UserConflictException {
         if (Optional.ofNullable(userRepository.findOneByEmail(email)).isPresent()) {
             throw new UserConflictException("email '" + email + "' already exists");
         }
-        return email;
     }
 }
