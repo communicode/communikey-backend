@@ -2,37 +2,42 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.repository;
 
 import de.communicode.communikey.domain.Key;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
+import java.util.Set;
 
 /**
- * The repository for {@link Key} entities.
+ * A repository for {@link Key} entities.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
  */
 @Repository
-public interface KeyRepository extends CrudRepository<Key, Long> {
-    /**
-     * Finds and returns the {@link Key} specified by the given {@code id}.
+public interface KeyRepository extends JpaRepository<Key, Long> {
+
+/**
+     * Finds all keys created by a user with the specified login.
      *
-     * @param id The ID of the {@link Key} to find
-     * @return the {@link Key} with the given {@code id}
+     * @param login the login of the user to find all created keys of
+     * @return a collection of keys
+     * @since 0.2.0
      */
-    Key findOneById(long id);
+    Set<Key> findAllByCreatedBy(String login);
 
     /**
-     * Finds and returns the first {@link Key} found with the given creation {@link Timestamp}.
+     * Finds the key with the specified name.
      *
-     * @param creationTimestamp The creation {@link Timestamp} for a {@link Key} to find
-     * @return the {@link Key} with the given creation {@link Timestamp}
+     * @param name the name of the key to find
+     * @return the key if found
+     * @since 0.2.0
      */
-    Key findOneByCreationTimestamp(Timestamp creationTimestamp);
+    Key findOneByName(String name);
+
+    Set<Key> findAllByCategoryIsNull();
 }

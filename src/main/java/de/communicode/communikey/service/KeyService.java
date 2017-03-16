@@ -2,71 +2,131 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.service;
 
-import de.communicode.communikey.domain.Key;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 
-import java.sql.Timestamp;
+import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.security.SecurityUtils;
+import de.communicode.communikey.service.payload.KeyPayload;
+import de.communicode.communikey.exception.KeyNotFoundException;
+import de.communicode.communikey.repository.KeyRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A service to interact with the {@link de.communicode.communikey.repository.KeyRepository}.
+ * The REST API service to process {@link Key} entities via a {@link KeyRepository}.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
  */
-public interface KeyService {
-    /**
-     * Gets all {@link Key} entities of the {@link de.communicode.communikey.repository.KeyRepository}.
-     *
-     * @return a collection of all {@link Key} entities
-     */
-    Set<Key> getAllKeys();
+@Service
+public class KeyService {
+
+    private final Logger log = LoggerFactory.getLogger(KeyService.class);
+    private final KeyRepository keyRepository;
+    private final UserService userService;
+
+    @Autowired
+    public KeyService(KeyRepository keyRepository, UserService userRestService) {
+        this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
+        this.userService = requireNonNull(userRestService, "userService must not be null!");
+    }
 
     /**
-     * Gets the {@link Key} with the given {@code id}.
+     * Creates a new key.
      *
-     * @param id The ID of the {@link Key}
-     * @return the {@link Key} with the given ID
-     * @throws NullPointerException if the given {@code id} is invalid
+     * @param payload the key payload
      */
-    Key getKeyById(long id) throws NullPointerException;
+    public Key create(KeyPayload payload) {
+        Key key = new Key();
+        key.setName(payload.getName());
+        key.setPassword(payload.getPassword());
+        key.setCreator(userService.validate(SecurityUtils.getCurrentUserLogin()));
+        key = keyRepository.save(key);
+        userService.addKey(SecurityUtils.getCurrentUserLogin(), key);
+        log.debug("Created new key with ID '{}'", key.getId());
+        return key;
+    }
 
     /**
-     * Gets the first {@link Key} found with the given creation date.
+     * Deletes the key with the specified ID.
      *
-     * @param timestamp The {@link Timestamp} of a {@link Key} to find
-     * @return a {@link Key} with the given creation timestamp
-     * @throws NullPointerException if no key found with the given {@code timestamp}
+     * @param keyId the ID of the key to delete
+     * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    Key getKeyByCreationDate(Timestamp timestamp) throws NullPointerException;
+    public void delete(Long keyId) throws KeyNotFoundException {
+        keyRepository.delete(validate(keyId));
+        log.debug("Deleted key with ID {}", keyId);
+    }
 
     /**
-     * Deletes the given {@link Key}.
-     *
-     * @param key The {@link Key} to delete
-     * @throws NullPointerException if the given {@code key} is null
+     * Deletes all keys.
      */
-    void deleteKey(Key key) throws NullPointerException;
+    public void deleteAll() {
+        keyRepository.deleteAll();
+        log.debug("Deleted all keys");
+    }
 
     /**
-     * Modifies the value of the given {@link Key}.
+     * Gets the key with the specified ID.
      *
-     * @param key The {@link Key} to modify the value of
-     * @param newValue The new value for the given {@link Key}
-     * @throws NullPointerException if the given {@code key} is null
-     * @throws IllegalArgumentException if the given new value is empty
+     * @param keyId the ID of the key to get
+     * @return the key
+     * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    void modifyKeyValue(Key key, String newValue) throws NullPointerException, IllegalArgumentException;
+    public Key get(Long keyId) throws KeyNotFoundException {
+        return validate(keyId);
+    }
 
     /**
-     * Saves the given {@link Key} in the {@link de.communicode.communikey.repository.KeyRepository}.
+     * Gets all keys the current user is authorized to.
      *
-     * @param key The {@link Key} to save
-     * @return the saved {@link Key}
-     * @throws NullPointerException if the given {@code key} is null
+     * @return a collection of all keys
      */
-    Key saveKey(Key key) throws NullPointerException;
+    public Set<Key> getAll() {
+        //Set<Key> keyPool = new HashSet<>();
+        //keyPool.addAll(keyRepository.findAllByCreator(userService.validate(SecurityUtils.getCurrentUserLogin())));
+/*        keyCategoryService.getAll().stream()
+            .flatMap(keyCategory -> keyCategory.getKeys().stream())
+            .forEach(keyPool::add);*/
+        //return keyPool;
+        return new HashSet<>(keyRepository.findAll());
+    }
+
+    /**
+     * Updates a key with the specified payload.
+     *
+     * @param keyId the ID of the key to update
+     * @param payload the payload to update the key with
+     * @return the updated key
+     * @since 0.2.0
+     */
+    public Key update(Long keyId, KeyPayload payload) {
+        Key key = validate(keyId);
+        key.setName(payload.getName());
+        key.setPassword(payload.getPassword());
+        key = keyRepository.save(key);
+        log.debug("Updated key with ID '{}'", key.getId());
+        return key;
+    }
+
+    /**
+     * Validates a key.
+     *
+     * @param keyId the ID of the key to validate
+     * @return the key if validated
+     * @throws KeyNotFoundException if the key with the specified ID has not been found
+     */
+    public Key validate(Long keyId) throws KeyNotFoundException {
+        return ofNullable(keyRepository.findOne(keyId)).orElseThrow(() -> new KeyNotFoundException(keyId));
+    }
 }

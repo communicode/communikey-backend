@@ -1,18 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="CheckStyle-IDEA">
-    <option name="configuration">
-      <map>
-        <entry key="active-configuration" value="LOCAL_FILE:/home/sgreb/store/run/intellij-idea-u/communicode_java_style_1.0.xml:Communicode Checkstyle 1.0.0" />
-        <entry key="check-nonjava-files" value="false" />
-        <entry key="check-test-classes" value="true" />
-        <entry key="location-0" value="LOCAL_FILE:/home/sgreb/store/run/intellij-idea-u/communicode_java_style_1.0.xml:Communicode Checkstyle 1.0.0" />
-        <entry key="location-1" value="CLASSPATH:/sun_checks.xml:The default Checkstyle rules" />
-        <entry key="suppress-errors" value="true" />
-        <entry key="thirdparty-classpath" value="" />
-      </map>
-    </option>
-  </component>
   <component name="CopyrightManager">
     <LanguageOptions name="HTML">
       <option name="fileTypeOverride" value="3" />
@@ -34,9 +21,6 @@
       <option name="addBlankAfter" value="false" />
     </LanguageOptions>
   </component>
-  <component name="EntryPointsManager">
-    <entry_points version="2.0" />
-  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
@@ -44,17 +28,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
-    <OptionsSetting value="true" id="Add" />
-    <OptionsSetting value="true" id="Remove" />
-    <OptionsSetting value="true" id="Checkout" />
-    <OptionsSetting value="true" id="Update" />
-    <OptionsSetting value="true" id="Status" />
-    <OptionsSetting value="true" id="Edit" />
-    <ConfirmationsSetting value="0" id="Add" />
-    <ConfirmationsSetting value="0" id="Remove" />
-  </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/target" />
   </component>
 </project>

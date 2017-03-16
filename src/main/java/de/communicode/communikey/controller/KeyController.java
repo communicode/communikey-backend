@@ -2,144 +2,132 @@
  * Copyright (C) communicode AG - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
- * 2016
+ * 2017
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.config.CommunikeyConstants.ENDPOINT_KEYS;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_KEY_DELETE;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_KEY_EDIT;
-import static de.communicode.communikey.config.CommunikeyConstants.REQUEST_KEY_NEW;
-import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_KEY_EDIT;
-import static de.communicode.communikey.config.CommunikeyConstants.TEMPLATE_KEY_NEW;
+import static de.communicode.communikey.controller.RequestMappings.KEYS;
+import static de.communicode.communikey.controller.RequestMappings.KEYS_ID;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.form.EditKeyForm;
-import de.communicode.communikey.form.NewKeyForm;
-import de.communicode.communikey.repository.KeyRepository;
+import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.service.KeyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import static de.communicode.communikey.util.CommunikeyConstantsUtil.asRedirect;
+import javax.validation.Valid;
+
+import java.util.Set;
 
 /**
- * The controller for all key endpoints.
+ * The REST API controller to process {@link Key}s.
+ * <p>
+ *     Mapped to the "{@value RequestMappings#KEYS}" endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
  */
-@Controller
+@RestController
+@RequestMapping(KEYS)
 public class KeyController {
-
-    private final KeyRepository keyRepository;
     private final KeyService keyService;
 
     @Autowired
-    public KeyController(KeyService keyService, KeyRepository keyRepository) {
+    public KeyController(KeyService keyService) {
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
-        this.keyRepository = requireNonNull(keyRepository, "keyService must not be null!");
     }
 
     /**
-     * Endpoint to list all {@link Key} entities.
-     *
-     * @param model the model holding the attributes
-     * @return the string to the endpoint
-     */
-    @GetMapping(value = ENDPOINT_KEYS)
-    String listKeys(Model model) {
-        model.addAttribute("keys", keyRepository.findAll());
-        return ENDPOINT_KEYS;
-    }
-
-    /**
-     * Endpoint to delete a {@link Key} entity.
-     *
-     * @param id the ID of the {@link Key} to delete
-     * @return the string to the endpoint redirection
-     */
-    @GetMapping(value = REQUEST_KEY_DELETE)
-    String deleteKey(@PathVariable long id) {
-        keyRepository.delete(id);
-        return asRedirect(ENDPOINT_KEYS);
-    }
-
-    /**
-     * Endpoint to the form to edit a {@link Key} entity.
-     *
+     * Creates a new key with the specified payload.
      * <p>
-     *   This is used to process the data entered by the user into the form.
-     * </p>
+     *     This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
      *
-     * @param id the ID of the {@link Key} to edit
-     * @param model the model holding the attributes
-     * @return the string to the endpoint
+     * @param payload the key request payload
+     * @return the key as response entity
+     * @since 0.2.0
      */
-    @GetMapping(value = REQUEST_KEY_EDIT)
-    String editKeyForm(@PathVariable long id, Model model) {
-        if (keyRepository.findOne(id) == null) {
-            return asRedirect(ENDPOINT_KEYS);
-        } else {
-            Key key = keyRepository.findOne(id);
-            EditKeyForm editKeyForm = new EditKeyForm();
-            editKeyForm.setValue(key.getValue());
-            model.addAttribute("key", key);
-            model.addAttribute("editKeyForm", editKeyForm);
-            return TEMPLATE_KEY_EDIT;
-        }
+    @PostMapping
+    public ResponseEntity<Key> create(@Valid @RequestBody KeyPayload payload) {
+        return new ResponseEntity<>(keyService.create(payload), HttpStatus.CREATED);
     }
 
     /**
-     * Endpoint to edit a {@link Key} entity.
-     *
-     * @param id the ID of the {@link Key} to edit
-     * @param editKeyForm the {@link EditKeyForm} as named {@link Model} attribute
-     * @return the string to the endpoint redirection
-     */
-    @PostMapping(value = REQUEST_KEY_EDIT)
-    String editKey(@PathVariable long id, @ModelAttribute("editKeyForm") EditKeyForm editKeyForm) {
-        Key key = keyRepository.findOne(id);
-        key.setValue(editKeyForm.getValue());
-        keyService.modifyKeyValue(keyRepository.findOne(id), editKeyForm.getValue());
-        keyRepository.save(key);
-        return asRedirect(ENDPOINT_KEYS);
-    }
-
-    /**
-     * Endpoint to the form to create a new {@link Key} entity.
-     *
+     * Deletes the key with the specified ID.
      * <p>
-     *   This is used to process the data entered by the user into the form.
-     * </p>
+     *     This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
      *
-     * @param newKey the new {@link Key} entity
-     * @param model the {@link Model} holding the attributes
-     * @return the string to the endpoint
+     * @param keyId the ID of the key to delete
+     * @return a empty response entity
+     * @since 0.2.0
      */
-    @GetMapping(value = REQUEST_KEY_NEW)
-    String newKeyForm(Key newKey, Model model) {
-        model.addAttribute("key", newKey);
-        model.addAttribute("newKeyForm", new NewKeyForm());
-        return TEMPLATE_KEY_NEW;
+    @DeleteMapping(value = KEYS_ID)
+    public ResponseEntity<Void> delete(@PathVariable Long keyId) {
+        keyService.delete(keyId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * Endpoint to create a new {@link Key} entity.
+     * Deletes all keys.
+     * <p>
+     *     This endpoint is mapped to "{@value RequestMappings#KEYS}".
      *
-     * @param newKeyForm the {@link NewKeyForm} as named {@link Model} attribute
-     * @return the string to the endpoint redirection
+     * @return a empty response entity
+     * @since 0.2.0
      */
-    @PostMapping(value = REQUEST_KEY_NEW)
-    String newKey(@ModelAttribute("newKeyForm") NewKeyForm newKeyForm) {
-        Key key = new Key(newKeyForm.getValue());
-        keyRepository.save(key);
-        return asRedirect(ENDPOINT_KEYS);
+    @DeleteMapping
+    public ResponseEntity<Key> deleteAll() {
+        keyService.deleteAll();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Gets the key with the specified ID.
+     * <p>
+     *     This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
+     *
+     * @param keyId the ID of the key entity to get
+     * @return the key as response entity
+     */
+    @GetMapping(value = KEYS_ID)
+    public ResponseEntity<Key> get(@PathVariable Long keyId) {
+        return new ResponseEntity<>(keyService.get(keyId), HttpStatus.OK);
+    }
+
+    /**
+     * Gets all keys.
+     * <p>
+     *     This endpoint is mapped to "{@value RequestMappings#KEYS}".
+     *
+     * @return a collection of keys as response entity
+     */
+    @GetMapping
+    public ResponseEntity<Set<Key>> getAll() {
+        return new ResponseEntity<>(keyService.getAll(), HttpStatus.OK);
+    }
+
+    /**
+     * Updates a key with the specified payload.
+     * <p>
+     *     This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
+     *
+     * @param keyId the ID of the key entity to update
+     * @param payload the key request payload to update the key entity with
+     * @return the updated key as response entity
+     * @since 0.2.0
+     */
+    @PutMapping(value = KEYS_ID)
+    public ResponseEntity<Key> update(@PathVariable Long keyId, @Valid @RequestBody KeyPayload payload) {
+        return new ResponseEntity<>(keyService.update(keyId, payload), HttpStatus.OK);
     }
 }
