@@ -14,8 +14,8 @@ import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.repository.KeyRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ import java.util.Set;
 @Service
 public class KeyService {
 
-    private final Logger log = LoggerFactory.getLogger(KeyService.class);
+    private static final Logger log = LogManager.getLogger(KeyService.class);
     private final KeyRepository keyRepository;
     private final UserService userService;
 

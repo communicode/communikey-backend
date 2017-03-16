@@ -24,8 +24,8 @@ import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
 import de.communicode.communikey.support.KeyCategoryChildrenMap;
 import de.communicode.communikey.support.KeyCategoryParentMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 @Service
 public class KeyCategoryService {
 
-    private final Logger log = LoggerFactory.getLogger(KeyCategoryService.class);
+    private static final Logger log = LogManager.getLogger(KeyCategoryService.class);
     private final KeyCategoryRepository keyCategoryRepository;
     private final KeyRepository keyRepository;
     private final UserService userService;

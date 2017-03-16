@@ -14,8 +14,8 @@ import de.communicode.communikey.exception.UserGroupConflictException;
 import de.communicode.communikey.exception.UserGroupNotFoundException;
 import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.repository.UserGroupRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ import java.util.stream.StreamSupport;
 @Service
 public class UserGroupService {
 
-    private final Logger log = LoggerFactory.getLogger(UserGroupService.class);
+    private static final Logger log = LogManager.getLogger(UserGroupService.class);
     private final UserGroupRepository userGroupRepository;
     private final UserService userService;
 

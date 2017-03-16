@@ -12,8 +12,8 @@ import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.config.CommunikeyProperties;
 import de.communicode.communikey.config.util.DefaultProfileUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -40,7 +40,7 @@ import java.util.Collection;
 @EnableConfigurationProperties(CommunikeyProperties.class)
 public class CommunikeyApplication {
 
-    private static final Logger log = LoggerFactory.getLogger(CommunikeyApplication.class);
+    private static final Logger log = LogManager.getLogger(CommunikeyApplication.class);
 
     private final Environment env;
 
