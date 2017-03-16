@@ -12,8 +12,8 @@ import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.config.CommunikeyProperties;
 import de.communicode.communikey.config.util.DefaultProfileUtil;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
