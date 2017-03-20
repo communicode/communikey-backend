@@ -28,6 +28,7 @@ import java.util.function.Predicate;
  * Configuration for {@link JsonView} annotated entity attributes to allow {@link Authority} based JSON response (de)serialization.
  *
  * @author sgreb@communicode.de
+ * @author tkabus@communicode.de
  * @since 0.2.0
  */
 @ControllerAdvice
@@ -37,8 +38,6 @@ public class RestViewConfiguration extends AbstractMappingJacksonResponseBodyAdv
     protected void beforeBodyWriteInternal(MappingJacksonValue bodyContainer, MediaType contentType, MethodParameter returnType, ServerHttpRequest request,
                                            ServerHttpResponse response) {
         Predicate<String> checkForAdmin = authority -> authority.equals(AuthoritiesConstants.ADMIN);
-        Predicate<String> checkForUser = authority -> authority.equals(AuthoritiesConstants.USER);
-        Predicate<String> check = checkForAdmin.or(checkForUser);
 
         Class<?> viewClass =  Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getAuthorities)
