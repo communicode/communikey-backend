@@ -140,10 +140,11 @@ public class UserGroupService {
      * @throws UserGroupNotFoundException if the user group with the specified name has not been found
      */
     public UserGroup update(String name, UserGroup payload) throws UserGroupNotFoundException {
+        validateUniqueName(payload.getName());
         return ofNullable(validate(name))
             .map(userGroup -> {
                 if (!userGroup.getName().equals(payload.getName())) {
-                    userGroup.setName(validateUniqueName(payload.getName()));
+                    userGroup.setName(payload.getName());
                     userGroupRepository.save(userGroup);
                     log.debug("Updated user group: {}", userGroup);
                 }
@@ -166,13 +167,11 @@ public class UserGroupService {
      * Validates that the specified name is unique.
      *
      * @param name the name to validate
-     * @return the validated name if unique
      * @throws UserGroupConflictException if the specified name is not unique
      */
-    private String validateUniqueName(String name) throws UserGroupConflictException {
+    private void validateUniqueName(String name) throws UserGroupConflictException {
         if (ofNullable(userGroupRepository.findOneByName(name)).isPresent()) {
             throw new UserGroupConflictException("user group '" + name +"' already exists");
         }
-        return name;
     }
 }
