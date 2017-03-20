@@ -68,14 +68,13 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         "authorities", "groups", "keyCategories", "responsibleKeyCategories"})
     private User creator;
 
-/*    @NotNull
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "key_categories_user_groups",
         joinColumns = {@JoinColumn(name = "key_category_id", referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(name = "user_group_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"categories", "users"})
-    private Set<UserGroup> groups = new HashSet<>();*/
+    private Set<UserGroup> groups = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "responsible_user_id")
@@ -130,6 +129,14 @@ public class KeyCategory extends AbstractEntity implements Serializable {
 
     public void setCreator(User creator) {
         this.creator = creator;
+    }
+
+    public Set<UserGroup> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(Set<UserGroup> groups) {
+        this.groups = groups;
     }
 
     public User getResponsible() {
