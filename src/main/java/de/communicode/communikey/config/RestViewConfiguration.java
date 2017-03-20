@@ -36,8 +36,8 @@ public class RestViewConfiguration extends AbstractMappingJacksonResponseBodyAdv
     @Override
     protected void beforeBodyWriteInternal(MappingJacksonValue bodyContainer, MediaType contentType, MethodParameter returnType, ServerHttpRequest request,
                                            ServerHttpResponse response) {
-        Predicate<String> checkForAdmin = s -> s.equals(AuthoritiesConstants.ADMIN);
-        Predicate<String> checkForUser = s -> s.equals(AuthoritiesConstants.USER);
+        Predicate<String> checkForAdmin = authority -> authority.equals(AuthoritiesConstants.ADMIN);
+        Predicate<String> checkForUser = authority -> authority.equals(AuthoritiesConstants.USER);
         Predicate<String> check = checkForAdmin.or(checkForUser);
 
         Class<?> viewClass =  Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
