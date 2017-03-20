@@ -44,7 +44,7 @@ public class RestViewConfiguration extends AbstractMappingJacksonResponseBodyAdv
                 .map(Authentication::getAuthorities)
                 .filter(authorities -> authorities.stream()
                         .map(GrantedAuthority::getAuthority)
-                        .anyMatch(check))
+                        .anyMatch(checkForAdmin))
                 .<Class<?>>map(isTrue -> AuthoritiesRestView.Admin.class)
                 .orElse(AuthoritiesRestView.User.class);
         bodyContainer.setSerializationView(viewClass);
