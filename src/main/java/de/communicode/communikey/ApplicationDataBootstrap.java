@@ -49,12 +49,8 @@ public class ApplicationDataBootstrap {
 
         KeyCategoryChildrenMap keyCategoryChildrenMap = KeyCategoryChildrenMap.getInstance();
         keyCategoryChildrenMap.initialize(keyCategoryRepository.findAll());
-        System.err.println("childs: " + keyCategoryChildrenMap.toString());
-
         KeyCategoryParentMap keyCategoryParentMap = KeyCategoryParentMap.getInstance();
         keyCategoryParentMap.initialize(keyCategoryRepository.findAll());
-        System.err.println("parents: " + keyCategoryParentMap.toString());
-
     }
 
     private void initializeAuthorities() {
