@@ -19,9 +19,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * The REST API service to process {@link UserGroup}s via a {@link UserGroupRepository}.
@@ -96,8 +95,7 @@ public class UserGroupService {
      * @return a collection of all user groups
      */
     public Set<UserGroup> getAll() {
-        return StreamSupport.stream(userGroupRepository.findAll().spliterator(), false)
-            .collect(Collectors.toSet());
+        return new HashSet<>(userGroupRepository.findAll());
     }
 
     /**
