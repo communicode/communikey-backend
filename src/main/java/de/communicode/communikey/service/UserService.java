@@ -50,7 +50,7 @@ import java.util.stream.StreamSupport;
 @Service
 public class UserService {
 
-    private static final Logger log = LogManager.getLogger(UserService.class);
+    private static final Logger log = LogManager.getLogger();
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;

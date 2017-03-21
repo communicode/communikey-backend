@@ -31,7 +31,7 @@ import java.util.Set;
 @Service
 public class KeyService {
 
-    private static final Logger log = LogManager.getLogger(KeyService.class);
+    private static final Logger log = LogManager.getLogger();
     private final KeyRepository keyRepository;
     private final UserService userService;
 

@@ -31,7 +31,7 @@ import java.util.Set;
 @Service
 public class UserGroupService {
 
-    private static final Logger log = LogManager.getLogger(UserGroupService.class);
+    private static final Logger log = LogManager.getLogger();
     private final UserGroupRepository userGroupRepository;
     private final UserService userService;
 

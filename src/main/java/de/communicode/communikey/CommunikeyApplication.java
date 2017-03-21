@@ -40,7 +40,7 @@ import java.util.Collection;
 @EnableConfigurationProperties(CommunikeyProperties.class)
 public class CommunikeyApplication {
 
-    private static final Logger log = LogManager.getLogger(CommunikeyApplication.class);
+    private static final Logger log = LogManager.getLogger();
 
     private final Environment env;
 

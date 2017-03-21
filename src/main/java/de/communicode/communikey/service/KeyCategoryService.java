@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 @Service
 public class KeyCategoryService {
 
-    private static final Logger log = LogManager.getLogger(KeyCategoryService.class);
+    private static final Logger log = LogManager.getLogger();
     private final KeyCategoryRepository keyCategoryRepository;
     private final KeyRepository keyRepository;
     private final UserService userService;
