@@ -39,7 +39,7 @@ public class RestViewConfiguration extends AbstractMappingJacksonResponseBodyAdv
                                            ServerHttpResponse response) {
         Predicate<String> checkForAdmin = authority -> authority.equals(AuthoritiesConstants.ADMIN);
 
-        Class<?> viewClass =  Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+        Class<?> viewClass = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getAuthorities)
                 .filter(authorities -> authorities.stream()
                         .map(GrantedAuthority::getAuthority)
