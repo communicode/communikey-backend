@@ -12,12 +12,15 @@ import static java.util.Optional.ofNullable;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
+import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.exception.KeyCategoryConflictException;
 import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import de.communicode.communikey.exception.KeyNotFoundException;
+import de.communicode.communikey.exception.UserGroupNotFoundException;
 import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.KeyRepository;
+import de.communicode.communikey.repository.UserGroupRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
@@ -52,6 +55,8 @@ public class KeyCategoryService {
     private final UserService userService;
     private final UserRepository userRepository;
     private final KeyService keyService;
+    private final UserGroupService userGroupService;
+    private final UserGroupRepository userGroupRepository;
     private final KeyCategoryChildrenMap keyCategoryChildrenMap = KeyCategoryChildrenMap.getInstance();
     private final KeyCategoryParentMap keyCategoryParentMap = KeyCategoryParentMap.getInstance();
 
@@ -62,12 +67,14 @@ public class KeyCategoryService {
 
     @Autowired
     public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService, KeyService keyService, KeyRepository keyRepository,
-                              UserRepository userRepository) {
+                              UserRepository userRepository, UserGroupService userGroupService, UserGroupRepository userGroupRepository) {
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
+        this.userGroupService = requireNonNull(userGroupService, "userGroupService must not be null!");
+        this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
     }
 
     /**
@@ -122,6 +129,28 @@ public class KeyCategoryService {
             return persistedKeyCategory;
         }
         return parent;
+    }
+
+    /**
+     * Adds a user group to a key category with the specified ID.
+     *
+     * @param keyCategoryId the ID of the key category to add the user group to
+     * @param userGroupName the name of the user group to be added to the key category
+     * @return the updated key category
+     * @throws KeyCategoryNotFoundException if the key category with specified ID has not been found
+     * @throws UserGroupNotFoundException if the user group with specified name has not been found
+     */
+    public KeyCategory addUserGroup(Long keyCategoryId, String userGroupName) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
+        KeyCategory keyCategory = validate(keyCategoryId);
+        UserGroup userGroup = userGroupService.validate(userGroupName);
+
+        if (keyCategory.getGroups().add(userGroup)) {
+            userGroup.getCategories().add(keyCategory);
+            userGroupRepository.save(userGroup);
+            log.debug("Added user group '{}' to key category with ID {}", userGroupName, keyCategoryId);
+            return keyCategoryRepository.save(keyCategory);
+        }
+         return keyCategory;
     }
 
     /**
