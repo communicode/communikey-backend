@@ -15,4 +15,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-public interface AuthorityRepository extends JpaRepository<Authority, String> {}
+public interface AuthorityRepository extends JpaRepository<Authority, String> {
+    /**
+     * Finds the authority entity with the specified name.
+     *
+     * @param name the name of the authority to find
+     * @return the found authority entity, {@code null} otherwise
+     * @since 0.3.0
+     */
+    Authority findOneByName(String name);
+}
