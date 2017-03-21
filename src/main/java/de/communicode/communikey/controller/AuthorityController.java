@@ -12,10 +12,12 @@ import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.exception.AuthorityNotFoundException;
+import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.AuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,6 +54,7 @@ public class AuthorityController {
      * @throws AuthorityNotFoundException if the authority with the specified name has not been found
      */
     @GetMapping(value = AUTHORITIES_NAME)
+    @Secured(AuthoritiesConstants.ADMIN)
     ResponseEntity<Authority> get(@PathVariable String authorityName) throws AuthorityNotFoundException {
         return new ResponseEntity<>(authorityService.get(authorityName), HttpStatus.OK);
     }
@@ -64,6 +67,7 @@ public class AuthorityController {
      * @return a collection of all authorities as response entity
      */
     @GetMapping
+    @Secured(AuthoritiesConstants.ADMIN)
     ResponseEntity<Set<Authority>> getAll() {
         return new ResponseEntity<>(authorityService.getAll(), HttpStatus.OK);
     }
