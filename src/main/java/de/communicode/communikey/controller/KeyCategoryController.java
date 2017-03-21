@@ -9,6 +9,7 @@ package de.communicode.communikey.controller;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_CHILDREN;
+import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_GROUPS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_KEYS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_RESPONSIBLE;
 import static java.util.Objects.requireNonNull;
@@ -69,6 +70,21 @@ public class KeyCategoryController {
     //@Secured(AuthoritiesConstants.ADMIN) // TODO: Uncomment again
     public ResponseEntity<KeyCategory> addChild(@PathVariable Long keyCategoryId, @RequestParam Long childKeyCategoryId) {
         return new ResponseEntity<>(keyCategoryService.addChild(keyCategoryId, childKeyCategoryId), HttpStatus.OK);
+    }
+
+    /**
+     * Adds a user group to a key category with the specified ID.
+     * <p>
+     *     This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_GROUPS}".
+     *
+     * @param keyCategoryId the ID of the parent key category to add the child to
+     * @param userGroupName the name of the user group to be added
+     * @return the updated parent key category as response entity
+     */
+    @GetMapping(value = KEY_CATEGORY_GROUPS)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<KeyCategory> addUserGroup(@PathVariable Long keyCategoryId, @RequestParam String userGroupName) {
+        return new ResponseEntity<>(keyCategoryService.addUserGroup(keyCategoryId, userGroupName), HttpStatus.OK);
     }
 
     /**
