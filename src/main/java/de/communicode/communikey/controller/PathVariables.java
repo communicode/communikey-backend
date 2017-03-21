@@ -12,7 +12,7 @@ package de.communicode.communikey.controller;
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-public class PathVariables {
+public final class PathVariables {
 
     private PathVariables() {}
 

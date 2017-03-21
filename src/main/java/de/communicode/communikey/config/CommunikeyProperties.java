@@ -25,7 +25,7 @@ import javax.validation.constraints.Size;
  * @since 0.2.0
  */
 @ConfigurationProperties(prefix = APP_ID, ignoreUnknownFields = false)
-public class CommunikeyProperties {
+public final class CommunikeyProperties {
 
     private final Security security = new Security();
 
