@@ -278,26 +278,20 @@ public class KeyCategoryService {
      *     |-- category6
      * </pre>
      *
-     * @return a collection of all key categories
+     * @return a collection of key categories
      */
     public Set<KeyCategory> getAll() {
-        //User user = userService.validate(SecurityUtils.getCurrentUserLogin());
-
-        Set<KeyCategory> keyCategoryPool = new HashSet<>();
+        Set<KeyCategory> authorizedKeyCategories = new HashSet<>();
 
         if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
-            keyCategoryPool.addAll(keyCategoryRepository.findAll());
+            authorizedKeyCategories.addAll(keyCategoryRepository.findAll());
         } else {
-/*        userService.validate(user.getLogin()).getGroups().stream()
-            .flatMap(userGroup -> userGroup.getCategories().stream())
-            .forEach(keyCategoryPool::add);*/
-            keyCategoryPool.addAll(keyCategoryRepository.findAllByCreator(userService.validate(SecurityUtils.getCurrentUserLogin())));
-            keyCategoryPool.addAll(userService.validate(SecurityUtils.getCurrentUserLogin()).getResponsibleKeyCategories());
-            //keyCategoryPool.addAll(getAllByResponsible(user.getLogin()));
+            userService.validate(SecurityUtils.getCurrentUserLogin()).getGroups().stream()
+                    .flatMap(userGroup -> userGroup.getCategories().stream())
+                    .forEach(authorizedKeyCategories::add);
         }
-
-        return keyCategoryPool.stream()
-            .filter(childCategory -> keyCategoryPool.stream()
+        return authorizedKeyCategories.stream()
+            .filter(childCategory -> authorizedKeyCategories.stream()
                 .noneMatch(parentCategory -> keyCategoryChildrenMap.getMap().get(parentCategory.getId()).contains(childCategory.getId())))
             .collect(Collectors.toSet());
     }
