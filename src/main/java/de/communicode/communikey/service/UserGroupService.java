@@ -53,9 +53,11 @@ public class UserGroupService {
     public UserGroup addUser(String userGroupName, String login) {
         return ofNullable(userGroupRepository.findOneByName(userGroupName))
             .map(userGroup -> {
-                userGroup.getUsers().add(userService.validate(login));
-                userGroupRepository.save(userGroup);
-                log.debug("Added user {} to user group {}", login, userGroup.getName());
+                if (userGroup.getUsers().add(userService.validate(login))) {
+                    userGroupRepository.save(userGroup);
+                    log.debug("Added user {} to user group {}", login, userGroup.getName());
+                    return userGroup;
+                }
                 return userGroup;
             }).orElseThrow(() -> new UserGroupNotFoundException(userGroupName));
     }
@@ -121,9 +123,10 @@ public class UserGroupService {
     public UserGroup removeUser(String userGroupName, String login) {
         return ofNullable(userGroupRepository.findOneByName(userGroupName))
             .map(userGroup -> {
-                userGroup.getUsers().remove(userService.validate(login));
-                userGroupRepository.save(userGroup);
-                log.debug("Removed user {} from user group {}", login, userGroup.getName());
+                if (userGroup.getUsers().remove(userService.validate(login))) {
+                    userGroupRepository.save(userGroup);
+                    log.debug("Removed user {} from user group {}", login, userGroup.getName());
+                }
                 return userGroup;
             }).orElseThrow(() -> new UserGroupNotFoundException(userGroupName));
     }
