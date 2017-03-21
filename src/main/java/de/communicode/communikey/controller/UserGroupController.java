@@ -80,6 +80,7 @@ public class UserGroupController {
      * @return the user group as response entity
      */
     @PostMapping
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<UserGroup> create(@Valid @RequestBody UserGroup payload) {
         return new ResponseEntity<>(userGroupService.create(payload), HttpStatus.CREATED);
     }
@@ -109,6 +110,7 @@ public class UserGroupController {
      * @return the user group as response entity
      */
     @GetMapping(value = USER_GROUPS_NAME)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<UserGroup> get(@PathVariable String userGroupName) {
         return new ResponseEntity<>(userGroupService.getByName(userGroupName), HttpStatus.OK);
     }
