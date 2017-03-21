@@ -147,7 +147,7 @@ public class KeyCategoryService {
         if (keyCategory.getGroups().add(userGroup)) {
             userGroup.getCategories().add(keyCategory);
             userGroupRepository.save(userGroup);
-            log.debug("Added user group '{}' to key category with ID {}", userGroupName, keyCategoryId);
+            log.debug("Added user group '{}' to key category with ID '{}'", userGroupName, keyCategoryId);
             return keyCategoryRepository.save(keyCategory);
         }
          return keyCategory;

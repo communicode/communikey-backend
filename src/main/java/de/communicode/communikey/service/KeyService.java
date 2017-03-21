@@ -65,7 +65,7 @@ public class KeyService {
      */
     public void delete(Long keyId) throws KeyNotFoundException {
         keyRepository.delete(validate(keyId));
-        log.debug("Deleted key with ID {}", keyId);
+        log.debug("Deleted key with ID '{}'", keyId);
     }
 
     /**

@@ -78,7 +78,7 @@ public class UserService {
                 user.setActivated(true);
                 user.setActivationKey(null);
                 userRepository.save(user);
-                log.debug("Activated user {} with activation key {}", user.getLogin(), activationKey);
+                log.debug("Activated user '{}' with activation key '{}'", user.getLogin(), activationKey);
                 return user;
             }).orElseThrow(() -> new ActivationKeyNotFoundException(activationKey));
     }
@@ -152,10 +152,10 @@ public class UserService {
             .map(user -> {
                 user.setActivated(false);
                 user.setActivationKey(SecurityUtils.generateRandomActivationKey());
-                log.debug("Generated new activation key {} for user {}", user.getActivationKey(), user.getLogin());
+                log.debug("Generated new activation key '{}' for user with login '{}'", user.getActivationKey(), user.getLogin());
                 deleteOauth2AccessTokens(login);
                 userRepository.save(user);
-                log.debug("Deactivated user {}", login);
+                log.debug("Deactivated user with login '{}'", login);
                 return user;
             }).orElseThrow(() -> new UserNotFoundException(login));
     }
@@ -169,7 +169,7 @@ public class UserService {
     public void delete(String login) throws UserNotFoundException {
         deleteOauth2AccessTokens(login);
         userRepository.delete(ofNullable(validate(login)).orElseThrow(() -> new UserNotFoundException(login)));
-        log.debug("Deleted user with login {}", login);
+        log.debug("Deleted user with login '{}'", login);
     }
 
     /**
@@ -183,13 +183,13 @@ public class UserService {
             .filter(User::isActivated)
             .map(user -> {
                 if (Objects.nonNull(user.getResetKey())) {
-                    log.debug("Rejected to generate already existing password reset key {}", user.getResetKey());
+                    log.debug("Rejected to generate already existing password reset key '{}'", user.getResetKey());
                     throw new UserConflictException("password reset key has already been generated");
                 }
                 user.setResetKey(SecurityUtils.generateRandomResetKey());
                 user.setResetDate(ZonedDateTime.now());
                 userRepository.save(user);
-                log.debug("Generated reset key {} for user {}", user.getResetKey(), email);
+                log.debug("Generated reset key '{}' for user with email '{}'", user.getResetKey(), email);
                 return ImmutableMap.<String, String>builder().
                     put("resetKey", user.getResetKey()).
                     build();
@@ -239,7 +239,7 @@ public class UserService {
                 user.setResetKey(null);
                 user.setResetDate(null);
                 userRepository.save(user);
-                log.debug("Reset password for user {} with reset key {}", user.getLogin(), resetKey);
+                log.debug("Reset password with reset key '{}' for user with login '{}'", resetKey, user.getLogin());
                 return true;
             }).orElseThrow(() -> new ResetKeyNotFoundException(resetKey));
     }
@@ -267,7 +267,7 @@ public class UserService {
                 user.setPassword(passwordEncoder.encode(payload.getPassword()));
 
                 userRepository.save(user);
-                log.debug("Updated user: {}", user);
+                log.debug("Updated user with login '{}'", user.getLogin());
                 return user;
             }).orElseThrow(() -> new UserNotFoundException(login));
     }
@@ -294,7 +294,7 @@ public class UserService {
                 }
                 deleteOauth2AccessTokens(login);
                 userRepository.save(user);
-                log.debug("Updated authorities of user {}: {}", user.getLogin(), user.getAuthorities());
+                log.debug("Updated authorities of user with login '{}': {}", user.getLogin(), user.getAuthorities());
                 return user;
             }).orElseThrow(() -> new UserNotFoundException(login));
     }
@@ -330,7 +330,7 @@ public class UserService {
     private void deleteOauth2AccessTokens(String login) {
         jdbcTokenStore.findTokensByUserName(login).forEach(accessToken -> {
             jdbcTokenStore.removeAccessToken(accessToken);
-            log.debug("Removed OAuth2 access token {} of user {}", accessToken.getValue(), login);
+            log.debug("Removed OAuth2 access token '{}' of user with login '{}'", accessToken.getValue(), login);
         });
     }
 

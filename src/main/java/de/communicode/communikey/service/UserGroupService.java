@@ -55,7 +55,7 @@ public class UserGroupService {
             .map(userGroup -> {
                 if (userGroup.getUsers().add(userService.validate(login))) {
                     userGroupRepository.save(userGroup);
-                    log.debug("Added user {} to user group {}", login, userGroup.getName());
+                    log.debug("Added user with login '{}' to user group '{}'", login, userGroup.getName());
                     return userGroup;
                 }
                 return userGroup;
@@ -76,7 +76,7 @@ public class UserGroupService {
         userGroup.setName(payload.getName());
 
         userGroupRepository.save(userGroup);
-        log.debug("Created new user group: {}", userGroup);
+        log.debug("Created new user group '{}'", userGroup.getName());
         return userGroup;
     }
 
@@ -88,7 +88,7 @@ public class UserGroupService {
      */
     public void delete(String name) {
         userGroupRepository.delete(ofNullable(validate(name)).orElseThrow(() -> new UserGroupNotFoundException(name)));
-        log.debug("Deleted user group {}", name);
+        log.debug("Deleted user group '{}'", name);
     }
 
     /**
@@ -125,7 +125,7 @@ public class UserGroupService {
             .map(userGroup -> {
                 if (userGroup.getUsers().remove(userService.validate(login))) {
                     userGroupRepository.save(userGroup);
-                    log.debug("Removed user {} from user group {}", login, userGroup.getName());
+                    log.debug("Removed user with login '{}' from user group '{}'", login, userGroup.getName());
                 }
                 return userGroup;
             }).orElseThrow(() -> new UserGroupNotFoundException(userGroupName));
@@ -146,7 +146,7 @@ public class UserGroupService {
                 if (!userGroup.getName().equals(payload.getName())) {
                     userGroup.setName(payload.getName());
                     userGroupRepository.save(userGroup);
-                    log.debug("Updated user group: {}", userGroup);
+                    log.debug("Updated user group '{}'", userGroup.getName());
                 }
                 return userGroup;
             }).orElseThrow(() -> new UserGroupNotFoundException(name));
