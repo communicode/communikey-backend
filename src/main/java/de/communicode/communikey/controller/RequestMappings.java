@@ -71,14 +71,14 @@ public final class RequestMappings {
     public static final String USER_GROUPS = API + "/groups";
 
     /**
-     * The endpoint for {@link UserGroup}s.
-     */
-    public static final String USER_GROUPS_USERS = "/users";
-
-    /**
      * The request parameter for a {@link UserGroup} name.
      */
     public static final String USER_GROUPS_NAME = "/{userGroupName}";
+
+    /**
+     * The endpoint for {@link UserGroup}s.
+     */
+    public static final String USER_GROUPS_USERS = USER_GROUPS_NAME + "/users";
 
     /**
      * The request parameter for a {@link User} login.

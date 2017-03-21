@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +41,6 @@ import java.util.Set;
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-@Validated
 @RestController
 @RequestMapping(USER_GROUPS)
 public class UserGroupController {
@@ -67,7 +65,7 @@ public class UserGroupController {
      * @param login the login of the user to be added
      * @return the user group as response entity
      */
-    @GetMapping(value = USER_GROUPS_NAME + USER_GROUPS_USERS)
+    @GetMapping(value = USER_GROUPS_USERS)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<UserGroup> addUser(@PathVariable String userGroupName, @RequestParam(name = USER_LOGIN) String login) {
         return new ResponseEntity<>(userGroupService.addUser(userGroupName, login), HttpStatus.OK);
