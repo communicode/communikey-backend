@@ -100,11 +100,11 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     }
 
     public Set<Key> getKeys() {
-        return keys;
+        return new HashSet<>(keys);
     }
 
     public void setKeys(Set<Key> keys) {
-        this.keys = keys;
+        this.keys = new HashSet<>(keys);
     }
 
     public KeyCategory getParent() {
@@ -116,11 +116,11 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     }
 
     public Set<KeyCategory> getChildren() {
-        return children;
+        return new HashSet<>(children);
     }
 
     public void setChildren(Set<KeyCategory> children) {
-        this.children = children;
+        this.children = new HashSet<>(children);
     }
 
     public User getCreator() {
@@ -132,11 +132,11 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     }
 
     public Set<UserGroup> getGroups() {
-        return groups;
+        return new HashSet<>(groups);
     }
 
     public void setGroups(Set<UserGroup> groups) {
-        this.groups = groups;
+        this.groups = new HashSet<>(groups);
     }
 
     public User getResponsible() {
