@@ -81,7 +81,7 @@ public class KeyCategoryService {
     public KeyCategory addChild(Long parentKeyCategoryId, Long childKeyCategoryId) throws KeyCategoryNotFoundException {
         KeyCategory parent = validate(parentKeyCategoryId);
         KeyCategory child = validate(childKeyCategoryId);
-        isUniqueKeyCategoryName(child.getName(), parentKeyCategoryId);
+        validateUniqueKeyCategoryName(child.getName(), parentKeyCategoryId);
 
         if (Objects.equals(parentKeyCategoryId, childKeyCategoryId)) {
             throw new KeyCategoryConflictException(
@@ -153,7 +153,7 @@ public class KeyCategoryService {
      * @throws UserNotFoundException if the user with the specified ID has not been found
      */
     public KeyCategory create(KeyCategoryPayload payload) throws KeyCategoryNotFoundException, UserNotFoundException {
-        isUniqueKeyCategoryName(payload.getName(), null);
+        validateUniqueKeyCategoryName(payload.getName(), null);
 
         KeyCategory keyCategory = new KeyCategory();
         User user = userService.validate(SecurityUtils.getCurrentUserLogin());
@@ -323,19 +323,15 @@ public class KeyCategoryService {
      * @param parentKeyCategoryId the ID of the parent key category to validate
      * @throws KeyCategoryConflictException if the specified key category name is not unique
      */
-    private boolean isUniqueKeyCategoryName(String name, Long parentKeyCategoryId) throws KeyCategoryConflictException {
+    private void validateUniqueKeyCategoryName(String name, Long parentKeyCategoryId) throws KeyCategoryConflictException {
         if (Objects.nonNull(parentKeyCategoryId)) {
             if (keyCategoryRepository.findOne(parentKeyCategoryId).getChildren().stream()
-                .anyMatch(keyCategory -> keyCategory.getName().equals(name))) {
+                    .anyMatch(keyCategory -> keyCategory.getName().equals(name))) {
                 throw new KeyCategoryConflictException("key category '" + name + "' already exists");
-            } else {
-                return true;
             }
-        }
-        if (keyCategoryRepository.findAllByParentIsNull().stream()
-            .anyMatch(keyCategory -> keyCategory.getName().equals(name))) {
+        } else if (keyCategoryRepository.findAllByParentIsNull().stream()
+                .anyMatch(keyCategory -> keyCategory.getName().equals(name))) {
             throw new KeyCategoryConflictException("key category '" + name + "' already exists");
         }
-        return true;
     }
 }
