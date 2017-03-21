@@ -205,16 +205,6 @@ public class UserService {
         return new HashSet<>(userRepository.findAll());
     }
 
-    /**
-     * Gets all keys created by the user with the the specified login.
-     *
-     * @param login the login of the user to get all created keys of
-     * @return a collection of keys
-     */
-    public Set<Key> getCreatedKeys(String login) {
-        return validate(login).getKeys();
-    }
-
     @Transactional(readOnly = true)
     public User getWithAuthoritiesByEmail(String email) {
         return userRepository.findOneWithAuthoritiesByEmail(email);
