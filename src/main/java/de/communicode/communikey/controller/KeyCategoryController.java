@@ -67,7 +67,7 @@ public class KeyCategoryController {
      * @return the updated parent key category as response entity
      */
     @GetMapping(value = KEY_CATEGORY_CHILDREN)
-    //@Secured(AuthoritiesConstants.ADMIN) // TODO: Uncomment again
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<KeyCategory> addChild(@PathVariable Long keyCategoryId, @RequestParam Long childKeyCategoryId) {
         return new ResponseEntity<>(keyCategoryService.addChild(keyCategoryId, childKeyCategoryId), HttpStatus.OK);
     }
@@ -97,7 +97,7 @@ public class KeyCategoryController {
      * @return the updated key category entity
      */
     @GetMapping(value = KEY_CATEGORY_KEYS)
-    //@Secured(AuthoritiesConstants.ADMIN) // TODO: Uncomment again
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<KeyCategory> addKey(@PathVariable Long keyCategoryId, @RequestParam Long keyId) {
         return new ResponseEntity<>(keyCategoryService.addKey(keyCategoryId, keyId), HttpStatus.OK);
     }
@@ -111,7 +111,7 @@ public class KeyCategoryController {
      * @return the key category as response entity
      */
     @PostMapping
-    //@Secured(AuthoritiesConstants.ADMIN) // TODO: Uncomment again
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<KeyCategory> create(@Valid @RequestBody KeyCategoryPayload payload) {
         return new ResponseEntity<>(keyCategoryService.create(payload), HttpStatus.CREATED);
     }
@@ -127,7 +127,7 @@ public class KeyCategoryController {
      * @return a empty response entity
      */
     @DeleteMapping(value = KEY_CATEGORIES_ID)
-    //@Secured(AuthoritiesConstants.ADMIN) // TODO: Uncomment again
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Void> delete(@PathVariable Long keyCategoryId) {
         keyCategoryService.delete(keyCategoryId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -185,7 +185,7 @@ public class KeyCategoryController {
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
     @PutMapping(value = KEY_CATEGORY_RESPONSIBLE)
-    //@Secured(AuthoritiesConstants.ADMIN) // TODO: Uncomment again
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<KeyCategory> setResponsibleUser(@PathVariable Long keyCategoryId, @RequestParam String userLogin) {
         return new ResponseEntity<>(keyCategoryService.setResponsibleUser(keyCategoryId, userLogin), HttpStatus.OK);
     }
