@@ -22,7 +22,6 @@ import static java.util.Objects.requireNonNull;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.security.AuthoritiesConstants;
-import de.communicode.communikey.service.KeyService;
 import de.communicode.communikey.service.UserService;
 import de.communicode.communikey.service.payload.UserPasswordResetPayload;
 import de.communicode.communikey.service.payload.UserPayload;
@@ -57,12 +56,10 @@ import java.util.Set;
 @RequestMapping(USERS)
 public class UserController {
 
-    private final KeyService keyService;
     private final UserService userService;
 
     @Autowired
-    public UserController(KeyService keyService, UserService userService) {
-        this.keyService = requireNonNull(keyService, "keyService must not be null!");
+    public UserController(UserService userService) {
         this.userService = requireNonNull(userService, "userService must not be null!");
     }
 
