@@ -11,11 +11,13 @@ import static de.communicode.communikey.controller.RequestMappings.KEYS_ID;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.service.KeyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,6 +59,7 @@ public class KeyController {
      * @since 0.2.0
      */
     @PostMapping
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> create(@Valid @RequestBody KeyPayload payload) {
         return new ResponseEntity<>(keyService.create(payload), HttpStatus.CREATED);
     }
@@ -71,6 +74,7 @@ public class KeyController {
      * @since 0.2.0
      */
     @DeleteMapping(value = KEYS_ID)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Void> delete(@PathVariable Long keyId) {
         keyService.delete(keyId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -85,6 +89,7 @@ public class KeyController {
      * @since 0.2.0
      */
     @DeleteMapping
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> deleteAll() {
         keyService.deleteAll();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -99,6 +104,7 @@ public class KeyController {
      * @return the key as response entity
      */
     @GetMapping(value = KEYS_ID)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> get(@PathVariable Long keyId) {
         return new ResponseEntity<>(keyService.get(keyId), HttpStatus.OK);
     }
@@ -111,6 +117,7 @@ public class KeyController {
      * @return a collection of keys as response entity
      */
     @GetMapping
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Set<Key>> getAll() {
         return new ResponseEntity<>(keyService.getAll(), HttpStatus.OK);
     }
@@ -126,6 +133,7 @@ public class KeyController {
      * @since 0.2.0
      */
     @PutMapping(value = KEYS_ID)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> update(@PathVariable Long keyId, @Valid @RequestBody KeyPayload payload) {
         return new ResponseEntity<>(keyService.update(keyId, payload), HttpStatus.OK);
     }
