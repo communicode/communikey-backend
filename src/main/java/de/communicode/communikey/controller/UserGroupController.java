@@ -155,6 +155,7 @@ public class UserGroupController {
      * @return the updated user group as response entity
      */
     @PutMapping(value = USER_GROUPS_NAME)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<UserGroup> update(@PathVariable String userGroupName, @Valid @RequestBody UserGroup payload) {
         return new ResponseEntity<>(userGroupService.update(userGroupName, payload), HttpStatus.OK);
     }
