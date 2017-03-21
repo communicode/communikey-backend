@@ -156,19 +156,6 @@ public class UserController {
     }
 
     /**
-     * Gets all keys created by the user with the specified login.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USER_KEYS}".
-     *
-     * @param login the login of the user to get all keys of
-     * @return a collection of keys
-     */
-    @GetMapping(value = USER_KEYS)
-    ResponseEntity<Set<Key>> getCreatedKeys(@PathVariable String login) {
-        return new ResponseEntity<>(userService.getCreatedKeys(login), HttpStatus.OK);
-    }
-
-    /**
      * Gets a random generated user password reset key for the specified email.
      * <p>
      * This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_PASSWORD_RESET}".
