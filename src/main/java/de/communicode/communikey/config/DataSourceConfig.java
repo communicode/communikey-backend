@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 /**
  * Configures Spring Security for the {@link de.communicode.communikey.domain.User} authentication.
  * <p>
- *     Provides the JDBC {@link DriverManagerDataSource} bean.
+ * Provides the JDBC {@link DriverManagerDataSource} bean.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -79,10 +79,10 @@ public class DataSourceConfig {
      * Populates the database with schema scripts.
      *
      * <p>
-     *     Currently runs the SQL script for
-     *     <ul>
-     *         <li>OAuth2</li>
-     *     </ul>
+     * Currently runs the SQL script for
+     * <ul>
+     * <li>OAuth2</li>
+     * </ul>
      *
      * @return the database populartor object
      */

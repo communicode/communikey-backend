@@ -31,7 +31,7 @@ import java.util.Collection;
  * A simple centralized, cross-platform credential manager.
  *
  * <p>
- *   This is the application boot class.
+ * This is the application boot class.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
