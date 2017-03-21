@@ -22,7 +22,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "authorities")
-public class Authority implements Serializable {
+public class Authority extends AbstractEntity implements Serializable {
 
     @NotNull
     @Size(max = 50)
