@@ -129,7 +129,7 @@ public class UserGroupController {
     /**
      * Removes a user from a user group.
      * <p>
-     * This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}{@value RequestMappings#USER_GROUPS_USERS}".
+     *     This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_USERS}".
      * <p>
      * Required parameter:
      * <ul>
@@ -139,7 +139,7 @@ public class UserGroupController {
      * @param login the login of the user to be removed
      * @return the user group as response entity
      */
-    @DeleteMapping(value = USER_GROUPS_NAME + USER_GROUPS_USERS)
+    @DeleteMapping(value = USER_GROUPS_USERS)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<UserGroup> removeUser(@PathVariable String userGroupName, @RequestParam(name = USER_LOGIN) String login) {
         return new ResponseEntity<>(userGroupService.removeUser(userGroupName, login), HttpStatus.OK);
