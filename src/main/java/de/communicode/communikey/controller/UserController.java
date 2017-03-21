@@ -76,6 +76,7 @@ public class UserController {
      * @return the response entity
      */
     @GetMapping(value = USERS_ACTIVATE)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Void> activate(@RequestParam(value = USER_ACTIVATION_KEY) String activationKey) {
         userService.activate(activationKey);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -109,6 +110,7 @@ public class UserController {
      * @return the created user as response entity
      */
     @PostMapping(value = USERS_REGISTER)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<User> create(@Valid @RequestBody UserPayload payload) {
         return new ResponseEntity<>(userService.create(payload), HttpStatus.CREATED);
     }
@@ -137,6 +139,7 @@ public class UserController {
      * @return the user as response entity
      */
     @GetMapping(value = USERS_LOGIN)
+    @Secured(AuthoritiesConstants.ADMIN)
     ResponseEntity<User> get(@PathVariable String login) {
         return new ResponseEntity<>(userService.getWithAuthoritiesByLogin(login), HttpStatus.OK);
     }
