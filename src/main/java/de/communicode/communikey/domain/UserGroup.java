@@ -94,4 +94,13 @@ public class UserGroup extends AbstractEntity implements Serializable {
     public void setCategories(Set<KeyCategory> categories) {
         this.categories = new HashSet<>(categories);
     }
+
+    @Override
+    public String toString() {
+        return "UserGroup{" +"id=" + id +
+                ", name='" + name + '\'' +
+                ", users=" + users +
+                ", categories=" + categories +
+                '}';
+    }
 }

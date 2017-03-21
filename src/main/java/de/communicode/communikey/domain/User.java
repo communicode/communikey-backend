@@ -243,4 +243,24 @@ public class User extends AbstractEntity implements Serializable {
     public void setResponsibleKeyCategories(Set<KeyCategory> responsibleKeyCategories) {
         this.responsibleKeyCategories = responsibleKeyCategories;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", login='" + login + '\'' +
+                ", email='" + email + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", activated=" + activated +
+                ", activationKey='" + activationKey + '\'' +
+                ", resetKey='" + resetKey + '\'' +
+                ", resetDate=" + resetDate +
+                ", authorities=" + authorities +
+                ", groups=" + groups +
+                ", keys=" + keys +
+                ", keyCategories=" + keyCategories +
+                ", responsibleKeyCategories=" + responsibleKeyCategories +
+                '}';
+    }
 }

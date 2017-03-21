@@ -146,4 +146,18 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     public void setResponsible(User responsible) {
         this.responsible = responsible;
     }
+
+    @Override
+    public String toString() {
+        return "KeyCategory{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", keys=" + keys +
+                ", parent=" + parent +
+                ", children=" + children +
+                ", creator=" + creator +
+                ", groups=" + groups +
+                ", responsible=" + responsible +
+                '}';
+    }
 }
