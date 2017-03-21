@@ -12,7 +12,6 @@ import static java.util.Optional.ofNullable;
 import com.google.common.collect.ImmutableMap;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.exception.ActivationKeyNotFoundException;
 import de.communicode.communikey.exception.ResetKeyNotFoundException;
@@ -39,7 +38,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * The REST API service to process {@link User} via a {@link UserRepository}.
@@ -94,20 +92,6 @@ public class UserService {
     public User addKey(String userLogin, Key key) {
         User user = validate(userLogin);
         user.getKeys().add(key);
-        return userRepository.save(user);
-    }
-
-    /**
-     * Adds the responsible key category to the user with the specified login.
-     *
-     * @param userLogin the login of the user to be set as the responsible of the key category
-     * @param keyCategory the key category to be added
-     * @return the updated user
-     * @throws UserNotFoundException if the user with the specified login has not been found
-     */
-    public User addResponsibleKeyCategory(String userLogin, KeyCategory keyCategory) {
-        User user = validate(userLogin);
-        user.getResponsibleKeyCategories().add(keyCategory);
         return userRepository.save(user);
     }
 
