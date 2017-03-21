@@ -90,15 +90,9 @@ public class KeyService {
     /**
      * Gets all keys the current user is authorized to.
      *
-     * @return a collection of all keys
+     * @return a collection of keys
      */
     public Set<Key> getAll() {
-        //Set<Key> keyPool = new HashSet<>();
-        //keyPool.addAll(keyRepository.findAllByCreator(userService.validate(SecurityUtils.getCurrentUserLogin())));
-/*        keyCategoryService.getAll().stream()
-            .flatMap(keyCategory -> keyCategory.getKeys().stream())
-            .forEach(keyPool::add);*/
-        //return keyPool;
         return new HashSet<>(keyRepository.findAll());
     }
 
