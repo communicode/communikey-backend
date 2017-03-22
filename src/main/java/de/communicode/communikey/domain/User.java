@@ -53,6 +53,7 @@ public class User extends AbstractEntity implements Serializable {
     @NotBlank
     @Size(max = 100)
     @Column(length = 100, unique = true, nullable = false)
+    @JsonView(AuthoritiesRestView.Admin.class)
     private String login;
 
     @NotBlank
@@ -109,12 +110,13 @@ public class User extends AbstractEntity implements Serializable {
     @JsonView(AuthoritiesRestView.Admin.class)
     private Set<UserGroup> groups = new HashSet<>();
 
-    @OneToMany(mappedBy = "creator")
-    @JsonIgnore
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
+    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "category", "creator", "password"})
     private Set<Key> keys = new HashSet<>();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
-    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible"})
+    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible", "groups",
+            "keys"})
     @JsonView(AuthoritiesRestView.Admin.class)
     private Set<KeyCategory> keyCategories = new HashSet<>();
 

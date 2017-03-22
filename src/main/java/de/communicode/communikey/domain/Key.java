@@ -43,13 +43,14 @@ public class Key extends AbstractEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "key_category_id")
-    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible", "keys"})
+    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible", "keys",
+            "groups"})
     private KeyCategory category;
 
     @ManyToOne
     @JoinColumn(name = "creator_user_id", nullable = false)
     @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
-        "authorities", "groups"})
+            "authorities", "groups", "keyCategories", "responsibleKeyCategories", "keys"})
     private User creator;
 
     @NotNull

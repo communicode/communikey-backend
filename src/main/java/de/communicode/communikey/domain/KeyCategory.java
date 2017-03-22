@@ -58,14 +58,14 @@ public class KeyCategory extends AbstractEntity implements Serializable {
 
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, mappedBy = "parent")
-    @JsonIgnoreProperties(value = {"groups", "parent", "keys"})
+    @JsonIgnoreProperties(value = {"groups", "parent"})
     private Set<KeyCategory> children = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "creator_user_id", nullable = false)
     @JsonIgnoreProperties(value = {
         "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
-        "authorities", "groups", "keyCategories", "responsibleKeyCategories"})
+        "authorities", "groups", "keyCategories", "responsibleKeyCategories", "keys"})
     private User creator;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -80,7 +80,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     @JoinColumn(name = "responsible_user_id")
     @JsonIgnoreProperties(value = {
         "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
-        "authorities", "groups", "keyCategories", "responsibleKeyCategories"})
+        "authorities", "groups", "keyCategories", "responsibleKeyCategories", "keys"})
     private User responsible;
 
     public Long getId() {
