@@ -92,6 +92,16 @@ public class UserGroupService {
     }
 
     /**
+     * Deletes all user groups.
+     *
+     * @since 0.3.0
+     */
+    public void deleteAll() {
+        userGroupRepository.deleteAll();
+        log.debug("Deleted all user groups");
+    }
+
+    /**
      * Gets all user groups.
      *
      * @return a collection of all user groups

@@ -102,6 +102,21 @@ public class UserGroupController {
     }
 
     /**
+     * Deletes all user groups.
+     * <p>
+     * This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}".
+     *
+     * @return a empty response entity
+     * @since 0.3.0
+     */
+    @DeleteMapping
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<UserGroup> deleteAll() {
+        userGroupService.deleteAll();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
      * Gets the user group with the specified name.
      * <p>
      * This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}".
