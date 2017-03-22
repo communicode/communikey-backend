@@ -19,6 +19,6 @@ public class AuthorityNotFoundException extends RuntimeException {
      * @param authorityName the name of the authority that has not been found
      */
     public AuthorityNotFoundException(String authorityName) {
-        super("authority '" + authorityName +"' not found");
+        super("authority '" + authorityName + "' not found");
     }
 }
