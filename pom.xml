@@ -42,7 +42,6 @@
 
         <commons-lang.version>3.5</commons-lang.version>
         <hikaricp.version>2.4.6</hikaricp.version>
-        <mapstruct.version>1.1.0.Final</mapstruct.version>
         <hibernate-envers.version>5.2.4.Final</hibernate-envers.version>
     </properties>
 
@@ -214,13 +213,6 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${mapstruct.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -278,21 +270,4 @@
             </releases>
         </pluginRepository>
     </pluginRepositories>
-
-    <profiles>
-        <profile>
-            <!--
-                Profile for applying IDE-specific configuration.
-                At the moment it only configures MapStruct, which you need when working with DTOs.
-            -->
-            <id>IDE</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.mapstruct</groupId>
-                    <artifactId>mapstruct-processor</artifactId>
-                    <version>${mapstruct.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

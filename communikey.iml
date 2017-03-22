@@ -114,6 +114,5 @@
     <orderEntry type="library" name="Maven: javax.transaction:jta:1.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.6" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.8.6" level="project" />
-    <orderEntry type="library" name="Maven: org.mapstruct:mapstruct-processor:1.1.0.Final" level="project" />
   </component>
 </module>
