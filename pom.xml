@@ -47,10 +47,10 @@
     </properties>
 
     <scm>
-        <connection>scm:git:ssh://git@stash.communicode.de:7999/cc/communikey.git</connection>
-        <developerConnection>scm:git:ssh://git@stash.communicode.de:7999/cc/communikey.git</developerConnection>
+        <connection>scm:git:ssh://git@bitbucket.communicode.de:7999/cckey/main.git</connection>
+        <developerConnection>scm:git:ssh://git@bitbucket.communicode.de:7999/cckey/main.git</developerConnection>
         <tag>HEAD</tag>
-        <url>https://stash.communicode.de/projects/CC/repos/communikey</url>
+        <url>https://bitbucket.communicode.de/projects/CCKEY/repos/main</url>
     </scm>
 
     <dependencies>
