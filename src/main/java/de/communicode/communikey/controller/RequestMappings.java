@@ -115,5 +115,19 @@ public final class RequestMappings {
      */
     public static final String USERS_PASSWORD_RESET = "/reset_password";
 
+    /**
+     * The endpoint for {@link Authority} entities.
+     *
+     * @since 0.3.0
+     */
+    public static final String AUTHORITIES = API + "/authorities";
+
+    /**
+     * The request parameter for a {@link Authority} name.
+     *
+     * @since 0.3.0
+     */
+    public static final String AUTHORITIES_NAME = "{authorityName}";
+
     private RequestMappings() {}
 }
