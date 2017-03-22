@@ -23,7 +23,7 @@
     <inceptionYear>2017</inceptionYear>
     <organization>
         <name>communicode AG</name>
-        <url>http://communicode.de</url>
+        <url>https://communicode.de</url>
     </organization>
 
     <developers>
@@ -32,7 +32,7 @@
             <name>Sven Greb</name>
             <email>sgreb@communicode.de</email>
             <organization>communicode AG</organization>
-            <organizationUrl>http://communicode.de</organizationUrl>
+            <organizationUrl>https://communicode.de</organizationUrl>
         </developer>
     </developers>
 
