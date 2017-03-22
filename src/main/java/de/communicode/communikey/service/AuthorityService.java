@@ -12,8 +12,6 @@ import static java.util.Optional.ofNullable;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.exception.AuthorityNotFoundException;
 import de.communicode.communikey.repository.AuthorityRepository;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +27,6 @@ import java.util.Set;
 @Service
 public class AuthorityService {
 
-    private static final Logger log = LogManager.getLogger(UserService.class);
     private final AuthorityRepository authorityRepository;
 
     @Autowired
