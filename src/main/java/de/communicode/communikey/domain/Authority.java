@@ -24,6 +24,8 @@ import java.io.Serializable;
 @Table(name = "authorities")
 public class Authority extends AbstractEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @NotNull
     @Size(max = 50)
     @Id
