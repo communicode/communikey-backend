@@ -70,17 +70,6 @@ public class CommunikeyApplication {
         SpringApplication app = new SpringApplication(CommunikeyApplication.class);
         DefaultProfileUtil.addDefaultProfile(app);
         Environment env = app.run(args).getEnvironment();
-        log.info(
-                "\nApplication '{}' is running!\n" +
-                "Active Profile(s): {}\n" +
-                "Access URLs:\n" +
-                "  Local:    http://localhost:{}\n" +
-                "  External: http://{}:{}\n",
-            env.getProperty("spring.application.name"),
-            env.getActiveProfiles(),
-            env.getProperty("server.port"),
-            InetAddress.getLocalHost().getHostAddress(),
-            env.getProperty("server.port")
-        );
+        log.info("Application '{}' is running! Active Profile(s): {}", env.getProperty("spring.application.name"), env.getActiveProfiles());
     }
 }
