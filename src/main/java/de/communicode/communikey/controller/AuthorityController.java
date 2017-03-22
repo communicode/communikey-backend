@@ -27,8 +27,8 @@ import java.util.Set;
 
 /**
  * The REST API controller to process {@link Authority} entities.
- * <p>
- * Mapped to the "{@value RequestMappings#AUTHORITIES}" endpoint.
+ *
+ * <p>Mapped to the "{@value RequestMappings#AUTHORITIES}" endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.3.0
@@ -46,8 +46,8 @@ public class AuthorityController {
 
     /**
      * Gets the authority with the specified name.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#AUTHORITIES}{@value RequestMappings#AUTHORITIES_NAME}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#AUTHORITIES}{@value RequestMappings#AUTHORITIES_NAME}".
      *
      * @param authorityName the name of the authority to get
      * @return the authority as response entity
@@ -61,8 +61,8 @@ public class AuthorityController {
 
     /**
      * Gets all authorities.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#AUTHORITIES}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#AUTHORITIES}".
      *
      * @return a collection of all authorities as response entity
      */
