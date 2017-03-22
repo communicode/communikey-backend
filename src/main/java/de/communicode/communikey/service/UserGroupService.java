@@ -83,12 +83,12 @@ public class UserGroupService {
     /**
      * Deletes the user group with the specified name.
      *
-     * @param name the name of the user group to delete
+     * @param userGroupName the name of the user group to delete
      * @throws UserGroupNotFoundException if the user group with the specified name has not been found
      */
-    public void delete(String name) {
-        userGroupRepository.delete(ofNullable(validate(name)).orElseThrow(() -> new UserGroupNotFoundException(name)));
-        log.debug("Deleted user group '{}'", name);
+    public void delete(String userGroupName) {
+        userGroupRepository.delete(validate(userGroupName));
+        log.debug("Deleted user group '{}'", userGroupName);
     }
 
     /**
