@@ -16,7 +16,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     database: MYSQL
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
   jackson:
     serialization:
       indent_output: false
