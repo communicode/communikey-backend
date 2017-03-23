@@ -1,0 +1,21 @@
+Configutation:
+  status: warn
+
+  Appenders:
+    Console:
+      name: CONSOLE
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%5p} [%t] %c{1}: %m%n"
+
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        - ref: CONSOLE
+    Logger:
+      - name: de.communicode.communikey.service
+        additivity: false
+        level: debug
+        AppenderRef:
+          - ref: CONSOLE

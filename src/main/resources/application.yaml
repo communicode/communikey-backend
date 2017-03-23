@@ -24,9 +24,3 @@ server:
   compression:
     enabled: true
     mime-types: application/json
-
-logging:
-  level:
-    de:
-      communicode:
-        communikey: debug
