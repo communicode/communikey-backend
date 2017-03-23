@@ -8,6 +8,7 @@ package de.communicode.communikey.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.Sets;
 import de.communicode.communikey.service.view.AuthoritiesRestView;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -24,7 +25,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -55,13 +55,13 @@ public class UserGroup extends AbstractEntity implements Serializable {
     @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
             "authorities", "groups", "keyCategories", "responsibleKeyCategories"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<User> users = new HashSet<>();
+    private Set<User> users = Sets.newConcurrentHashSet();
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")
     @JsonIgnoreProperties(value = {"children", "responsible", "keys", "parent", "groups", "creator", "createdBy", "createdDate", "lastModifiedBy",
             "lastModifiedDate"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<KeyCategory> categories = new HashSet<>();
+    private Set<KeyCategory> categories = Sets.newConcurrentHashSet();
 
     public Long getId() {
         return id;

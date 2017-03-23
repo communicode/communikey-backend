@@ -7,6 +7,7 @@
 package de.communicode.communikey.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.collect.Sets;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.CascadeType;
@@ -25,7 +26,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -49,7 +49,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "category")
     @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "creator", "category"})
-    private Set<Key> keys = new HashSet<>();
+    private Set<Key> keys = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn
@@ -59,7 +59,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, mappedBy = "parent")
     @JsonIgnoreProperties(value = {"groups", "parent"})
-    private Set<KeyCategory> children = new HashSet<>();
+    private Set<KeyCategory> children = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn(name = "creator_user_id", nullable = false)
@@ -74,7 +74,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         joinColumns = {@JoinColumn(name = "key_category_id", referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(name = "user_group_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"categories", "users"})
-    private Set<UserGroup> groups = new HashSet<>();
+    private Set<UserGroup> groups = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn(name = "responsible_user_id")

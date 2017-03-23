@@ -11,6 +11,7 @@ import static de.communicode.communikey.config.SecurityConfig.EMAIL_REGEX;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.Sets;
 import de.communicode.communikey.service.view.AuthoritiesRestView;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.validator.constraints.NotBlank;
@@ -32,7 +33,6 @@ import javax.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -103,28 +103,28 @@ public class User extends AbstractEntity implements Serializable {
         inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
     @BatchSize(size = 20)
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<Authority> authorities = new HashSet<>();
+    private Set<Authority> authorities = Sets.newConcurrentHashSet();
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
     @JsonIgnoreProperties(value = {"users", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "categories"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<UserGroup> groups = new HashSet<>();
+    private Set<UserGroup> groups = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
     @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "category", "creator", "password"})
-    private Set<Key> keys = new HashSet<>();
+    private Set<Key> keys = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
     @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible", "groups",
             "keys"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<KeyCategory> keyCategories = new HashSet<>();
+    private Set<KeyCategory> keyCategories = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "responsible")
     @JsonIgnoreProperties(value = {"children", "responsible", "keys", "parent", "groups", "creator", "createdBy", "createdDate", "lastModifiedBy",
         "lastModifiedDate"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<KeyCategory> responsibleKeyCategories = new HashSet<>();
+    private Set<KeyCategory> responsibleKeyCategories = Sets.newConcurrentHashSet();
 
     public Long getId() {
         return id;
