@@ -10,7 +10,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.collect.Sets;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -57,7 +56,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     private KeyCategory parent = null;
 
     @NotNull
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, mappedBy = "parent")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "parent")
     @JsonIgnoreProperties(value = {"groups", "parent"})
     private Set<KeyCategory> children = Sets.newConcurrentHashSet();
 

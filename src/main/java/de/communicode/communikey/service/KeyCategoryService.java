@@ -9,6 +9,7 @@ package de.communicode.communikey.service;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
+import com.google.common.collect.Sets;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
@@ -33,9 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -195,8 +193,8 @@ public class KeyCategoryService {
 
         user.getResponsibleKeyCategories().add(keyCategory);
         userRepository.save(user);
-        keyCategoryChildrenMap.getMap().put(keyCategory.getId(), new HashSet<>());
-        keyCategoryParentMap.getMap().put(keyCategory.getId(), new HashSet<>());
+        keyCategoryChildrenMap.getMap().put(keyCategory.getId(), Sets.newConcurrentHashSet());
+        keyCategoryParentMap.getMap().put(keyCategory.getId(), Sets.newConcurrentHashSet());
         log.debug("Created new key category with ID '{}'", keyCategory.getId());
         return keyCategory;
     }
@@ -281,7 +279,7 @@ public class KeyCategoryService {
      * @return a collection of key categories
      */
     public Set<KeyCategory> getAll() {
-        Set<KeyCategory> authorizedKeyCategories = new HashSet<>();
+        Set<KeyCategory> authorizedKeyCategories = Sets.newConcurrentHashSet();
 
         if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
             authorizedKeyCategories.addAll(keyCategoryRepository.findAll());

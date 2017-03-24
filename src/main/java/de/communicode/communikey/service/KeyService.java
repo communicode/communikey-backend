@@ -9,6 +9,7 @@ package de.communicode.communikey.service;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
+import com.google.common.collect.Sets;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyPayload;
@@ -19,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -93,7 +93,7 @@ public class KeyService {
      * @return a collection of keys
      */
     public Set<Key> getAll() {
-        return new HashSet<>(keyRepository.findAll());
+        return Sets.newConcurrentHashSet(keyRepository.findAll());
     }
 
     /**

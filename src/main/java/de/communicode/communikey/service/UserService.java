@@ -10,6 +10,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.User;
@@ -31,7 +32,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -106,7 +106,7 @@ public class UserService {
         validateUniqueEmail(payload.getEmail());
 
         User user = new User();
-        Set<Authority> authorities = new HashSet<>();
+        Set<Authority> authorities = Sets.newConcurrentHashSet();
         Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
 
         user.setEmail(payload.getEmail().toLowerCase(Locale.ENGLISH));
@@ -186,7 +186,7 @@ public class UserService {
      * @return a collection of all user
      */
     public Set<User> getAll() {
-        return new HashSet<>(userRepository.findAll());
+        return Sets.newConcurrentHashSet(userRepository.findAll());
     }
 
     @Transactional(readOnly = true)

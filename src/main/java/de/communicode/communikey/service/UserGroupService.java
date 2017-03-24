@@ -9,6 +9,7 @@ package de.communicode.communikey.service;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
+import com.google.common.collect.Sets;
 import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.exception.UserGroupConflictException;
 import de.communicode.communikey.exception.UserGroupNotFoundException;
@@ -19,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -107,7 +107,7 @@ public class UserGroupService {
      * @return a collection of all user groups
      */
     public Set<UserGroup> getAll() {
-        return new HashSet<>(userGroupRepository.findAll());
+        return Sets.newConcurrentHashSet(userGroupRepository.findAll());
     }
 
     /**

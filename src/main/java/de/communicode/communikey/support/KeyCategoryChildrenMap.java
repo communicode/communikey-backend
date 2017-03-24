@@ -7,6 +7,7 @@
 package de.communicode.communikey.support;
 
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import de.communicode.communikey.domain.KeyCategory;
 
@@ -31,7 +32,7 @@ import java.util.Set;
  */
 public class KeyCategoryChildrenMap {
     private static KeyCategoryChildrenMap singletonInstance = new KeyCategoryChildrenMap();
-    private Map<Long, Set<Long>> map = new MapMaker().makeMap();
+    private Map<Long, Set<Long>> map = Maps.newConcurrentMap();
 
     public static KeyCategoryChildrenMap getInstance() {
         return singletonInstance;

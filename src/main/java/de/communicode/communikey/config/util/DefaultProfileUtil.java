@@ -6,10 +6,10 @@
  */
 package de.communicode.communikey.config.util;
 
+import com.google.common.collect.Maps;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.Environment;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,7 +37,7 @@ public final class DefaultProfileUtil {
      * @param app the Spring application
      */
     public static void addDefaultProfile(SpringApplication app) {
-        Map<String, Object> defProperties = new HashMap<>();
+        Map<String, Object> defProperties = Maps.newConcurrentMap();
         defProperties.put(SPRING_PROFILE_DEFAULT, COMMUNIKEY_PROFILE_DEVELOPMENT);
         app.setDefaultProperties(defProperties);
     }

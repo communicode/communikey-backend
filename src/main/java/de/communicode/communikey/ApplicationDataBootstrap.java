@@ -2,6 +2,7 @@ package de.communicode.communikey;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.Sets;
 import de.communicode.communikey.config.CommunikeyProperties;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.repository.AuthorityRepository;
@@ -18,7 +19,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -69,7 +69,7 @@ public class ApplicationDataBootstrap {
 
     private void initializeUser() {
         if (Objects.isNull(userRepository.findOneByLogin(communikeyProperties.getSecurity().getRoot().getLogin()))) {
-            Set<Authority> authorities = new HashSet<>();
+            Set<Authority> authorities = Sets.newConcurrentHashSet();
             Authority authorityAdmin = authorityRepository.findOne(AuthoritiesConstants.ADMIN);
             Authority authorityUser = authorityRepository.findOne(AuthoritiesConstants.USER);
 
