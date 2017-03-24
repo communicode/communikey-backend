@@ -194,37 +194,25 @@ public class KeyCategoryService {
     }
 
     /**
-     * Deletes the specified key category.
+     * Deletes the key category with the specified ID.
      * <p>
      *     <strong>This is a recursive operation that deletes all children key categories!</strong>
      *
      * @param keyCategoryId the ID of the key category to delete
-     * @throws KeyCategoryNotFoundException if no key category entity with the specified ID has been found
+     * @throws KeyCategoryNotFoundException if the key category with the specified ID has been found
      */
     public void delete(Long keyCategoryId) throws KeyCategoryNotFoundException {
-        keyCategoryRepository.delete(validate(keyCategoryId));
+        KeyCategory keyCategory = validate(keyCategoryId);
 
         keyCategoryChildrenMap.getMap().get(keyCategoryId)
-            // for all children of the target...
-            .forEach(childId -> keyCategoryParentMap.getMap().get(keyCategoryId)
-                // ...get all parents of the target and remove all children of the target (including itself) from all parents of the target
-                .forEach(parentId -> {
-                    keyCategoryChildrenMap.getMap().get(parentId).removeAll(keyCategoryChildrenMap.getMap().get(keyCategoryId));
-                    keyCategoryChildrenMap.getMap().get(parentId).remove(keyCategoryId);
-                }));
-
+                .forEach(childKeyCategoryId -> dissolveReferences(validate(childKeyCategoryId)));
         keyCategoryChildrenMap.getMap().get(keyCategoryId)
-            .forEach(childId -> {
-                // remove all children of the target from the parent map
-                keyCategoryParentMap.getMap().remove(childId);
-                // remove the target itself from the parent map
-                keyCategoryParentMap.getMap().remove(keyCategoryId);
-                // remove all children of the target from the child map
-                keyCategoryChildrenMap.getMap().remove(childId);
-            });
+                .forEach(childKeyCategoryId -> keyCategoryRepository.delete(validate(childKeyCategoryId)));
 
-        // remove the target itself from the child map
-        keyCategoryChildrenMap.getMap().remove(keyCategoryId);
+        keyCategory = dissolveReferences(keyCategory);
+        updateReferenceMapsOnDelete(keyCategoryId);
+
+        keyCategoryRepository.delete(keyCategory);
         log.debug("Deleted key category with ID '{}'", keyCategoryId);
     }
 
@@ -348,5 +336,62 @@ public class KeyCategoryService {
                 .anyMatch(keyCategory -> keyCategory.getName().equals(name))) {
             throw new KeyCategoryConflictException("key category '" + name + "' already exists");
         }
+    }
+
+    /**
+     * Dissolves all references to connected {@link Key}, {@link UserGroup} and children key category entities.
+     *
+     * <p>Used to prepare the deletion of a key category.
+     *
+     * @param keyCategory the key category to dissolve all references of
+     * @return the updated key category
+     * @since 0.3.0
+     */
+    private KeyCategory dissolveReferences(KeyCategory keyCategory) {
+        keyCategory.getKeys()
+                .forEach(key -> {
+                    key.setCategory(null);
+                    keyRepository.save(key);
+                    log.debug("Removed key category with ID '{}' from key with ID '{}'", keyCategory.getId(), key.getId());
+                });
+        keyCategory.getGroups()
+                .forEach(userGroup -> {
+                    userGroup.getCategories().remove(keyCategory);
+                    userGroupRepository.save(userGroup);
+                    log.debug("Removed key category with ID '{}' from user group with name '{}'", keyCategory.getId(), userGroup.getName());
+                });
+        keyCategory.setParent(null);
+        keyCategory.getChildren().clear();
+        return keyCategoryRepository.save(keyCategory);
+    }
+
+    /**
+     * Deletes the key category with the specified ID from the {@link KeyCategoryParentMap} and {@link KeyCategoryChildrenMap}.
+     *
+     * <p>Used to prepare the deletion of a key category.
+     *
+     * @param keyCategoryId the ID of the key category to delete from the reference maps
+     * @since 0.3.0
+     */
+    private void updateReferenceMapsOnDelete(Long keyCategoryId) {
+        keyCategoryParentMap.getMap().get(keyCategoryId)
+                .forEach(parentId -> {
+                    keyCategoryChildrenMap.getMap().get(parentId).removeAll(keyCategoryChildrenMap.getMap().get(keyCategoryId));
+                    log.debug("Removed children key categories with the IDs {} from the key category with the ID '{}'",
+                            keyCategoryChildrenMap.getMap().get(keyCategoryId), parentId);
+                    keyCategoryChildrenMap.getMap().get(parentId).remove(keyCategoryId);
+                    log.debug("Removed children key category with the ID '{}' from the key category with the ID '{}'", keyCategoryId, parentId);
+                });
+        keyCategoryChildrenMap.getMap().get(keyCategoryId)
+                .forEach(childId -> {
+                    keyCategoryParentMap.getMap().remove(childId);
+                    log.debug("Removed children key category with the ID '{}' from the key category parent map", childId);
+                    keyCategoryChildrenMap.getMap().remove(childId);
+                    log.debug("Removed children key category with the ID '{}' from the key category children map", childId);
+                });
+        keyCategoryParentMap.getMap().remove(keyCategoryId);
+        log.debug("Removed children key category with the ID '{}' from the key category parent map", keyCategoryId);
+        keyCategoryChildrenMap.getMap().remove(keyCategoryId);
+        log.debug("Removed children key category with the ID '{}' from the key category children map", keyCategoryId);
     }
 }
