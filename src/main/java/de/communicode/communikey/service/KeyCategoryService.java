@@ -31,7 +31,6 @@ import de.communicode.communikey.support.KeyCategoryParentMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -57,11 +56,6 @@ public class KeyCategoryService {
     private final UserGroupRepository userGroupRepository;
     private final KeyCategoryChildrenMap keyCategoryChildrenMap = KeyCategoryChildrenMap.getInstance();
     private final KeyCategoryParentMap keyCategoryParentMap = KeyCategoryParentMap.getInstance();
-
-    @Bean
-    public Map<KeyCategory, Set<KeyCategory>> keyCategoryTable() {
-        return new HashMap<>();
-    }
 
     @Autowired
     public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService, KeyService keyService, KeyRepository keyRepository,
