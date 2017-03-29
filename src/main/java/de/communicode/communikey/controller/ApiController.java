@@ -8,6 +8,7 @@ package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.CommunikeyApplication.COMMUNIKEY_REST_API_VERSION;
 import static de.communicode.communikey.controller.RequestMappings.API;
+import static de.communicode.communikey.controller.RequestParameter.API_VERSION;
 
 import com.google.common.collect.ImmutableMap;
 import org.springframework.http.HttpStatus;
@@ -33,14 +34,18 @@ public class ApiController {
 
     /**
      * Gets the version of the communikey REST API.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORIES_ID}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#API}".
+     *
+     * <p>Required parameter:
+     * <ul>
+     *     <li>{@value RequestParameter#API_VERSION}</li>
      *
      * @param version the request parameter to get the version
      * @return the version of the communikey REST API as response entity
      */
-    @GetMapping
-    ResponseEntity<Map<String, String>> getRestApiVersion(@RequestParam String version) {
-        return new ResponseEntity<>(ImmutableMap.of("version", COMMUNIKEY_REST_API_VERSION), HttpStatus.OK);
+    @GetMapping(params = API_VERSION)
+    ResponseEntity<Map<String, String>> getRestApiVersion(@RequestParam(value = API_VERSION) String version) {
+        return new ResponseEntity<>(ImmutableMap.of(API_VERSION, COMMUNIKEY_REST_API_VERSION), HttpStatus.OK);
     }
 }
