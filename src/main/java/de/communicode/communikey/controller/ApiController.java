@@ -8,9 +8,13 @@ package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.CommunikeyApplication.COMMUNIKEY_REST_API_VERSION;
 import static de.communicode.communikey.controller.RequestMappings.API;
+import static de.communicode.communikey.controller.RequestParameter.API_PRIVILEGED;
 import static de.communicode.communikey.controller.RequestParameter.API_VERSION;
 
 import com.google.common.collect.ImmutableMap;
+import de.communicode.communikey.domain.User;
+import de.communicode.communikey.security.AuthoritiesConstants;
+import de.communicode.communikey.security.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,5 +51,22 @@ public class ApiController {
     @GetMapping(params = API_VERSION)
     ResponseEntity<Map<String, String>> getRestApiVersion(@RequestParam(value = API_VERSION) String version) {
         return new ResponseEntity<>(ImmutableMap.of(API_VERSION, COMMUNIKEY_REST_API_VERSION), HttpStatus.OK);
+    }
+
+    /**
+     * Checks if the current {@link User} is privileged.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#API}".
+     *
+     * <p>Required parameter:
+     * <ul>
+     *     <li>{@value RequestParameter#API_PRIVILEGED}</li>
+     *
+     * @param privileged the request parameter to get the privilege status
+     * @return {@code true} if the current user is privileged, {@code false} otherwise
+     */
+    @GetMapping(params = API_PRIVILEGED)
+    ResponseEntity isUserPrivileged(@RequestParam(value = API_PRIVILEGED) String privileged) {
+        return new ResponseEntity<>(ImmutableMap.of(API_PRIVILEGED, SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)), HttpStatus.OK);
     }
 }
