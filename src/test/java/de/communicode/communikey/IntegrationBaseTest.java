@@ -7,6 +7,7 @@
 package de.communicode.communikey;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
@@ -14,21 +15,30 @@ import de.communicode.communikey.config.CommunikeyProperties;
 import de.communicode.communikey.config.SecurityConfig;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.User;
+import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.repository.AuthorityRepository;
+import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
+import de.communicode.communikey.service.AuthorityService;
+import de.communicode.communikey.service.KeyCategoryService;
+import de.communicode.communikey.service.KeyService;
+import de.communicode.communikey.service.UserGroupService;
+import de.communicode.communikey.service.UserService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.util.OAuth2Utils;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -49,29 +59,54 @@ import java.util.Set;
 @ActiveProfiles("test")
 public abstract class IntegrationBaseTest {
     @Autowired
-    private UserRepository userRepository;
+    protected UserRepository userRepository;
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    protected UserService userService;
     @Autowired
-    private AuthorityRepository authorityRepository;
+    protected KeyCategoryService keyCategoryService;
     @Autowired
-    private CommunikeyProperties communikeyProperties;
+    protected KeyService keyService;
     @Autowired
-    private Environment environment;
+    protected UserGroupService userGroupService;
     @Autowired
-    private TestRestTemplate testRestTemplate;
-    private String decodedUserPassword = "password";
+    protected PasswordEncoder passwordEncoder;
+    @Autowired
+    protected AuthorityService authorityService;
+    @Autowired
+    protected JdbcTokenStore jdbcTokenStore;
+    @Autowired
+    protected CommunikeyProperties communikeyProperties;
+    @Autowired
+    protected TestRestTemplate testRestTemplate;
+    protected String decodedUserPassword = "password";
+    protected String userLogin = "user";
+    private String userEmail = userLogin + "@communicode.de";
     protected User user = new User();
     protected String userOAuth2AccessToken;
     protected String adminUserOAuth2AccessToken;
+    @LocalServerPort
+    protected int definedServerPort;
 
     @Before
-    public void initialize() {
+    public void setup() {
         user = userRepository.save(createUser());
         adminUserOAuth2AccessToken = generateUserAccessToken(
                 communikeyProperties.getSecurity().getRoot().getLogin(),
                 communikeyProperties.getSecurity().getRoot().getPassword());
-        userOAuth2AccessToken = generateUserAccessToken(user.getLogin(), decodedUserPassword);
+        userOAuth2AccessToken = generateUserAccessToken(userLogin, decodedUserPassword);
+    }
+
+    @After
+    public void cleanUp() {
+        userRepository.findAll().stream()
+                .filter(testUser -> !testUser.getLogin().equals(communikeyProperties.getSecurity().getRoot().getLogin()))
+                .forEach(nonRootUser -> {
+                    jdbcTokenStore.findTokensByUserName(nonRootUser.getLogin()).forEach(accessToken -> jdbcTokenStore.removeAccessToken(accessToken));
+                    userService.delete(nonRootUser.getLogin());
+                });
+        keyCategoryService.deleteAll();
+        keyService.deleteAll();
+        userGroupService.deleteAll();
     }
 
     private String generateUserAccessToken(String login, String password) {
@@ -85,7 +120,7 @@ public abstract class IntegrationBaseTest {
         oAuth2TokenRequestParam.put(OAuth2Utils.REDIRECT_URI, communikeyProperties.getSecurity().getoAuth2().getRedirectUrl());
 
         ResponseEntity oAuth2AccessTokenResponse = testRestTemplate.getForEntity(
-                requestUrlBuilder.append("http://localhost:").append(environment.getProperty("server.port"))
+                requestUrlBuilder.append("http://localhost:").append(definedServerPort)
                         .append("/oauth/authorize?")
                         .append(Joiner.on("&").withKeyValueSeparator("=").join(oAuth2TokenRequestParam)).toString(),
                 String.class
@@ -94,15 +129,15 @@ public abstract class IntegrationBaseTest {
     }
 
     private User createUser() {
-        user.setEmail("user@communicode.de");
-        user.setLogin("user");
+        user.setEmail(userEmail);
+        user.setLogin(userLogin);
         user.setFirstName("first_name");
         user.setLastName("last_name");
         user.setPassword(passwordEncoder.encode(decodedUserPassword));
         user.setActivationKey(SecurityUtils.generateRandomActivationKey());
         user.setActivated(true);
         Set<Authority> authorities = Sets.newConcurrentHashSet();
-        authorities.add(authorityRepository.findOne(AuthoritiesConstants.USER));
+        authorities.add(authorityService.get(AuthoritiesConstants.USER));
         user.setAuthorities(authorities);
         return user;
     }
