@@ -43,6 +43,7 @@ public class CommunikeyApplication {
     private static final Logger log = LogManager.getLogger(CommunikeyApplication.class);
 
     private final Environment env;
+    public static final String COMMUNIKEY_REST_API_VERSION = "0.2.0";
 
     @Autowired
     public CommunikeyApplication(Environment env) {
