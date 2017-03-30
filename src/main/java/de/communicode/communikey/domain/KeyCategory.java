@@ -98,12 +98,28 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         this.name = name;
     }
 
-    public Set<Key> getKeys() {
-        return keys;
+    public boolean addKey(Key key) {
+        return keys.add(key);
     }
 
-    public void setKeys(Set<Key> keys) {
-        this.keys = keys;
+    public boolean addKeys(Set<Key> keys) {
+        return this.keys.addAll(keys);
+    }
+
+    public boolean removeKey(Key key) {
+        return keys.remove(key);
+    }
+
+    public boolean removeKeys(Set<Key> keys) {
+        return this.keys.removeAll(keys);
+    }
+
+    public void removeAllKeys() {
+        keys.clear();
+    }
+
+    public Set<Key> getKeys() {
+        return keys;
     }
 
     public KeyCategory getParent() {
@@ -114,12 +130,28 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         this.parent = parent;
     }
 
-    public Set<KeyCategory> getChildren() {
-        return children;
+    public boolean addChild(KeyCategory keyCategory) {
+        return children.add(keyCategory);
     }
 
-    public void setChildren(Set<KeyCategory> children) {
-        this.children = children;
+    public boolean addChildrens(Set<KeyCategory> keyCategories) {
+        return children.addAll(keyCategories);
+    }
+
+    public boolean removeChild(KeyCategory keyCategory) {
+        return children.remove(keyCategory);
+    }
+
+    public boolean removeChildren(Set<KeyCategory> keyCategories) {
+        return children.removeAll(keyCategories);
+    }
+
+    public void removeAllChildren() {
+        children.clear();
+    }
+
+    public Set<KeyCategory> getChildren() {
+        return children;
     }
 
     public User getCreator() {
@@ -130,12 +162,28 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         this.creator = creator;
     }
 
-    public Set<UserGroup> getGroups() {
-        return groups;
+    public boolean addGroup(UserGroup userGroup) {
+        return groups.add(userGroup);
     }
 
-    public void setGroups(Set<UserGroup> groups) {
-        this.groups = groups;
+    public boolean addGroups(Set<UserGroup> userGroups) {
+        return groups.addAll(userGroups);
+    }
+
+    public boolean removeGroup(UserGroup userGroup) {
+        return groups.remove(userGroup);
+    }
+
+    public boolean removeGroups(Set<UserGroup> userGroups) {
+        return groups.removeAll(userGroups);
+    }
+
+    public void removeAllGroups() {
+        groups.clear();
+    }
+
+    public Set<UserGroup> getGroups() {
+        return groups;
     }
 
     public User getResponsible() {

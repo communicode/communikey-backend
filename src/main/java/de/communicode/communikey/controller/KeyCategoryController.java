@@ -175,6 +175,36 @@ public class KeyCategoryController {
     }
 
     /**
+     * Removes a user group from the key category with the specified ID.
+     * <p>
+     * This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_GROUPS}".
+     *
+     * @param keyCategoryId the ID of the key category to remove the user group from
+     * @param userGroupName the name of the user group to be removed from the key category
+     * @return the updated key category as response entity
+     */
+    @DeleteMapping(value = KEY_CATEGORY_GROUPS)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<KeyCategory> removeUserGroup(@PathVariable Long keyCategoryId, @RequestParam String userGroupName) {
+        return new ResponseEntity<>(keyCategoryService.removeUserGroup(keyCategoryId, userGroupName), HttpStatus.OK);
+    }
+
+    /**
+     * Removes the key from the key category with the specified ID.
+     * <p>
+     * This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_KEYS}".
+     *
+     * @param keyCategoryId the ID of the key category the key will be deleted from
+     * @param keyId the ID of the key to be deleted
+     * @return the updated key category as response entity
+     */
+    @DeleteMapping(value = KEY_CATEGORY_KEYS)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<KeyCategory> removeKey(@PathVariable Long keyCategoryId, @RequestParam Long keyId) {
+        return new ResponseEntity<>(keyCategoryService.removeKey(keyCategoryId, keyId), HttpStatus.OK);
+    }
+
+    /**
      * Sets the responsible user for the key category with the specified ID.
      * <p>
      * This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_RESPONSIBLE}".

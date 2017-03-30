@@ -81,7 +81,7 @@ public class ApplicationDataBootstrap {
             rootUser.setActivated(true);
             authorities.add(authorityAdmin);
             authorities.add(authorityUser);
-            rootUser.setAuthorities(authorities);
+            rootUser.addAuthorities(authorities);
 
             userRepository.save(rootUser);
         }

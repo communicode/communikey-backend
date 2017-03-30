@@ -79,20 +79,52 @@ public class UserGroup extends AbstractEntity implements Serializable {
         this.name = name;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public boolean addUser(User user) {
+        return users.add(user);
     }
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
+    public boolean addUsers(Set<User> user) {
+        return users.addAll(user);
+    }
+
+    public boolean removeUser(User user) {
+        return users.remove(user);
+    }
+
+    public boolean removeUsers(Set<User> users) {
+        return this.users.removeAll(users);
+    }
+
+    public void removeAllUser() {
+        users.clear();
+    }
+
+    public Set<User> getUsers() {
+        return Sets.newConcurrentHashSet(users);
+    }
+
+    public boolean addCategory(KeyCategory keyCategory) {
+        return categories.add(keyCategory);
+    }
+
+    public boolean addCategories(Set<KeyCategory> keyCategories) {
+        return categories.addAll(keyCategories);
+    }
+
+    public boolean removeCategory(KeyCategory keyCategory) {
+        return categories.remove(keyCategory);
+    }
+
+    public boolean removeCategories(Set<KeyCategory> keyCategories) {
+        return categories.removeAll(keyCategories);
+    }
+
+    public void removeAllCategories() {
+        categories.clear();
     }
 
     public Set<KeyCategory> getCategories() {
-        return categories;
-    }
-
-    public void setCategories(Set<KeyCategory> categories) {
-        this.categories = categories;
+        return Sets.newConcurrentHashSet(categories);
     }
 
     @Override

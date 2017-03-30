@@ -91,7 +91,7 @@ public class UserService {
      */
     public User addKey(String userLogin, Key key) {
         User user = validate(userLogin);
-        user.getKeys().add(key);
+        user.addKey(key);
         return userRepository.save(user);
     }
 
@@ -117,7 +117,7 @@ public class UserService {
         user.setActivationKey(SecurityUtils.generateRandomActivationKey());
         user.setActivated(true);
         authorities.add(authority);
-        user.setAuthorities(authorities);
+        user.addAuthorities(authorities);
 
         userRepository.save(user);
         log.debug("Created new user: {}", user);
@@ -271,10 +271,10 @@ public class UserService {
                     .map(authorityRepository::findOne)
                     .collect(Collectors.toSet());
                 if (!payloadAuthorities.equals(user.getAuthorities())) {
-                    user.getAuthorities().clear();
+                    user.removeAllAuthorities();
                     payload.stream()
                         .map(authorityRepository::findOne)
-                        .forEach(authority -> user.getAuthorities().add(authority));
+                        .forEach(user::addAuthority);
                 }
                 deleteOauth2AccessTokens(login);
                 userRepository.save(user);

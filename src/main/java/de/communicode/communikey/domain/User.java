@@ -206,44 +206,124 @@ public class User extends AbstractEntity implements Serializable {
         this.resetDate = resetDate;
     }
 
-    public Set<Authority> getAuthorities() {
-        return authorities;
+    public boolean addAuthority(Authority authority) {
+        return authorities.add(authority);
     }
 
-    public void setAuthorities(Set<Authority> authorities) {
-        this.authorities = authorities;
+    public boolean addAuthorities(Set<Authority> authorities) {
+        return this.authorities.addAll(authorities);
+    }
+
+    public boolean removeAuthority(Authority authority) {
+        return authorities.remove(authority);
+    }
+
+    public boolean removeAuthorities(Set<Authority> authorities) {
+        return this.authorities.removeAll(authorities);
+    }
+
+    public void removeAllAuthorities() {
+        authorities.clear();
+    }
+
+    public Set<Authority> getAuthorities() {
+        return Sets.newConcurrentHashSet(authorities);
+    }
+
+    public boolean addGroup(UserGroup userGroup) {
+        return groups.add(userGroup);
+    }
+
+    public boolean addGroups(Set<UserGroup> userGroups) {
+        return this.groups.addAll(userGroups);
+    }
+
+    public boolean removeGroup(UserGroup userGroups) {
+        return groups.remove(userGroups);
+    }
+
+    public boolean removeGroups(Set<UserGroup> userGroups) {
+        return this.groups.removeAll(userGroups);
+    }
+
+    public void removeAllGroups() {
+        groups.clear();
     }
 
     public Set<UserGroup> getGroups() {
-        return groups;
+        return Sets.newConcurrentHashSet(groups);
     }
 
-    public void setGroups(Set<UserGroup> groups) {
-        this.groups = groups;
+    public boolean addKey(Key key) {
+        return keys.add(key);
+    }
+
+    public boolean addKeys(Set<Key> keys) {
+        return this.keys.addAll(keys);
+    }
+
+    public boolean removeKey(Key key) {
+        return keys.remove(key);
+    }
+
+    public boolean removeKeys(Set<Key> keys) {
+        return this.keys.removeAll(keys);
+    }
+
+    public void removeAllKeys() {
+        keys.clear();
     }
 
     public Set<Key> getKeys() {
         return keys;
     }
 
-    public void setKeys(Set<Key> keys) {
-        this.keys = keys;
+    public boolean addKeyCategory(KeyCategory keyCategory) {
+        return keyCategories.add(keyCategory);
+    }
+
+    public boolean addKeyCategories(Set<KeyCategory> keyCategories) {
+        return this.keyCategories.addAll(keyCategories);
+    }
+
+    public boolean removeKeyCategory(KeyCategory keyCategory) {
+        return keyCategories.remove(keyCategory);
+    }
+
+    public boolean removeKeyCategories(Set<KeyCategory> keyCategories) {
+        return this.keyCategories.removeAll(keyCategories);
+    }
+
+    public void removeAllKeyCategories() {
+        keyCategories.clear();
     }
 
     public Set<KeyCategory> getKeyCategories() {
-        return keyCategories;
+        return Sets.newConcurrentHashSet(responsibleKeyCategories);
     }
 
-    public void setKeyCategories(Set<KeyCategory> keyCategories) {
-        this.keyCategories = keyCategories;
+    public boolean addResponsibleKeyCategory(KeyCategory responsibleKeyCategory) {
+        return responsibleKeyCategories.add(responsibleKeyCategory);
+    }
+
+    public boolean addResponsibleKeyCategories(Set<KeyCategory> responsibleKeyCategories) {
+        return this.responsibleKeyCategories.addAll(responsibleKeyCategories);
+    }
+
+    public boolean removeResponsibleKeyCategory(KeyCategory responsibleKeyCategory) {
+        return responsibleKeyCategories.remove(responsibleKeyCategory);
+    }
+
+    public boolean removeResponsibleKeyCategories(Set<KeyCategory> responsibleKeyCategories) {
+        return this.responsibleKeyCategories.removeAll(responsibleKeyCategories);
+    }
+
+    public void removeAllResponsibleKeyCategories() {
+        responsibleKeyCategories.clear();
     }
 
     public Set<KeyCategory> getResponsibleKeyCategories() {
-        return responsibleKeyCategories;
-    }
-
-    public void setResponsibleKeyCategories(Set<KeyCategory> responsibleKeyCategories) {
-        this.responsibleKeyCategories = responsibleKeyCategories;
+        return Sets.newConcurrentHashSet(responsibleKeyCategories);
     }
 
     @Override

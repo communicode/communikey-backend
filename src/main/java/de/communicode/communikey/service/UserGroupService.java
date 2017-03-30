@@ -53,7 +53,7 @@ public class UserGroupService {
     public UserGroup addUser(String userGroupName, String login) {
         return ofNullable(userGroupRepository.findOneByName(userGroupName))
             .map(userGroup -> {
-                if (userGroup.getUsers().add(userService.validate(login))) {
+                if (userGroup.addUser(userService.validate(login))) {
                     userGroupRepository.save(userGroup);
                     log.debug("Added user with login '{}' to user group '{}'", login, userGroup.getName());
                     return userGroup;
@@ -133,7 +133,7 @@ public class UserGroupService {
     public UserGroup removeUser(String userGroupName, String login) {
         return ofNullable(userGroupRepository.findOneByName(userGroupName))
             .map(userGroup -> {
-                if (userGroup.getUsers().remove(userService.validate(login))) {
+                if (userGroup.removeUser(userService.validate(login))) {
                     userGroupRepository.save(userGroup);
                     log.debug("Removed user with login '{}' from user group '{}'", login, userGroup.getName());
                 }
