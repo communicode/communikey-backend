@@ -26,6 +26,7 @@ import de.communicode.communikey.service.KeyCategoryService;
 import de.communicode.communikey.service.KeyService;
 import de.communicode.communikey.service.UserGroupService;
 import de.communicode.communikey.service.UserService;
+import io.codearte.jfairy.Fairy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.experimental.categories.Category;
@@ -78,6 +79,10 @@ public abstract class IntegrationBaseTest {
     protected CommunikeyProperties communikeyProperties;
     @Autowired
     protected TestRestTemplate testRestTemplate;
+
+    protected Fairy fairy;
+
+    protected User user = new User();
     protected String decodedUserPassword = "password";
     protected String userLogin = "user";
     private String userEmail = userLogin + "@communicode.de";
@@ -89,6 +94,7 @@ public abstract class IntegrationBaseTest {
 
     @Before
     public void setup() {
+        fairy = Fairy.create();
         user = userRepository.save(createUser());
         adminUserOAuth2AccessToken = generateUserAccessToken(
                 communikeyProperties.getSecurity().getRoot().getLogin(),
@@ -131,8 +137,8 @@ public abstract class IntegrationBaseTest {
     private User createUser() {
         user.setEmail(userEmail);
         user.setLogin(userLogin);
-        user.setFirstName("first_name");
-        user.setLastName("last_name");
+        user.setFirstName(fairy.person().getFirstName());
+        user.setLastName(fairy.person().getLastName());
         user.setPassword(passwordEncoder.encode(decodedUserPassword));
         user.setActivationKey(SecurityUtils.generateRandomActivationKey());
         user.setActivated(true);
