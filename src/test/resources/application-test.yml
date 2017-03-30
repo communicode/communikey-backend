@@ -17,3 +17,7 @@ spring:
     database: MYSQL
     hibernate:
       ddl-auto: create-drop
+
+server:
+  address: localhost
+  port: 8080
