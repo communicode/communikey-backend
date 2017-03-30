@@ -78,10 +78,11 @@ public abstract class IntegrationBaseTest {
     protected User user = new User();
     protected String decodedUserPassword = "password";
     protected String userLogin = "user";
-    private String userEmail = userLogin + "@communicode.de";
-    protected User user = new User();
+    protected String userEmail = userLogin + "@communicode.de";
+
     protected String userOAuth2AccessToken;
     protected String adminUserOAuth2AccessToken;
+
     @LocalServerPort
     protected int definedServerPort;
 
@@ -89,10 +90,10 @@ public abstract class IntegrationBaseTest {
     public void setup() {
         fairy = Fairy.create();
         user = userRepository.save(createUser());
-        adminUserOAuth2AccessToken = generateUserAccessToken(
+        adminUserOAuth2AccessToken = generateOAuth2ImplicitGrantTypeFlowAccessToken(
                 communikeyProperties.getSecurity().getRoot().getLogin(),
                 communikeyProperties.getSecurity().getRoot().getPassword());
-        userOAuth2AccessToken = generateUserAccessToken(userLogin, decodedUserPassword);
+        userOAuth2AccessToken = generateOAuth2ImplicitGrantTypeFlowAccessToken(userLogin, decodedUserPassword);
     }
 
     @After
@@ -105,7 +106,16 @@ public abstract class IntegrationBaseTest {
         userGroupService.deleteAll();
     }
 
-    private String generateUserAccessToken(String login, String password) {
+    /**
+     * Generates a OAuth2 access token for the user with the specified login- and password using the "implicit" grant type flow.
+     *
+     * @param login the login of the user to generate the OAuth2 access token for
+     * @param password the password of the user
+     * @return the redirect URL which contains the access token as parameter
+     * @see <a href="https://tools.ietf.org/html/rfc6749#section-1.3.2"></a>RFC6749 - The OAuth 2.0 Authorization Framework</a>
+     * @see <a href="http://oauthlib.readthedocs.io/en/latest/oauth2/grants/implicit.html"></a>oauthlib - Read The Docs</a>
+     */
+    protected String generateOAuth2ImplicitGrantTypeFlowAccessToken(String login, String password) {
         StringBuilder requestUrlBuilder = new StringBuilder();
         Map<String, String> oAuth2TokenRequestParam = new HashMap<>();
         testRestTemplate = new TestRestTemplate(login, password);
@@ -121,7 +131,7 @@ public abstract class IntegrationBaseTest {
                         .append(Joiner.on("&").withKeyValueSeparator("=").join(oAuth2TokenRequestParam)).toString(),
                 String.class
         );
-        return extractOAuth2AccessToken(oAuth2AccessTokenResponse);
+        return extractOAuth2AccessTokenFromRedirectUrl(oAuth2AccessTokenResponse.getHeaders().getLocation().toString());
     }
 
     private User createUser() {
@@ -139,14 +149,14 @@ public abstract class IntegrationBaseTest {
     }
 
     /**
-     * Extracts the OAuth2 access token from the response entity location header.
+     * Extracts the OAuth2 access token from a response entity location header redirect URL.
      *
-     * @param responseEntity the response entity to extract the access token from
+     * @param redirectUrl the URL to extract the access token from
      * @return the extracted OAuth2 access token
      * @throws NullPointerException if the response entity location header is null
      */
-    private String extractOAuth2AccessToken(final ResponseEntity responseEntity) {
-        final String redirectUrl = requireNonNull(responseEntity.getHeaders().getLocation().toString(), "redirectUrl must not be null!");
+    private String extractOAuth2AccessTokenFromRedirectUrl(final String redirectUrl) {
+        requireNonNull(redirectUrl, "redirectUrl must not be null!");
         String keyName = OAuth2AccessToken.ACCESS_TOKEN + "=";
 
         final int keyIdx = redirectUrl.indexOf(keyName);
