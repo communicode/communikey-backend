@@ -12,7 +12,7 @@ package de.communicode.communikey.controller;
  * @author sgreb@communicode.de
  * @since 0.3.0
  */
-public class RequestParameter {
+public final class RequestParameter {
 
     /**
      * The request parameter for the {@value RequestMappings#API} endpoint to get the privilege status of the current user.
