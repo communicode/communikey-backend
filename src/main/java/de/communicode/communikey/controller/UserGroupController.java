@@ -103,8 +103,7 @@ public class UserGroupController {
 
     /**
      * Deletes all user groups.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}".
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}".
      *
      * @return a empty response entity
      * @since 0.3.0
