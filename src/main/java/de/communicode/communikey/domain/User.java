@@ -275,7 +275,7 @@ public class User extends AbstractEntity implements Serializable {
     }
 
     public Set<Key> getKeys() {
-        return keys;
+        return Sets.newConcurrentHashSet(keys);
     }
 
     public boolean addKeyCategory(KeyCategory keyCategory) {
