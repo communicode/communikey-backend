@@ -26,8 +26,7 @@ import java.util.Map;
 
 /**
  * The REST API controller to provide information about the communikey API.
- * <p>
- * Mapped to the "{@value RequestMappings#API}" endpoint.
+ * <p>Mapped to the "{@value RequestMappings#API}" endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.3.0
@@ -44,6 +43,7 @@ public class ApiController {
      * <p>Required parameter:
      * <ul>
      *     <li>{@value RequestParameter#API_VERSION}</li>
+     * </ul>
      *
      * @param version the request parameter to get the version
      * @return the version of the communikey REST API as response entity
@@ -61,6 +61,7 @@ public class ApiController {
      * <p>Required parameter:
      * <ul>
      *     <li>{@value RequestParameter#API_PRIVILEGED}</li>
+     * </ul>
      *
      * @param privileged the request parameter to get the privilege status
      * @return {@code true} if the current user is privileged, {@code false} otherwise
