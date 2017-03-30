@@ -7,7 +7,6 @@
 package de.communicode.communikey;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.ofNullable;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
@@ -15,9 +14,6 @@ import de.communicode.communikey.config.CommunikeyProperties;
 import de.communicode.communikey.config.SecurityConfig;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.User;
-import de.communicode.communikey.exception.UserNotFoundException;
-import de.communicode.communikey.repository.AuthorityRepository;
-import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
@@ -39,7 +35,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.util.OAuth2Utils;
-import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -74,8 +69,6 @@ public abstract class IntegrationBaseTest {
     @Autowired
     protected AuthorityService authorityService;
     @Autowired
-    protected JdbcTokenStore jdbcTokenStore;
-    @Autowired
     protected CommunikeyProperties communikeyProperties;
     @Autowired
     protected TestRestTemplate testRestTemplate;
@@ -106,10 +99,7 @@ public abstract class IntegrationBaseTest {
     public void cleanUp() {
         userRepository.findAll().stream()
                 .filter(testUser -> !testUser.getLogin().equals(communikeyProperties.getSecurity().getRoot().getLogin()))
-                .forEach(nonRootUser -> {
-                    jdbcTokenStore.findTokensByUserName(nonRootUser.getLogin()).forEach(accessToken -> jdbcTokenStore.removeAccessToken(accessToken));
-                    userService.delete(nonRootUser.getLogin());
-                });
+                .forEach(nonRootUser -> userService.delete(nonRootUser.getLogin()));
         keyCategoryService.deleteAll();
         keyService.deleteAll();
         userGroupService.deleteAll();
