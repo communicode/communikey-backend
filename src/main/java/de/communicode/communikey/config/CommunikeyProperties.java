@@ -18,8 +18,8 @@ import javax.validation.constraints.Size;
 
 /**
  * communikey (default) configuration properties.
- * <p>
- * Values can be overridden in the {@code application.yml} file.
+ *
+ * <p>Values can be overridden in the {@code application.yml} file.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0

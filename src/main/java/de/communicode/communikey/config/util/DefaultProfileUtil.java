@@ -15,8 +15,8 @@ import java.util.Map;
 /**
  * Utility class to load a Spring profile to be used as default when the {@code spring.profiles.active} is not set in the environment or as command line
  * argument.
- * <p>
- * If the value is not available in {@code application.yml} then the {@code dev} profile will be used as default.
+ *
+ * <p>If the value is not available in {@code application.yml} then the {@code dev} profile will be used as default.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0

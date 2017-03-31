@@ -33,8 +33,8 @@ import java.util.Set;
 
 /**
  * The REST API controller to process {@link Key}s.
- * <p>
- * Mapped to the "{@value RequestMappings#KEYS}" endpoint.
+ *
+ * <p>Mapped to the "{@value RequestMappings#KEYS}" endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
@@ -51,8 +51,8 @@ public class KeyController {
 
     /**
      * Creates a new key with the specified payload.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
      *
      * @param payload the key request payload
      * @return the key as response entity
@@ -66,8 +66,8 @@ public class KeyController {
 
     /**
      * Deletes the key with the specified ID.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
      *
      * @param keyId the ID of the key to delete
      * @return a empty response entity
@@ -82,8 +82,8 @@ public class KeyController {
 
     /**
      * Deletes all keys.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}".
      *
      * @return a empty response entity
      * @since 0.2.0
@@ -97,8 +97,8 @@ public class KeyController {
 
     /**
      * Gets the key with the specified ID.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
      *
      * @param keyId the ID of the key entity to get
      * @return the key as response entity
@@ -111,8 +111,8 @@ public class KeyController {
 
     /**
      * Gets all keys.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}".
      *
      * @return a collection of keys as response entity
      */
@@ -124,8 +124,8 @@ public class KeyController {
 
     /**
      * Updates a key with the specified payload.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
      *
      * @param keyId the ID of the key entity to update
      * @param payload the key request payload to update the key entity with

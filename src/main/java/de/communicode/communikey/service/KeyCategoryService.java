@@ -195,8 +195,8 @@ public class KeyCategoryService {
 
     /**
      * Deletes the key category with the specified ID.
-     * <p>
-     *     <strong>This is a recursive operation that deletes all children key categories!</strong>
+     *
+     * <p><strong>This is a recursive operation that deletes all children key categories!</strong>
      *
      * @param keyCategoryId the ID of the key category to delete
      * @throws KeyCategoryNotFoundException if the key category with the specified ID has been found
@@ -228,11 +228,9 @@ public class KeyCategoryService {
 
     /**
      * Gets all key category entities the current user is authorized to receive.
-     * <p>
-     *     If a key category is already included as direct- or indirect child of another key category, only the parent key category should be added to the
-     *     return collection.
-     * <p>
-     *     Example of a collection with multiple indirect key category children references:
+     * <p>If a key category is already included as direct- or indirect child of another key category, only the parent key category should be added to the return
+     * collection.
+     * <p>Example of a collection with multiple indirect key category children references:
      * <pre>
      *     |-- category1
      *     |   |-- category2
