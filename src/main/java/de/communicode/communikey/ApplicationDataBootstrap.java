@@ -74,11 +74,11 @@ public class ApplicationDataBootstrap {
     }
 
     private void initializeUser() {
-        if (Objects.isNull(userRepository.findOneByLogin(communikeyProperties.getSecurity().getRoot().getLogin()))) {
-            rootUser.setEmail(communikeyProperties.getSecurity().getRoot().getEmail());
-            rootUser.setLogin(communikeyProperties.getSecurity().getRoot().getLogin());
-            rootUser.setFirstName(communikeyProperties.getSecurity().getRoot().getFirstName());
-            rootUser.setPassword(passwordEncoder.encode(communikeyProperties.getSecurity().getRoot().getPassword()));
+        if (Objects.isNull(userRepository.findOneByLogin(communikeyProperties.getSecurity().getRoot().getRootLogin()))) {
+            rootUser.setEmail(communikeyProperties.getSecurity().getRoot().getRootEmail());
+            rootUser.setLogin(communikeyProperties.getSecurity().getRoot().getRootLogin());
+            rootUser.setFirstName(communikeyProperties.getSecurity().getRoot().getRootFirstName());
+            rootUser.setPassword(passwordEncoder.encode(communikeyProperties.getSecurity().getRoot().getRootPassword()));
             rootUser.setActivationKey(SecurityUtils.generateRandomActivationKey());
             rootUser.setActivated(true);
             Set<Authority> authorities = Sets.newConcurrentHashSet();

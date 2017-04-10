@@ -91,43 +91,43 @@ public final class CommunikeyProperties {
             @Size(max = 50)
             private String lastName;
 
-            public String getLogin() {
+            public String getRootLogin() {
                 return login;
             }
 
-            public void setLogin(String login) {
+            public void setRootLogin(String login) {
                 this.login = login;
             }
 
-            public String getEmail() {
+            public String getRootEmail() {
                 return email;
             }
 
-            public void setEmail(String email) {
+            public void setRootEmail(String email) {
                 this.email = email;
             }
 
-            public String getPassword() {
+            public String getRootPassword() {
                 return password;
             }
 
-            public void setPassword(String password) {
+            public void setRootPassword(String password) {
                 this.password = password;
             }
 
-            public String getFirstName() {
+            public String getRootFirstName() {
                 return firstName;
             }
 
-            public void setFirstName(String firstName) {
+            public void setRootFirstName(String firstName) {
                 this.firstName = firstName;
             }
 
-            public String getLastName() {
+            public String getRootLastName() {
                 return lastName;
             }
 
-            public void setLastName(String lastName) {
+            public void setRootLastName(String lastName) {
                 this.lastName = lastName;
             }
 
