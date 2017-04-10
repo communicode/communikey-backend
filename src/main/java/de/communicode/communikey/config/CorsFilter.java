@@ -22,16 +22,18 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CORSFilter implements Filter {
+public class CorsFilter implements Filter {
 
     private static final Logger log = LogManager.getLogger();
 
-    public CORSFilter() {
+    public CorsFilter() {
         log.debug("Initialize CORS filter");
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // No configuration necessary
+    }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -50,5 +52,7 @@ public class CORSFilter implements Filter {
     }
 
     @Override
-    public void destroy() {}
+    public void destroy() {
+        // Handled by Spring
+    }
 }
