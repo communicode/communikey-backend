@@ -75,16 +75,15 @@ public class ApplicationDataBootstrap {
 
     private void initializeUser() {
         if (Objects.isNull(userRepository.findOneByLogin(communikeyProperties.getSecurity().getRoot().getLogin()))) {
-            Set<Authority> authorities = Sets.newConcurrentHashSet();
-            Authority authorityAdmin = authorityRepository.findOne(AuthoritiesConstants.ADMIN);
-            Authority authorityUser = authorityRepository.findOne(AuthoritiesConstants.USER);
-
             rootUser.setEmail(communikeyProperties.getSecurity().getRoot().getEmail());
             rootUser.setLogin(communikeyProperties.getSecurity().getRoot().getLogin());
             rootUser.setFirstName(communikeyProperties.getSecurity().getRoot().getFirstName());
             rootUser.setPassword(passwordEncoder.encode(communikeyProperties.getSecurity().getRoot().getPassword()));
             rootUser.setActivationKey(SecurityUtils.generateRandomActivationKey());
             rootUser.setActivated(true);
+            Set<Authority> authorities = Sets.newConcurrentHashSet();
+            Authority authorityAdmin = authorityRepository.findOne(AuthoritiesConstants.ADMIN);
+            Authority authorityUser = authorityRepository.findOne(AuthoritiesConstants.USER);
             authorities.add(authorityAdmin);
             authorities.add(authorityUser);
             rootUser.addAuthorities(authorities);
