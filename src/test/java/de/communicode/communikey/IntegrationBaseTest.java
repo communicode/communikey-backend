@@ -144,7 +144,7 @@ public abstract class IntegrationBaseTest {
         user.setActivated(true);
         Set<Authority> authorities = Sets.newConcurrentHashSet();
         authorities.add(authorityService.get(AuthoritiesConstants.USER));
-        user.setAuthorities(authorities);
+        user.addAuthorities(authorities);
         return user;
     }
 
