@@ -27,10 +27,6 @@ public class UserPasswordResetPayload {
     @Size(max = 20)
     private String resetKey;
 
-    public UserPasswordResetPayload() {
-        // Prevent instantiation
-    }
-
     public String getPassword() {
         return password;
     }
