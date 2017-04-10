@@ -120,6 +120,7 @@ public class KeyCategoryController {
      * Deletes the key category with the specified ID.
      *
      * <p><strong>This is a recursive action that deletes all children key categories!</strong>
+     *
      * <p>This endpoint is mapped to {@value RequestMappings#KEYS}{@value RequestMappings#KEY_CATEGORIES_ID}.
      *
      * @param keyCategoryId the ID of the key category to delete

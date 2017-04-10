@@ -67,6 +67,7 @@ public class UserController {
      * Activates the user with the specified activation key.
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_ACTIVATE}".
+     *
      * <p>Required parameter:
      * <ul>
      *   <li>{@value PathVariables#USER_ACTIVATION_KEY}</li>
@@ -86,6 +87,7 @@ public class UserController {
      * Deactivates the user with the specified login.
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_DEACTIVATE}".
+     *
      * <p>Required parameter:
      * <ul>
      *   <li>{@value RequestMappings#USERS_LOGIN}</li>
@@ -158,6 +160,7 @@ public class UserController {
     /**
      * Gets a random generated user password reset key for the specified email.
      * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_PASSWORD_RESET}".
+     *
      * <p>Required parameter:
      * <ul>
      *   <li>{@code email}</li>

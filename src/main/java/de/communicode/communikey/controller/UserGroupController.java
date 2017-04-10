@@ -56,6 +56,7 @@ public class UserGroupController {
      * Adds a user to a user group.
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}{@value RequestMappings#USER_GROUPS_USERS}".
+     *
      * <p>Required parameter:
      * <ul>
      *   <li>{@value PathVariables#USER_LOGIN}</li>
@@ -103,6 +104,7 @@ public class UserGroupController {
 
     /**
      * Deletes all user groups.
+     *
      * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}".
      *
      * @return a empty response entity
@@ -144,6 +146,7 @@ public class UserGroupController {
      * Removes a user from a user group.
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_USERS}".
+     *
      * <p>Required parameter:
      * <ul>
      *   <li>{@value PathVariables#USER_LOGIN}</li>

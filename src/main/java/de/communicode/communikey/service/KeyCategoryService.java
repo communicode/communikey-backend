@@ -228,8 +228,10 @@ public class KeyCategoryService {
 
     /**
      * Gets all key category entities the current user is authorized to receive.
+     *
      * <p>If a key category is already included as direct- or indirect child of another key category, only the parent key category should be added to the return
      * collection.
+     *
      * <p>Example of a collection with multiple indirect key category children references:
      * <pre>
      *     |-- category1
