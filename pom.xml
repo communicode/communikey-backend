@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-        xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>de.communicode</groupId>
-    <artifactId>communikey</artifactId>
-    <version>0.1.0</version>
-    <packaging>jar</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -16,6 +9,11 @@
         <version>1.4.4.RELEASE</version>
         <relativePath/>
     </parent>
+
+    <groupId>de.communicode</groupId>
+    <artifactId>communikey</artifactId>
+    <version>0.1.0</version>
+    <packaging>jar</packaging>
 
     <name>communikey</name>
     <description>A simple centralized, cross-platform credential manager.</description>
@@ -36,6 +34,13 @@
         </developer>
     </developers>
 
+    <scm>
+        <connection>scm:git:ssh://git@bitbucket.communicode.de:7999/cckey/main.git</connection>
+        <developerConnection>scm:git:ssh://git@bitbucket.communicode.de:7999/cckey/main.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://bitbucket.communicode.de/projects/CCKEY/repos/main</url>
+    </scm>
+
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -44,13 +49,6 @@
         <hikaricp.version>2.4.6</hikaricp.version>
         <hibernate-envers.version>5.2.4.Final</hibernate-envers.version>
     </properties>
-
-    <scm>
-        <connection>scm:git:ssh://git@bitbucket.communicode.de:7999/cckey/main.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.communicode.de:7999/cckey/main.git</developerConnection>
-        <tag>HEAD</tag>
-        <url>https://bitbucket.communicode.de/projects/CCKEY/repos/main</url>
-    </scm>
 
     <dependencies>
         <dependency>
