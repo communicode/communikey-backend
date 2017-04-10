@@ -53,7 +53,7 @@ public class UserService {
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public final JdbcTokenStore jdbcTokenStore;
+    private final JdbcTokenStore jdbcTokenStore;
 
     @Autowired
     public UserService(UserRepository userRepository, AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder, JdbcTokenStore jdbcTokenStore) {
@@ -91,7 +91,7 @@ public class UserService {
      */
     public User addKey(String userLogin, Key key) {
         User user = validate(userLogin);
-        user.getKeys().add(key);
+        user.addCreatedKey(key);
         return userRepository.save(user);
     }
 
@@ -103,21 +103,21 @@ public class UserService {
      * @throws UserConflictException if a user with the specified email already exists
      */
     public User create(UserPayload payload) throws UserConflictException {
-        validateUniqueEmail(payload.getEmail());
+        String email = payload.getEmail();
+        validateUniqueEmail(email);
 
         User user = new User();
-        Set<Authority> authorities = Sets.newConcurrentHashSet();
-        Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
-
-        user.setEmail(payload.getEmail().toLowerCase(Locale.ENGLISH));
+        user.setEmail(email.toLowerCase(Locale.ENGLISH));
         user.setLogin(extractLoginFromEmail(payload.getEmail()));
         user.setFirstName(payload.getFirstName());
         user.setLastName(payload.getLastName());
         user.setPassword(passwordEncoder.encode(payload.getPassword()));
         user.setActivationKey(SecurityUtils.generateRandomActivationKey());
         user.setActivated(true);
+        Set<Authority> authorities = Sets.newConcurrentHashSet();
+        Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
         authorities.add(authority);
-        user.setAuthorities(authorities);
+        user.addAuthorities(authorities);
 
         userRepository.save(user);
         log.debug("Created new user: {}", user);
@@ -206,7 +206,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getWithAuthorities() {
-        return Optional.ofNullable(userRepository.findOneWithAuthoritiesByEmail(SecurityUtils.getCurrentUserLogin())).orElse(null);
+        return ofNullable(userRepository.findOneWithAuthoritiesByEmail(SecurityUtils.getCurrentUserLogin())).orElse(null);
     }
 
     /**
@@ -237,12 +237,13 @@ public class UserService {
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
     public User update(String login, UserPayload payload) throws UserNotFoundException {
-        validateUniqueEmail(payload.getEmail());
+        String email = payload.getEmail();
+        validateUniqueEmail(email);
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
-                if (!user.getEmail().equals(payload.getEmail())) {
-                    user.setEmail(payload.getEmail());
-                    user.setLogin(extractLoginFromEmail(payload.getEmail()));
+                if (!user.getEmail().equals(email)) {
+                    user.setEmail(email);
+                    user.setLogin(extractLoginFromEmail(email));
                     deactivate(login);
                     deleteOauth2AccessTokens(login);
                 }
@@ -271,10 +272,10 @@ public class UserService {
                     .map(authorityRepository::findOne)
                     .collect(Collectors.toSet());
                 if (!payloadAuthorities.equals(user.getAuthorities())) {
-                    user.getAuthorities().clear();
+                    user.removeAllAuthorities();
                     payload.stream()
                         .map(authorityRepository::findOne)
-                        .forEach(authority -> user.getAuthorities().add(authority));
+                        .forEach(user::addAuthority);
                 }
                 deleteOauth2AccessTokens(login);
                 userRepository.save(user);
@@ -335,7 +336,7 @@ public class UserService {
      * @throws UserConflictException if the specified email is not unique
      */
     private void validateUniqueEmail(String email) throws UserConflictException {
-        if (Optional.ofNullable(userRepository.findOneByEmail(email)).isPresent()) {
+        if (ofNullable(userRepository.findOneByEmail(email)).isPresent()) {
             throw new UserConflictException("email '" + email + "' already exists");
         }
     }

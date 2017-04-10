@@ -40,8 +40,8 @@ import java.util.Set;
 
 /**
  * The REST API controller to process {@link KeyCategory} entities.
- * <p>
- * Mapped to the "{@value RequestMappings#KEY_CATEGORIES}" endpoint.
+ *
+ * <p>Mapped to the "{@value RequestMappings#KEY_CATEGORIES}" endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -59,8 +59,8 @@ public class KeyCategoryController {
 
     /**
      * Adds a key category as child to a parent key category with the specified ID.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_CHILDREN}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_CHILDREN}".
      *
      * @param keyCategoryId the ID of the parent key category to add the child to
      * @param childKeyCategoryId the ID of the child key category to be added
@@ -74,8 +74,8 @@ public class KeyCategoryController {
 
     /**
      * Adds a user group to a key category with the specified ID.
-     * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_GROUPS}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_GROUPS}".
      *
      * @param keyCategoryId the ID of the parent key category to add the child to
      * @param userGroupName the name of the user group to be added
@@ -89,8 +89,8 @@ public class KeyCategoryController {
 
     /**
      * Adds the key to the key category with the specified ID.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_KEYS}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_KEYS}".
      *
      * @param keyCategoryId the ID of the key category to add the key to
      * @param keyId the ID of the key to be added
@@ -104,8 +104,8 @@ public class KeyCategoryController {
 
     /**
      * Creates a new key category without a parent key category.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}".
      *
      * @param payload the payload for the new key category
      * @return the key category as response entity
@@ -118,10 +118,10 @@ public class KeyCategoryController {
 
     /**
      * Deletes the key category with the specified ID.
-     * <p>
-     * <strong>This is a recursive action that deletes all children key categories!</strong>
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEY_CATEGORIES_ID}".
+     *
+     * <p><strong>This is a recursive action that deletes all children key categories!</strong>
+     *
+     * <p>This endpoint is mapped to {@value RequestMappings#KEYS}{@value RequestMappings#KEY_CATEGORIES_ID}.
      *
      * @param keyCategoryId the ID of the key category to delete
      * @return a empty response entity
@@ -135,8 +135,8 @@ public class KeyCategoryController {
 
     /**
      * Deletes all key categories.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}".
      *
      * @return a empty response entity
      */
@@ -149,8 +149,8 @@ public class KeyCategoryController {
 
     /**
      * Gets the {@link KeyCategory} entity with the specified ID.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORIES_ID}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORIES_ID}".
      *
      * @param keyCategoryId the ID of the key category entity to get
      * @return the key category entity
@@ -164,8 +164,8 @@ public class KeyCategoryController {
 
     /**
      * Gets all key category entities.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}".
      *
      * @return a collection of key categories
      */
@@ -175,9 +175,39 @@ public class KeyCategoryController {
     }
 
     /**
+     * Removes a user group from the key category with the specified ID.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_GROUPS}".
+     *
+     * @param keyCategoryId the ID of the key category to remove the user group from
+     * @param userGroupName the name of the user group to be removed from the key category
+     * @return the updated key category as response entity
+     */
+    @DeleteMapping(value = KEY_CATEGORY_GROUPS)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<KeyCategory> removeUserGroup(@PathVariable Long keyCategoryId, @RequestParam String userGroupName) {
+        return new ResponseEntity<>(keyCategoryService.removeUserGroup(keyCategoryId, userGroupName), HttpStatus.OK);
+    }
+
+    /**
+     * Removes the key from the key category with the specified ID.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_KEYS}".
+     *
+     * @param keyCategoryId the ID of the key category the key will be deleted from
+     * @param keyId the ID of the key to be deleted
+     * @return the updated key category as response entity
+     */
+    @DeleteMapping(value = KEY_CATEGORY_KEYS)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<KeyCategory> removeKey(@PathVariable Long keyCategoryId, @RequestParam Long keyId) {
+        return new ResponseEntity<>(keyCategoryService.removeKey(keyCategoryId, keyId), HttpStatus.OK);
+    }
+
+    /**
      * Sets the responsible user for the key category with the specified ID.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_RESPONSIBLE}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_RESPONSIBLE}".
      *
      * @param keyCategoryId the ID of the key category to set the responsible user of
      * @param userLogin the login of the user to be set as the responsible of the key category

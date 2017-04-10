@@ -22,16 +22,13 @@ import org.springframework.core.env.Environment;
 
 import javax.annotation.PostConstruct;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
 
 /**
  * A simple centralized, cross-platform credential manager.
  *
- * <p>
- * This is the application boot class.
+ * <p>This is the application boot class.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
@@ -43,6 +40,7 @@ public class CommunikeyApplication {
     private static final Logger log = LogManager.getLogger();
 
     private final Environment env;
+    public static final String COMMUNIKEY_REST_API_VERSION = "0.2.0";
 
     @Autowired
     public CommunikeyApplication(Environment env) {
@@ -64,9 +62,8 @@ public class CommunikeyApplication {
      * Runs the application.
      *
      * @param args the command line arguments
-     * @throws UnknownHostException if the local host name could not be resolved into an address
      */
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) {
         SpringApplication app = new SpringApplication(CommunikeyApplication.class);
         DefaultProfileUtil.addDefaultProfile(app);
         Environment env = app.run(args).getEnvironment();

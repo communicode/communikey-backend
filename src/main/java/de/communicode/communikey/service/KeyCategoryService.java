@@ -78,10 +78,6 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if a key category with specified ID has not been found
      */
     public KeyCategory addChild(Long parentKeyCategoryId, Long childKeyCategoryId) throws KeyCategoryNotFoundException {
-        KeyCategory parent = validate(parentKeyCategoryId);
-        KeyCategory child = validate(childKeyCategoryId);
-        validateUniqueKeyCategoryName(child.getName(), parentKeyCategoryId);
-
         if (Objects.equals(parentKeyCategoryId, childKeyCategoryId)) {
             throw new KeyCategoryConflictException(
                 "parent key category ID '" + parentKeyCategoryId + "' equals child key category ID '" + childKeyCategoryId + "'");
@@ -90,7 +86,10 @@ public class KeyCategoryService {
             throw new KeyCategoryConflictException("key category with ID '" + parentKeyCategoryId + "' can not be set as own child reference");
         }
 
-        if (parent.getChildren().add(child)) {
+        KeyCategory child = this.validate(childKeyCategoryId);
+        validateUniqueKeyCategoryName(child.getName(), parentKeyCategoryId);
+        KeyCategory parent = validate(parentKeyCategoryId);
+        if (parent.addChild(child)) {
             ofNullable(child.getParent()).ifPresent(directParent -> {
                 keyCategoryChildrenMap.getMap().get(directParent.getId()).remove(childKeyCategoryId);
                 keyCategoryParentMap.getMap().get(directParent.getId())
@@ -107,7 +106,6 @@ public class KeyCategoryService {
             });
 
             child.setParent(parent);
-            KeyCategory persistedKeyCategory = keyCategoryRepository.save(parent);
             log.debug("Added key category with ID '{}' as child to key category with ID '{}'", child.getId(), parent.getId());
 
             keyCategoryChildrenMap.getMap().get(parentKeyCategoryId).add(childKeyCategoryId);
@@ -118,7 +116,7 @@ public class KeyCategoryService {
                 .forEach(childId -> keyCategoryParentMap.getMap().get(childId).addAll(keyCategoryParentMap.getMap().get(childKeyCategoryId)));
             keyCategoryParentMap.getMap().get(childKeyCategoryId)
                 .forEach(parentId -> keyCategoryChildrenMap.getMap().get(parentId).addAll(keyCategoryChildrenMap.getMap().get(parentKeyCategoryId)));
-            return persistedKeyCategory;
+            return keyCategoryRepository.save(parent);
         }
         return parent;
     }
@@ -136,8 +134,8 @@ public class KeyCategoryService {
         KeyCategory keyCategory = validate(keyCategoryId);
         UserGroup userGroup = userGroupService.validate(userGroupName);
 
-        if (keyCategory.getGroups().add(userGroup)) {
-            userGroup.getCategories().add(keyCategory);
+        if (keyCategory.addGroup(userGroup)) {
+            userGroup.addCategory(keyCategory);
             userGroupRepository.save(userGroup);
             log.debug("Added user group '{}' to key category with ID '{}'", userGroupName, keyCategoryId);
             return keyCategoryRepository.save(keyCategory);
@@ -159,7 +157,7 @@ public class KeyCategoryService {
         Key key = keyService.validate(keyId);
         key.setCategory(keyCategory);
         key = keyRepository.save(key);
-        keyCategory.getKeys().add(key);
+        keyCategory.addKey(key);
         keyCategory = keyCategoryRepository.save(keyCategory);
         log.debug("Added key with ID '{}' to key category with ID '{}'", keyId, keyCategoryId);
         return keyCategory;
@@ -174,18 +172,19 @@ public class KeyCategoryService {
      * @throws UserNotFoundException if the user with the specified ID has not been found
      */
     public KeyCategory create(KeyCategoryPayload payload) throws KeyCategoryNotFoundException, UserNotFoundException {
-        validateUniqueKeyCategoryName(payload.getName(), null);
+        String name = payload.getName();
+        validateUniqueKeyCategoryName(name, null);
 
         KeyCategory keyCategory = new KeyCategory();
         User user = userService.validate(SecurityUtils.getCurrentUserLogin());
 
-        keyCategory.setName(payload.getName());
-        keyCategory.setCreator(userService.validate(SecurityUtils.getCurrentUserLogin()));
+        keyCategory.setName(name);
+        keyCategory.setCreator(user);
         keyCategory = keyCategoryRepository.save(keyCategory);
         setResponsibleUser(keyCategory.getId(), user.getLogin());
 
 
-        user.getResponsibleKeyCategories().add(keyCategory);
+        user.addResponsibleKeyCategory(keyCategory);
         userRepository.save(user);
         keyCategoryChildrenMap.getMap().put(keyCategory.getId(), Sets.newConcurrentHashSet());
         keyCategoryParentMap.getMap().put(keyCategory.getId(), Sets.newConcurrentHashSet());
@@ -195,8 +194,8 @@ public class KeyCategoryService {
 
     /**
      * Deletes the key category with the specified ID.
-     * <p>
-     *     <strong>This is a recursive operation that deletes all children key categories!</strong>
+     *
+     * <p><strong>This is a recursive operation that deletes all children key categories!</strong>
      *
      * @param keyCategoryId the ID of the key category to delete
      * @throws KeyCategoryNotFoundException if the key category with the specified ID has been found
@@ -228,11 +227,11 @@ public class KeyCategoryService {
 
     /**
      * Gets all key category entities the current user is authorized to receive.
-     * <p>
-     *     If a key category is already included as direct- or indirect child of another key category, only the parent key category should be added to the
-     *     return collection.
-     * <p>
-     *     Example of a collection with multiple indirect key category children references:
+     *
+     * <p>If a key category is already included as direct- or indirect child of another key category, only the parent key category should be added to the return
+     * collection.
+     *
+     * <p>Example of a collection with multiple indirect key category children references:
      * <pre>
      *     |-- category1
      *     |   |-- category2
@@ -248,7 +247,7 @@ public class KeyCategoryService {
      *     |-- category6
      * </pre>
      *
-     * This will be reduced to contain no more duplicated key categories:
+     * <p>This will be reduced to contain no more duplicated key categories:
      * <pre>
      *     |-- category1
      *     |   |-- category2
@@ -288,6 +287,49 @@ public class KeyCategoryService {
     }
 
     /**
+     * Removes a user group from the key category with the specified ID.
+     *
+     * @param keyCategoryId the ID of the key category to remove the user group from
+     * @param userGroupName the name of the user group to be removed from the key category
+     * @return the updated key category
+     * @throws KeyCategoryNotFoundException if the key category with specified ID has not been found
+     * @throws UserGroupNotFoundException if the user group with specified name has not been found
+     */
+    public KeyCategory removeUserGroup(Long keyCategoryId, String userGroupName) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
+        KeyCategory keyCategory = validate(keyCategoryId);
+        UserGroup userGroup = userGroupService.validate(userGroupName);
+
+        if (keyCategory.removeGroup(userGroup)) {
+            userGroup.removeCategory(keyCategory);
+            userGroupRepository.save(userGroup);
+            log.debug("Removed user group with name '{}' from key category with ID '{}'", userGroupName, keyCategoryId);
+            return keyCategoryRepository.save(keyCategory);
+        }
+        return keyCategory;
+    }
+
+    /**
+     * Removes the key from the key category with the specified ID.
+     *
+     * @param keyCategoryId the ID of the key category the key will be deleted from
+     * @param keyId the ID of the key to be deleted
+     * @return the updated key category
+     * @throws KeyCategoryNotFoundException if the key category with the specified ID has not been found
+     * @throws KeyNotFoundException if the key with the specified ID has not been found
+     */
+    public KeyCategory removeKey(Long keyCategoryId, Long keyId) {
+        KeyCategory keyCategory = validate(keyCategoryId);
+        Key key = keyService.validate(keyId);
+
+        key.setCategory(null);
+        key = keyRepository.save(key);
+        keyCategory.removeKey(key);
+        keyCategory = keyCategoryRepository.save(keyCategory);
+        log.debug("Removed key with ID '{}' from key category with ID '{}'", keyId, keyCategoryId);
+        return keyCategory;
+    }
+
+    /**
      * Sets the responsible user for the key category with the specified ID.
      *
      * @param keyCategoryId the ID of the key category to set the responsible user of
@@ -303,7 +345,7 @@ public class KeyCategoryService {
         keyCategory.setResponsible(user);
         keyCategory = keyCategoryRepository.save(keyCategory);
 
-        user.getResponsibleKeyCategories().add(keyCategory);
+        user.addResponsibleKeyCategory(keyCategory);
         userRepository.save(user);
         return keyCategory;
     }
@@ -356,12 +398,12 @@ public class KeyCategoryService {
                 });
         keyCategory.getGroups()
                 .forEach(userGroup -> {
-                    userGroup.getCategories().remove(keyCategory);
+                    userGroup.removeCategory(keyCategory);
                     userGroupRepository.save(userGroup);
                     log.debug("Removed key category with ID '{}' from user group with name '{}'", keyCategory.getId(), userGroup.getName());
                 });
         keyCategory.setParent(null);
-        keyCategory.getChildren().clear();
+        keyCategory.removeAllChildren();
         return keyCategoryRepository.save(keyCategory);
     }
 

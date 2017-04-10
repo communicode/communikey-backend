@@ -26,6 +26,7 @@ public interface KeyCategoryRepository extends CrudRepository<KeyCategory, Long>
      *
      * @return a collection of found key category entities
      */
+    @Override
     Set<KeyCategory> findAll();
 
     /**

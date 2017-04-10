@@ -11,6 +11,7 @@ import static java.util.Optional.ofNullable;
 
 import com.google.common.collect.Sets;
 import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.User;
 import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.exception.KeyNotFoundException;
@@ -48,11 +49,13 @@ public class KeyService {
      */
     public Key create(KeyPayload payload) {
         Key key = new Key();
+        String userLogin = SecurityUtils.getCurrentUserLogin();
+        User user = userService.validate(userLogin);
+        key.setCreator(user);
         key.setName(payload.getName());
         key.setPassword(payload.getPassword());
-        key.setCreator(userService.validate(SecurityUtils.getCurrentUserLogin()));
         key = keyRepository.save(key);
-        userService.addKey(SecurityUtils.getCurrentUserLogin(), key);
+        userService.addKey(userLogin, key);
         log.debug("Created new key with ID '{}'", key.getId());
         return key;
     }

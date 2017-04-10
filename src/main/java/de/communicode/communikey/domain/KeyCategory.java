@@ -38,27 +38,29 @@ import java.util.Set;
 @Table(name = "key_categories")
 public class KeyCategory extends AbstractEntity implements Serializable {
 
+    private static final long serialVersionUID = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     @Column(length = 100, nullable = false)
+    @NotBlank
     private String name;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "category")
     @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "creator", "category"})
-    private Set<Key> keys = Sets.newConcurrentHashSet();
+    private final Set<Key> keys = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn
     @JsonIgnoreProperties(value = {"groups", "children", "keys"})
-    private KeyCategory parent = null;
+    private KeyCategory parent;
 
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "parent")
     @JsonIgnoreProperties(value = {"groups", "parent"})
-    private Set<KeyCategory> children = Sets.newConcurrentHashSet();
+    private final Set<KeyCategory> children = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn(name = "creator_user_id", nullable = false)
@@ -73,7 +75,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         joinColumns = {@JoinColumn(name = "key_category_id", referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(name = "user_group_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"categories", "users"})
-    private Set<UserGroup> groups = Sets.newConcurrentHashSet();
+    private final Set<UserGroup> groups = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn(name = "responsible_user_id")
@@ -98,12 +100,28 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         this.name = name;
     }
 
-    public Set<Key> getKeys() {
-        return keys;
+    public boolean addKey(Key key) {
+        return keys.add(key);
     }
 
-    public void setKeys(Set<Key> keys) {
-        this.keys = keys;
+    public boolean addKeys(Set<Key> keys) {
+        return this.keys.addAll(keys);
+    }
+
+    public boolean removeKey(Key key) {
+        return keys.remove(key);
+    }
+
+    public boolean removeKeys(Set<Key> keys) {
+        return this.keys.removeAll(keys);
+    }
+
+    public void removeAllKeys() {
+        keys.clear();
+    }
+
+    public Set<Key> getKeys() {
+        return Sets.newConcurrentHashSet(keys);
     }
 
     public KeyCategory getParent() {
@@ -114,12 +132,28 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         this.parent = parent;
     }
 
-    public Set<KeyCategory> getChildren() {
-        return children;
+    public boolean addChild(KeyCategory keyCategory) {
+        return children.add(keyCategory);
     }
 
-    public void setChildren(Set<KeyCategory> children) {
-        this.children = children;
+    public boolean addChildrens(Set<KeyCategory> keyCategories) {
+        return children.addAll(keyCategories);
+    }
+
+    public boolean removeChild(KeyCategory keyCategory) {
+        return children.remove(keyCategory);
+    }
+
+    public boolean removeChildren(Set<KeyCategory> keyCategories) {
+        return children.removeAll(keyCategories);
+    }
+
+    public void removeAllChildren() {
+        children.clear();
+    }
+
+    public Set<KeyCategory> getChildren() {
+        return Sets.newConcurrentHashSet(children);
     }
 
     public User getCreator() {
@@ -130,12 +164,28 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         this.creator = creator;
     }
 
-    public Set<UserGroup> getGroups() {
-        return groups;
+    public boolean addGroup(UserGroup userGroup) {
+        return groups.add(userGroup);
     }
 
-    public void setGroups(Set<UserGroup> groups) {
-        this.groups = groups;
+    public boolean addGroups(Set<UserGroup> userGroups) {
+        return groups.addAll(userGroups);
+    }
+
+    public boolean removeGroup(UserGroup userGroup) {
+        return groups.remove(userGroup);
+    }
+
+    public boolean removeGroups(Set<UserGroup> userGroups) {
+        return groups.removeAll(userGroups);
+    }
+
+    public void removeAllGroups() {
+        groups.clear();
+    }
+
+    public Set<UserGroup> getGroups() {
+        return Sets.newConcurrentHashSet(groups);
     }
 
     public User getResponsible() {

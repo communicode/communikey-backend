@@ -35,8 +35,8 @@ import java.util.Set;
 
 /**
  * The REST API controller to process {@link UserGroup}s.
- * <p>
- * Mapped to the {@value RequestMappings#USER_GROUPS} endpoint.
+ *
+ * <p>Mapped to the {@value RequestMappings#USER_GROUPS} endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -54,12 +54,13 @@ public class UserGroupController {
 
     /**
      * Adds a user to a user group.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}{@value RequestMappings#USER_GROUPS_USERS}".
-     * <p>
-     * Required parameter:
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}{@value RequestMappings#USER_GROUPS_USERS}".
+     *
+     * <p>Required parameter:
      * <ul>
-     * <li>{@value PathVariables#USER_LOGIN}</li>
+     *   <li>{@value PathVariables#USER_LOGIN}</li>
+     * </ul>
      *
      * @param userGroupName the name of the user group to add the user to
      * @param login the login of the user to be added
@@ -73,8 +74,8 @@ public class UserGroupController {
 
     /**
      * Creates a new user group.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}".
      *
      * @param payload the payload for the new user group
      * @return the user group as response entity
@@ -88,8 +89,8 @@ public class UserGroupController {
 
     /**
      * Deletes the user group with the specified ID.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}".
      *
      * @param userGroupName the name of the user group to delete
      * @return the user group as response entity
@@ -103,8 +104,8 @@ public class UserGroupController {
 
     /**
      * Deletes all user groups.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}".
      *
      * @return a empty response entity
      * @since 0.3.0
@@ -118,8 +119,8 @@ public class UserGroupController {
 
     /**
      * Gets the user group with the specified name.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}".
      *
      * @param userGroupName the name of the user group to get
      * @return the user group as response entity
@@ -143,12 +144,13 @@ public class UserGroupController {
 
     /**
      * Removes a user from a user group.
-     * <p>
-     *     This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_USERS}".
-     * <p>
-     * Required parameter:
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_USERS}".
+     *
+     * <p>Required parameter:
      * <ul>
-     * <li>{@value PathVariables#USER_LOGIN}</li>
+     *   <li>{@value PathVariables#USER_LOGIN}</li>
+     * </ul>
      *
      * @param userGroupName the name of the user group to remove the user from
      * @param login the login of the user to be removed
@@ -162,8 +164,8 @@ public class UserGroupController {
 
     /**
      * Updates a user group with the specified payload.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}".
      *
      * @param userGroupName the name of the user group to update
      * @param payload the user group payload to update the user group with

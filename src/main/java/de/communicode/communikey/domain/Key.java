@@ -33,6 +33,8 @@ import java.io.Serializable;
 @Table(name = "\"keys\"")
 public class Key extends AbstractEntity implements Serializable {
 
+    private static final long serialVersionUID = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

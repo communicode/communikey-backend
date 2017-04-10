@@ -7,9 +7,11 @@
 package de.communicode.communikey.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.common.collect.Lists;
 import org.springframework.http.HttpStatus;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +39,7 @@ public class ErrorResponse {
     public ErrorResponse(HttpStatus httpStatus, Timestamp timestamp, String error) {
         status = httpStatus.value();
         reason = httpStatus.getReasonPhrase();
-        this.timestamp = timestamp;
+        this.timestamp = new Timestamp(timestamp.getTime());
         this.error = error;
     }
 
@@ -51,7 +53,7 @@ public class ErrorResponse {
     public ErrorResponse(HttpStatus httpStatus, Timestamp timestamp, List<String> errors) {
         status = httpStatus.value();
         reason = httpStatus.getReasonPhrase();
-        this.timestamp = timestamp;
+        this.timestamp = new Timestamp(timestamp.getTime());
         this.errors = errors;
     }
 
@@ -60,7 +62,7 @@ public class ErrorResponse {
     }
 
     public List<String> getErrors() {
-        return errors;
+        return new ArrayList<>(errors);
     }
 
     public String getReason() {
@@ -72,7 +74,7 @@ public class ErrorResponse {
     }
 
     public Timestamp getTimestamp() {
-        return timestamp;
+        return new Timestamp(timestamp.getTime());
     }
 
     public void setError(String error) {
@@ -80,7 +82,7 @@ public class ErrorResponse {
     }
 
     public void setErrors(List<String> errors) {
-        this.errors = errors;
+        this.errors = new ArrayList<>(errors);
     }
 
     public void setReason(String reason) {
@@ -92,6 +94,6 @@ public class ErrorResponse {
     }
 
     public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
+        this.timestamp = new Timestamp(timestamp.getTime());
     }
 }
