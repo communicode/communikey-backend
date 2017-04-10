@@ -103,28 +103,28 @@ public class User extends AbstractEntity implements Serializable {
         inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
     @BatchSize(size = 20)
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<Authority> authorities = Sets.newConcurrentHashSet();
+    private final Set<Authority> authorities = Sets.newConcurrentHashSet();
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
     @JsonIgnoreProperties(value = {"users", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "categories"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<UserGroup> groups = Sets.newConcurrentHashSet();
+    private final Set<UserGroup> groups = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
     @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "category", "creator", "password"})
-    private Set<Key> keys = Sets.newConcurrentHashSet();
+    private final Set<Key> keys = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
     @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible", "groups",
             "keys"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<KeyCategory> keyCategories = Sets.newConcurrentHashSet();
+    private final Set<KeyCategory> keyCategories = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "responsible")
     @JsonIgnoreProperties(value = {"children", "responsible", "keys", "parent", "groups", "creator", "createdBy", "createdDate", "lastModifiedBy",
         "lastModifiedDate"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<KeyCategory> responsibleKeyCategories = Sets.newConcurrentHashSet();
+    private final Set<KeyCategory> responsibleKeyCategories = Sets.newConcurrentHashSet();
 
     public Long getId() {
         return id;

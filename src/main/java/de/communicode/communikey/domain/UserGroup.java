@@ -55,13 +55,13 @@ public class UserGroup extends AbstractEntity implements Serializable {
     @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
             "authorities", "groups", "keyCategories", "responsibleKeyCategories"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<User> users = Sets.newConcurrentHashSet();
+    private final Set<User> users = Sets.newConcurrentHashSet();
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")
     @JsonIgnoreProperties(value = {"children", "responsible", "keys", "parent", "groups", "creator", "createdBy", "createdDate", "lastModifiedBy",
             "lastModifiedDate"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<KeyCategory> categories = Sets.newConcurrentHashSet();
+    private final Set<KeyCategory> categories = Sets.newConcurrentHashSet();
 
     public Long getId() {
         return id;

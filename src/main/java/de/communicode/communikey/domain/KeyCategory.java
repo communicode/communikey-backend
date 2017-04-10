@@ -48,7 +48,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "category")
     @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "creator", "category"})
-    private Set<Key> keys = Sets.newConcurrentHashSet();
+    private final Set<Key> keys = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn
@@ -58,7 +58,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "parent")
     @JsonIgnoreProperties(value = {"groups", "parent"})
-    private Set<KeyCategory> children = Sets.newConcurrentHashSet();
+    private final Set<KeyCategory> children = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn(name = "creator_user_id", nullable = false)
@@ -73,7 +73,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         joinColumns = {@JoinColumn(name = "key_category_id", referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(name = "user_group_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"categories", "users"})
-    private Set<UserGroup> groups = Sets.newConcurrentHashSet();
+    private final Set<UserGroup> groups = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn(name = "responsible_user_id")
