@@ -91,7 +91,7 @@ public class UserService {
      */
     public User addKey(String userLogin, Key key) {
         User user = validate(userLogin);
-        user.addKey(key);
+        user.addCreatedKey(key);
         return userRepository.save(user);
     }
 

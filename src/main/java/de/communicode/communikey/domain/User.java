@@ -254,23 +254,23 @@ public class User extends AbstractEntity implements Serializable {
         return Sets.newConcurrentHashSet(groups);
     }
 
-    public boolean addKey(Key key) {
+    public boolean addCreatedKey(Key key) {
         return keys.add(key);
     }
 
-    public boolean addKeys(Set<Key> keys) {
+    public boolean addCreatedKeys(Set<Key> keys) {
         return this.keys.addAll(keys);
     }
 
-    public boolean removeKey(Key key) {
+    public boolean removeCreatedKey(Key key) {
         return keys.remove(key);
     }
 
-    public boolean removeKeys(Set<Key> keys) {
+    public boolean removeCreatedKeys(Set<Key> keys) {
         return this.keys.removeAll(keys);
     }
 
-    public void removeAllKeys() {
+    public void removeAllCreatedKeys() {
         keys.clear();
     }
 
