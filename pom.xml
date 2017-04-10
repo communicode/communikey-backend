@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-        xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>de.communicode</groupId>
-    <artifactId>communikey</artifactId>
-    <version>0.1.0</version>
-    <packaging>jar</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -17,13 +10,18 @@
         <relativePath/>
     </parent>
 
+    <groupId>de.communicode</groupId>
+    <artifactId>communikey</artifactId>
+    <version>0.1.0</version>
+    <packaging>jar</packaging>
+
     <name>communikey</name>
     <description>A simple centralized, cross-platform credential manager.</description>
     <url>https://key.communicode.de</url>
     <inceptionYear>2017</inceptionYear>
     <organization>
         <name>communicode AG</name>
-        <url>http://communicode.de</url>
+        <url>https://communicode.de</url>
     </organization>
 
     <developers>
@@ -32,9 +30,16 @@
             <name>Sven Greb</name>
             <email>sgreb@communicode.de</email>
             <organization>communicode AG</organization>
-            <organizationUrl>http://communicode.de</organizationUrl>
+            <organizationUrl>https://communicode.de</organizationUrl>
         </developer>
     </developers>
+
+    <scm>
+        <connection>scm:git:ssh://git@bitbucket.communicode.de:7999/cckey/main.git</connection>
+        <developerConnection>scm:git:ssh://git@bitbucket.communicode.de:7999/cckey/main.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://bitbucket.communicode.de/projects/CCKEY/repos/main</url>
+    </scm>
 
     <properties>
         <java.version>1.8</java.version>
@@ -44,13 +49,6 @@
         <hikaricp.version>2.4.6</hikaricp.version>
         <hibernate-envers.version>5.2.4.Final</hibernate-envers.version>
     </properties>
-
-    <scm>
-        <connection>scm:git:ssh://git@stash.communicode.de:7999/cc/communikey.git</connection>
-        <developerConnection>scm:git:ssh://git@stash.communicode.de:7999/cc/communikey.git</developerConnection>
-        <tag>HEAD</tag>
-        <url>https://stash.communicode.de/projects/CC/repos/communikey</url>
-    </scm>
 
     <dependencies>
         <dependency>
@@ -173,6 +171,10 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
     </dependencies>
 

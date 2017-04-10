@@ -26,8 +26,8 @@ import javax.annotation.PostConstruct;
 
 /**
  * Configures the security for user authentications and requests to the REST API.
- * <p>
- * Provides the {@link #passwordEncoder()} bean.
+ *
+ * <p>Provides the {@link #passwordEncoder()} bean.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -75,7 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .requestMatchers().antMatchers("/oauth/authorize")
         .and()
             .authorizeRequests()
-            .antMatchers("/oauth/authorize").authenticated()
+            .antMatchers("/oauth/authorize").permitAll()
         .and()
             .csrf().disable();
     }

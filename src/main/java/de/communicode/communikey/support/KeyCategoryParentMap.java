@@ -7,6 +7,7 @@
 package de.communicode.communikey.support;
 
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import de.communicode.communikey.domain.KeyCategory;
 
@@ -17,12 +18,12 @@ import java.util.Set;
 
 /**
  * A reference map wrapper class for {@link KeyCategory} entities to track direct- and indirect parents of each key category.
- * <p>
- * Each map key is a ID of a key category mapped to a unordered value list of unique key category IDs.
+ *
+ * <p>Each map key is a ID of a key category mapped to a unordered value list of unique key category IDs.
  * Every value can either be a direct- or indirect key category parent.
  * The map object can be accessed with the {@link #getMap()} method.
- * <p>
- * This class is a Singleton.
+ *
+ * <p>This class is a Singleton.
  * The instance can be obtained via {@link #getInstance()}.
  * The map object is baked by {@link MapMaker#makeMap()} to be thread-safe.
  *
@@ -32,7 +33,7 @@ import java.util.Set;
  */
 public class KeyCategoryParentMap {
     private static KeyCategoryParentMap singletonInstance = new KeyCategoryParentMap();
-    private Map<Long, Set<Long>> map = new MapMaker().makeMap();
+    private Map<Long, Set<Long>> map = Maps.newConcurrentMap();
 
     public static KeyCategoryParentMap getInstance() {
         return singletonInstance;

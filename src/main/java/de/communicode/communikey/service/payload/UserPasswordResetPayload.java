@@ -27,8 +27,6 @@ public class UserPasswordResetPayload {
     @Size(max = 20)
     private String resetKey;
 
-    public UserPasswordResetPayload() {}
-
     public String getPassword() {
         return password;
     }

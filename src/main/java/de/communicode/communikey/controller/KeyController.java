@@ -11,11 +11,13 @@ import static de.communicode.communikey.controller.RequestMappings.KEYS_ID;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.service.KeyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,8 +33,8 @@ import java.util.Set;
 
 /**
  * The REST API controller to process {@link Key}s.
- * <p>
- * Mapped to the "{@value RequestMappings#KEYS}" endpoint.
+ *
+ * <p>Mapped to the "{@value RequestMappings#KEYS}" endpoint.
  *
  * @author sgreb@communicode.de
  * @since 0.1.0
@@ -49,28 +51,30 @@ public class KeyController {
 
     /**
      * Creates a new key with the specified payload.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
      *
      * @param payload the key request payload
      * @return the key as response entity
      * @since 0.2.0
      */
     @PostMapping
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> create(@Valid @RequestBody KeyPayload payload) {
         return new ResponseEntity<>(keyService.create(payload), HttpStatus.CREATED);
     }
 
     /**
      * Deletes the key with the specified ID.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
      *
      * @param keyId the ID of the key to delete
      * @return a empty response entity
      * @since 0.2.0
      */
     @DeleteMapping(value = KEYS_ID)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Void> delete(@PathVariable Long keyId) {
         keyService.delete(keyId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -78,13 +82,14 @@ public class KeyController {
 
     /**
      * Deletes all keys.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}".
      *
      * @return a empty response entity
      * @since 0.2.0
      */
     @DeleteMapping
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> deleteAll() {
         keyService.deleteAll();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -92,33 +97,35 @@ public class KeyController {
 
     /**
      * Gets the key with the specified ID.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
      *
      * @param keyId the ID of the key entity to get
      * @return the key as response entity
      */
     @GetMapping(value = KEYS_ID)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> get(@PathVariable Long keyId) {
         return new ResponseEntity<>(keyService.get(keyId), HttpStatus.OK);
     }
 
     /**
      * Gets all keys.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}".
      *
      * @return a collection of keys as response entity
      */
     @GetMapping
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Set<Key>> getAll() {
         return new ResponseEntity<>(keyService.getAll(), HttpStatus.OK);
     }
 
     /**
      * Updates a key with the specified payload.
-     * <p>
-     * This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEYS_ID}".
      *
      * @param keyId the ID of the key entity to update
      * @param payload the key request payload to update the key entity with
@@ -126,6 +133,7 @@ public class KeyController {
      * @since 0.2.0
      */
     @PutMapping(value = KEYS_ID)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> update(@PathVariable Long keyId, @Valid @RequestBody KeyPayload payload) {
         return new ResponseEntity<>(keyService.update(keyId, payload), HttpStatus.OK);
     }

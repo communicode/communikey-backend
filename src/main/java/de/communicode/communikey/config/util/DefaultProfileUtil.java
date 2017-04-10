@@ -6,17 +6,17 @@
  */
 package de.communicode.communikey.config.util;
 
+import com.google.common.collect.Maps;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.Environment;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Utility class to load a Spring profile to be used as default when the {@code spring.profiles.active} is not set in the environment or as command line
  * argument.
- * <p>
- * If the value is not available in {@code application.yml} then the {@code dev} profile will be used as default.
+ *
+ * <p>If the value is not available in {@code application.yml} then the {@code dev} profile will be used as default.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -37,7 +37,7 @@ public final class DefaultProfileUtil {
      * @param app the Spring application
      */
     public static void addDefaultProfile(SpringApplication app) {
-        Map<String, Object> defProperties = new HashMap<>();
+        Map<String, Object> defProperties = Maps.newConcurrentMap();
         defProperties.put(SPRING_PROFILE_DEFAULT, COMMUNIKEY_PROFILE_DEVELOPMENT);
         app.setDefaultProperties(defProperties);
     }

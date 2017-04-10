@@ -9,6 +9,7 @@ package de.communicode.communikey.service;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
+import com.google.common.collect.Sets;
 import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.exception.UserGroupConflictException;
 import de.communicode.communikey.exception.UserGroupNotFoundException;
@@ -20,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * The REST API service to process {@link UserGroup}s via a {@link UserGroupRepository}.
@@ -32,7 +31,7 @@ import java.util.stream.StreamSupport;
 @Service
 public class UserGroupService {
 
-    private static final Logger log = LogManager.getLogger(UserGroupService.class);
+    private static final Logger log = LogManager.getLogger();
     private final UserGroupRepository userGroupRepository;
     private final UserService userService;
 
@@ -54,9 +53,11 @@ public class UserGroupService {
     public UserGroup addUser(String userGroupName, String login) {
         return ofNullable(userGroupRepository.findOneByName(userGroupName))
             .map(userGroup -> {
-                userGroup.getUsers().add(userService.validate(login));
-                userGroupRepository.save(userGroup);
-                log.debug("Added user {} to user group {}", login, userGroup.getName());
+                if (userGroup.addUser(userService.validate(login))) {
+                    userGroupRepository.save(userGroup);
+                    log.debug("Added user with login '{}' to user group '{}'", login, userGroup.getName());
+                    return userGroup;
+                }
                 return userGroup;
             }).orElseThrow(() -> new UserGroupNotFoundException(userGroupName));
     }
@@ -75,20 +76,29 @@ public class UserGroupService {
         userGroup.setName(payload.getName());
 
         userGroupRepository.save(userGroup);
-        log.debug("Created new user group: {}", userGroup);
+        log.debug("Created new user group '{}'", userGroup.getName());
         return userGroup;
     }
 
     /**
      * Deletes the user group with the specified name.
      *
-     * @param name the name of the user group to delete
+     * @param userGroupName the name of the user group to delete
      * @throws UserGroupNotFoundException if the user group with the specified name has not been found
      */
-    public boolean delete(String name) {
-        userGroupRepository.delete(ofNullable(validate(name)).orElseThrow(() -> new UserGroupNotFoundException(name)));
-        log.debug("Deleted user group {}", name);
-        return true;
+    public void delete(String userGroupName) {
+        userGroupRepository.delete(validate(userGroupName));
+        log.debug("Deleted user group '{}'", userGroupName);
+    }
+
+    /**
+     * Deletes all user groups.
+     *
+     * @since 0.3.0
+     */
+    public void deleteAll() {
+        userGroupRepository.deleteAll();
+        log.debug("Deleted all user groups");
     }
 
     /**
@@ -97,8 +107,7 @@ public class UserGroupService {
      * @return a collection of all user groups
      */
     public Set<UserGroup> getAll() {
-        return StreamSupport.stream(userGroupRepository.findAll().spliterator(), false)
-            .collect(Collectors.toSet());
+        return Sets.newConcurrentHashSet(userGroupRepository.findAll());
     }
 
     /**
@@ -124,9 +133,10 @@ public class UserGroupService {
     public UserGroup removeUser(String userGroupName, String login) {
         return ofNullable(userGroupRepository.findOneByName(userGroupName))
             .map(userGroup -> {
-                userGroup.getUsers().remove(userService.validate(login));
-                userGroupRepository.save(userGroup);
-                log.debug("Removed user {} from user group {}", login, userGroup.getName());
+                if (userGroup.removeUser(userService.validate(login))) {
+                    userGroupRepository.save(userGroup);
+                    log.debug("Removed user with login '{}' from user group '{}'", login, userGroup.getName());
+                }
                 return userGroup;
             }).orElseThrow(() -> new UserGroupNotFoundException(userGroupName));
     }
@@ -146,7 +156,7 @@ public class UserGroupService {
                 if (!userGroup.getName().equals(payload.getName())) {
                     userGroup.setName(payload.getName());
                     userGroupRepository.save(userGroup);
-                    log.debug("Updated user group: {}", userGroup);
+                    log.debug("Updated user group '{}'", userGroup.getName());
                 }
                 return userGroup;
             }).orElseThrow(() -> new UserGroupNotFoundException(name));

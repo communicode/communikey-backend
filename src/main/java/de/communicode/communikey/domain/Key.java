@@ -9,6 +9,7 @@ package de.communicode.communikey.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GenerationType;
@@ -32,6 +33,8 @@ import java.io.Serializable;
 @Table(name = "\"keys\"")
 public class Key extends AbstractEntity implements Serializable {
 
+    private static final long serialVersionUID = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,15 +44,16 @@ public class Key extends AbstractEntity implements Serializable {
     @Column(length = 100, nullable = false)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "key_category_id")
-    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible", "keys"})
+    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible", "keys",
+            "groups"})
     private KeyCategory category;
 
     @ManyToOne
     @JoinColumn(name = "creator_user_id", nullable = false)
     @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
-        "authorities", "groups"})
+            "authorities", "groups", "keyCategories", "responsibleKeyCategories", "keys"})
     private User creator;
 
     @NotNull

@@ -9,7 +9,9 @@ package de.communicode.communikey.service;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
+import com.google.common.collect.Sets;
 import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.User;
 import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.exception.KeyNotFoundException;
@@ -19,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -31,7 +32,7 @@ import java.util.Set;
 @Service
 public class KeyService {
 
-    private static final Logger log = LogManager.getLogger(KeyService.class);
+    private static final Logger log = LogManager.getLogger();
     private final KeyRepository keyRepository;
     private final UserService userService;
 
@@ -48,11 +49,13 @@ public class KeyService {
      */
     public Key create(KeyPayload payload) {
         Key key = new Key();
+        String userLogin = SecurityUtils.getCurrentUserLogin();
+        User user = userService.validate(userLogin);
+        key.setCreator(user);
         key.setName(payload.getName());
         key.setPassword(payload.getPassword());
-        key.setCreator(userService.validate(SecurityUtils.getCurrentUserLogin()));
         key = keyRepository.save(key);
-        userService.addKey(SecurityUtils.getCurrentUserLogin(), key);
+        userService.addKey(userLogin, key);
         log.debug("Created new key with ID '{}'", key.getId());
         return key;
     }
@@ -65,7 +68,7 @@ public class KeyService {
      */
     public void delete(Long keyId) throws KeyNotFoundException {
         keyRepository.delete(validate(keyId));
-        log.debug("Deleted key with ID {}", keyId);
+        log.debug("Deleted key with ID '{}'", keyId);
     }
 
     /**
@@ -90,16 +93,10 @@ public class KeyService {
     /**
      * Gets all keys the current user is authorized to.
      *
-     * @return a collection of all keys
+     * @return a collection of keys
      */
     public Set<Key> getAll() {
-        //Set<Key> keyPool = new HashSet<>();
-        //keyPool.addAll(keyRepository.findAllByCreator(userService.validate(SecurityUtils.getCurrentUserLogin())));
-/*        keyCategoryService.getAll().stream()
-            .flatMap(keyCategory -> keyCategory.getKeys().stream())
-            .forEach(keyPool::add);*/
-        //return keyPool;
-        return new HashSet<>(keyRepository.findAll());
+        return Sets.newConcurrentHashSet(keyRepository.findAll());
     }
 
     /**

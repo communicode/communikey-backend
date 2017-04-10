@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS oauth_access_token (
   client_id VARCHAR(255),
   authentication LONG VARBINARY,
   refresh_token VARCHAR(255)
-);
+) DEFAULT CHARSET=utf8;

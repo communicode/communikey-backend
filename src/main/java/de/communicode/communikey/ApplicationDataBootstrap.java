@@ -1,5 +1,14 @@
+/*
+ * Copyright (C) communicode AG - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * 2017
+ */
 package de.communicode.communikey;
 
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.collect.Sets;
 import de.communicode.communikey.config.CommunikeyProperties;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.repository.AuthorityRepository;
@@ -16,7 +25,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Component
@@ -35,11 +44,11 @@ public class ApplicationDataBootstrap {
     @Autowired
     public ApplicationDataBootstrap(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository,
                                     CommunikeyProperties communikeyProperties, KeyCategoryRepository keyCategoryRepository) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authorityRepository = authorityRepository;
-        this.communikeyProperties = communikeyProperties;
-        this.keyCategoryRepository = keyCategoryRepository;
+        this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
+        this.passwordEncoder = requireNonNull(passwordEncoder, "passwordEncoder must not be null!");
+        this.authorityRepository = requireNonNull(authorityRepository, "authorityRepository must not be null!");
+        this.communikeyProperties = requireNonNull(communikeyProperties, "communikeyProperties must not be null!");
+        this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
     }
 
     @EventListener(ContextRefreshedEvent.class)
@@ -49,37 +58,37 @@ public class ApplicationDataBootstrap {
 
         KeyCategoryChildrenMap keyCategoryChildrenMap = KeyCategoryChildrenMap.getInstance();
         keyCategoryChildrenMap.initialize(keyCategoryRepository.findAll());
-        System.err.println("childs: " + keyCategoryChildrenMap.toString());
-
         KeyCategoryParentMap keyCategoryParentMap = KeyCategoryParentMap.getInstance();
         keyCategoryParentMap.initialize(keyCategoryRepository.findAll());
-        System.err.println("parents: " + keyCategoryParentMap.toString());
-
     }
 
     private void initializeAuthorities() {
-        roleUser.setName("ROLE_USER");
-        roleAdmin.setName("ROLE_ADMIN");
-
-        authorityRepository.save(roleUser);
-        authorityRepository.save(roleAdmin);
+        if (!authorityRepository.exists(AuthoritiesConstants.USER)) {
+            roleUser.setName(AuthoritiesConstants.USER);
+            authorityRepository.save(roleUser);
+        }
+        if (!authorityRepository.exists(AuthoritiesConstants.ADMIN)) {
+            roleAdmin.setName(AuthoritiesConstants.ADMIN);
+            authorityRepository.save(roleAdmin);
+        }
     }
 
     private void initializeUser() {
-        Set<Authority> authorities = new HashSet<>();
-        Authority authorityAdmin = authorityRepository.findOne(AuthoritiesConstants.ADMIN);
-        Authority authorityUser = authorityRepository.findOne(AuthoritiesConstants.USER);
+        if (Objects.isNull(userRepository.findOneByLogin(communikeyProperties.getSecurity().getRoot().getLogin()))) {
+            rootUser.setEmail(communikeyProperties.getSecurity().getRoot().getEmail());
+            rootUser.setLogin(communikeyProperties.getSecurity().getRoot().getLogin());
+            rootUser.setFirstName(communikeyProperties.getSecurity().getRoot().getFirstName());
+            rootUser.setPassword(passwordEncoder.encode(communikeyProperties.getSecurity().getRoot().getPassword()));
+            rootUser.setActivationKey(SecurityUtils.generateRandomActivationKey());
+            rootUser.setActivated(true);
+            Set<Authority> authorities = Sets.newConcurrentHashSet();
+            Authority authorityAdmin = authorityRepository.findOne(AuthoritiesConstants.ADMIN);
+            Authority authorityUser = authorityRepository.findOne(AuthoritiesConstants.USER);
+            authorities.add(authorityAdmin);
+            authorities.add(authorityUser);
+            rootUser.addAuthorities(authorities);
 
-        rootUser.setEmail(communikeyProperties.getSecurity().getRoot().getEmail());
-        rootUser.setLogin(communikeyProperties.getSecurity().getRoot().getLogin());
-        rootUser.setFirstName(communikeyProperties.getSecurity().getRoot().getFirstName());
-        rootUser.setPassword(passwordEncoder.encode(communikeyProperties.getSecurity().getRoot().getPassword()));
-        rootUser.setActivationKey(SecurityUtils.generateRandomActivationKey());
-        rootUser.setActivated(true);
-        authorities.add(authorityAdmin);
-        authorities.add(authorityUser);
-        rootUser.setAuthorities(authorities);
-
-        userRepository.save(rootUser);
+            userRepository.save(rootUser);
+        }
     }
 }

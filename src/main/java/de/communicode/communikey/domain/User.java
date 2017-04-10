@@ -11,6 +11,7 @@ import static de.communicode.communikey.config.SecurityConfig.EMAIL_REGEX;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.Sets;
 import de.communicode.communikey.service.view.AuthoritiesRestView;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.validator.constraints.NotBlank;
@@ -32,7 +33,6 @@ import javax.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -44,6 +44,8 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User extends AbstractEntity implements Serializable {
+
+    private static final long serialVersionUID = 1;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -103,27 +105,28 @@ public class User extends AbstractEntity implements Serializable {
         inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
     @BatchSize(size = 20)
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<Authority> authorities = new HashSet<>();
+    private final Set<Authority> authorities = Sets.newConcurrentHashSet();
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
-    @JsonIgnoreProperties(value = {"users", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate"})
+    @JsonIgnoreProperties(value = {"users", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "categories"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<UserGroup> groups = new HashSet<>();
-
-    @OneToMany(mappedBy = "creator")
-    @JsonIgnore
-    private Set<Key> keys = new HashSet<>();
+    private final Set<UserGroup> groups = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
-    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible"})
+    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "category", "creator", "password"})
+    private final Set<Key> keys = Sets.newConcurrentHashSet();
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
+    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible", "groups",
+            "keys"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<KeyCategory> keyCategories = new HashSet<>();
+    private final Set<KeyCategory> keyCategories = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "responsible")
     @JsonIgnoreProperties(value = {"children", "responsible", "keys", "parent", "groups", "creator", "createdBy", "createdDate", "lastModifiedBy",
         "lastModifiedDate"})
     @JsonView(AuthoritiesRestView.Admin.class)
-    private Set<KeyCategory> responsibleKeyCategories = new HashSet<>();
+    private final Set<KeyCategory> responsibleKeyCategories = Sets.newConcurrentHashSet();
 
     public Long getId() {
         return id;
@@ -205,43 +208,143 @@ public class User extends AbstractEntity implements Serializable {
         this.resetDate = resetDate;
     }
 
-    public Set<Authority> getAuthorities() {
-        return authorities;
+    public boolean addAuthority(Authority authority) {
+        return authorities.add(authority);
     }
 
-    public void setAuthorities(Set<Authority> authorities) {
-        this.authorities = authorities;
+    public boolean addAuthorities(Set<Authority> authorities) {
+        return this.authorities.addAll(authorities);
+    }
+
+    public boolean removeAuthority(Authority authority) {
+        return authorities.remove(authority);
+    }
+
+    public boolean removeAuthorities(Set<Authority> authorities) {
+        return this.authorities.removeAll(authorities);
+    }
+
+    public void removeAllAuthorities() {
+        authorities.clear();
+    }
+
+    public Set<Authority> getAuthorities() {
+        return Sets.newConcurrentHashSet(authorities);
+    }
+
+    public boolean addGroup(UserGroup userGroup) {
+        return groups.add(userGroup);
+    }
+
+    public boolean addGroups(Set<UserGroup> userGroups) {
+        return this.groups.addAll(userGroups);
+    }
+
+    public boolean removeGroup(UserGroup userGroups) {
+        return groups.remove(userGroups);
+    }
+
+    public boolean removeGroups(Set<UserGroup> userGroups) {
+        return this.groups.removeAll(userGroups);
+    }
+
+    public void removeAllGroups() {
+        groups.clear();
     }
 
     public Set<UserGroup> getGroups() {
-        return groups;
+        return Sets.newConcurrentHashSet(groups);
     }
 
-    public void setGroups(Set<UserGroup> groups) {
-        this.groups = groups;
+    public boolean addCreatedKey(Key key) {
+        return keys.add(key);
+    }
+
+    public boolean addCreatedKeys(Set<Key> keys) {
+        return this.keys.addAll(keys);
+    }
+
+    public boolean removeCreatedKey(Key key) {
+        return keys.remove(key);
+    }
+
+    public boolean removeCreatedKeys(Set<Key> keys) {
+        return this.keys.removeAll(keys);
+    }
+
+    public void removeAllCreatedKeys() {
+        keys.clear();
     }
 
     public Set<Key> getKeys() {
-        return keys;
+        return Sets.newConcurrentHashSet(keys);
     }
 
-    public void setKeys(Set<Key> keys) {
-        this.keys = keys;
+    public boolean addKeyCategory(KeyCategory keyCategory) {
+        return keyCategories.add(keyCategory);
+    }
+
+    public boolean addKeyCategories(Set<KeyCategory> keyCategories) {
+        return this.keyCategories.addAll(keyCategories);
+    }
+
+    public boolean removeKeyCategory(KeyCategory keyCategory) {
+        return keyCategories.remove(keyCategory);
+    }
+
+    public boolean removeKeyCategories(Set<KeyCategory> keyCategories) {
+        return this.keyCategories.removeAll(keyCategories);
+    }
+
+    public void removeAllKeyCategories() {
+        keyCategories.clear();
     }
 
     public Set<KeyCategory> getKeyCategories() {
-        return keyCategories;
+        return Sets.newConcurrentHashSet(responsibleKeyCategories);
     }
 
-    public void setKeyCategories(Set<KeyCategory> keyCategories) {
-        this.keyCategories = keyCategories;
+    public boolean addResponsibleKeyCategory(KeyCategory responsibleKeyCategory) {
+        return responsibleKeyCategories.add(responsibleKeyCategory);
+    }
+
+    public boolean addResponsibleKeyCategories(Set<KeyCategory> responsibleKeyCategories) {
+        return this.responsibleKeyCategories.addAll(responsibleKeyCategories);
+    }
+
+    public boolean removeResponsibleKeyCategory(KeyCategory responsibleKeyCategory) {
+        return responsibleKeyCategories.remove(responsibleKeyCategory);
+    }
+
+    public boolean removeResponsibleKeyCategories(Set<KeyCategory> responsibleKeyCategories) {
+        return this.responsibleKeyCategories.removeAll(responsibleKeyCategories);
+    }
+
+    public void removeAllResponsibleKeyCategories() {
+        responsibleKeyCategories.clear();
     }
 
     public Set<KeyCategory> getResponsibleKeyCategories() {
-        return responsibleKeyCategories;
+        return Sets.newConcurrentHashSet(responsibleKeyCategories);
     }
 
-    public void setResponsibleKeyCategories(Set<KeyCategory> responsibleKeyCategories) {
-        this.responsibleKeyCategories = responsibleKeyCategories;
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", login='" + login + '\'' +
+                ", email='" + email + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", activated=" + activated +
+                ", activationKey='" + activationKey + '\'' +
+                ", resetKey='" + resetKey + '\'' +
+                ", resetDate=" + resetDate +
+                ", authorities=" + authorities +
+                ", groups=" + groups +
+                ", keys=" + keys +
+                ", keyCategories=" + keyCategories +
+                ", responsibleKeyCategories=" + responsibleKeyCategories +
+                '}';
     }
 }
