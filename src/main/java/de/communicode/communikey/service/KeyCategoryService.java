@@ -107,7 +107,6 @@ public class KeyCategoryService {
             });
 
             child.setParent(parent);
-            KeyCategory persistedKeyCategory = keyCategoryRepository.save(parent);
             log.debug("Added key category with ID '{}' as child to key category with ID '{}'", child.getId(), parent.getId());
 
             keyCategoryChildrenMap.getMap().get(parentKeyCategoryId).add(childKeyCategoryId);
@@ -118,7 +117,7 @@ public class KeyCategoryService {
                 .forEach(childId -> keyCategoryParentMap.getMap().get(childId).addAll(keyCategoryParentMap.getMap().get(childKeyCategoryId)));
             keyCategoryParentMap.getMap().get(childKeyCategoryId)
                 .forEach(parentId -> keyCategoryChildrenMap.getMap().get(parentId).addAll(keyCategoryChildrenMap.getMap().get(parentKeyCategoryId)));
-            return persistedKeyCategory;
+            return keyCategoryRepository.save(parent);
         }
         return parent;
     }
@@ -180,7 +179,7 @@ public class KeyCategoryService {
         User user = userService.validate(SecurityUtils.getCurrentUserLogin());
 
         keyCategory.setName(payload.getName());
-        keyCategory.setCreator(userService.validate(SecurityUtils.getCurrentUserLogin()));
+        keyCategory.setCreator(user);
         keyCategory = keyCategoryRepository.save(keyCategory);
         setResponsibleUser(keyCategory.getId(), user.getLogin());
 
@@ -248,7 +247,7 @@ public class KeyCategoryService {
      *     |-- category6
      * </pre>
      *
-     * This will be reduced to contain no more duplicated key categories:
+     * <p>This will be reduced to contain no more duplicated key categories:
      * <pre>
      *     |-- category1
      *     |   |-- category2

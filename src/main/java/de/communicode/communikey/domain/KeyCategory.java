@@ -38,12 +38,14 @@ import java.util.Set;
 @Table(name = "key_categories")
 public class KeyCategory extends AbstractEntity implements Serializable {
 
+    private static final long serialVersionUID = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     @Column(length = 100, nullable = false)
+    @NotBlank
     private String name;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "category")
@@ -53,7 +55,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     @ManyToOne
     @JoinColumn
     @JsonIgnoreProperties(value = {"groups", "children", "keys"})
-    private KeyCategory parent = null;
+    private KeyCategory parent;
 
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "parent")

@@ -53,7 +53,7 @@ public class UserService {
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public final JdbcTokenStore jdbcTokenStore;
+    private final JdbcTokenStore jdbcTokenStore;
 
     @Autowired
     public UserService(UserRepository userRepository, AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder, JdbcTokenStore jdbcTokenStore) {
@@ -106,9 +106,6 @@ public class UserService {
         validateUniqueEmail(payload.getEmail());
 
         User user = new User();
-        Set<Authority> authorities = Sets.newConcurrentHashSet();
-        Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
-
         user.setEmail(payload.getEmail().toLowerCase(Locale.ENGLISH));
         user.setLogin(extractLoginFromEmail(payload.getEmail()));
         user.setFirstName(payload.getFirstName());
@@ -116,6 +113,8 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(payload.getPassword()));
         user.setActivationKey(SecurityUtils.generateRandomActivationKey());
         user.setActivated(true);
+        Set<Authority> authorities = Sets.newConcurrentHashSet();
+        Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
         authorities.add(authority);
         user.addAuthorities(authorities);
 
@@ -335,7 +334,7 @@ public class UserService {
      * @throws UserConflictException if the specified email is not unique
      */
     private void validateUniqueEmail(String email) throws UserConflictException {
-        if (Optional.ofNullable(userRepository.findOneByEmail(email)).isPresent()) {
+        if (ofNullable(userRepository.findOneByEmail(email)).isPresent()) {
             throw new UserConflictException("email '" + email + "' already exists");
         }
     }

@@ -37,6 +37,8 @@ import java.util.Set;
 @Table(name = "user_groups")
 public class UserGroup extends AbstractEntity implements Serializable {
 
+    private static final long serialVersionUID = 1;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(AuthoritiesRestView.Admin.class)

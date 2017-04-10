@@ -159,6 +159,7 @@ public class UserController {
 
     /**
      * Gets a random generated user password reset key for the specified email.
+     *
      * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_PASSWORD_RESET}".
      *
      * <p>Required parameter:
