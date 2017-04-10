@@ -119,7 +119,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     }
 
     public Set<Key> getKeys() {
-        return Sets.newConcurrentHashSet(keys);
+        return keys;
     }
 
     public KeyCategory getParent() {
@@ -151,7 +151,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     }
 
     public Set<KeyCategory> getChildren() {
-        return Sets.newConcurrentHashSet(children);
+        return children;
     }
 
     public User getCreator() {
@@ -183,7 +183,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     }
 
     public Set<UserGroup> getGroups() {
-        return Sets.newConcurrentHashSet(groups);
+        return groups;
     }
 
     public User getResponsible() {

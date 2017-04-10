@@ -100,7 +100,7 @@ public class UserGroup extends AbstractEntity implements Serializable {
     }
 
     public Set<User> getUsers() {
-        return Sets.newConcurrentHashSet(users);
+        return users;
     }
 
     public boolean addCategory(KeyCategory keyCategory) {
@@ -124,7 +124,7 @@ public class UserGroup extends AbstractEntity implements Serializable {
     }
 
     public Set<KeyCategory> getCategories() {
-        return Sets.newConcurrentHashSet(categories);
+        return categories;
     }
 
     @Override

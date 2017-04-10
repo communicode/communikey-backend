@@ -227,7 +227,7 @@ public class User extends AbstractEntity implements Serializable {
     }
 
     public Set<Authority> getAuthorities() {
-        return Sets.newConcurrentHashSet(authorities);
+        return authorities;
     }
 
     public boolean addGroup(UserGroup userGroup) {
@@ -251,7 +251,7 @@ public class User extends AbstractEntity implements Serializable {
     }
 
     public Set<UserGroup> getGroups() {
-        return Sets.newConcurrentHashSet(groups);
+        return groups;
     }
 
     public boolean addKey(Key key) {
@@ -275,7 +275,7 @@ public class User extends AbstractEntity implements Serializable {
     }
 
     public Set<Key> getKeys() {
-        return Sets.newConcurrentHashSet(keys);
+        return keys;
     }
 
     public boolean addKeyCategory(KeyCategory keyCategory) {
@@ -299,7 +299,7 @@ public class User extends AbstractEntity implements Serializable {
     }
 
     public Set<KeyCategory> getKeyCategories() {
-        return Sets.newConcurrentHashSet(responsibleKeyCategories);
+        return responsibleKeyCategories;
     }
 
     public boolean addResponsibleKeyCategory(KeyCategory responsibleKeyCategory) {
@@ -323,7 +323,7 @@ public class User extends AbstractEntity implements Serializable {
     }
 
     public Set<KeyCategory> getResponsibleKeyCategories() {
-        return Sets.newConcurrentHashSet(responsibleKeyCategories);
+        return responsibleKeyCategories;
     }
 
     @Override
