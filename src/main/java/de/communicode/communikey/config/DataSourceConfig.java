@@ -47,6 +47,10 @@ public class DataSourceConfig {
     @Value("${spring.datasource.password}")
     private String databasePassword;
 
+    public DataSourceConfig() {
+        //No handling
+    }
+
     /**
      * Configures the JDBC driver manager data source.
      *
