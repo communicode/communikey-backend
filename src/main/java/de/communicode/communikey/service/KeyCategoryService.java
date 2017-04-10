@@ -78,10 +78,6 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if a key category with specified ID has not been found
      */
     public KeyCategory addChild(Long parentKeyCategoryId, Long childKeyCategoryId) throws KeyCategoryNotFoundException {
-        KeyCategory parent = validate(parentKeyCategoryId);
-        KeyCategory child = validate(childKeyCategoryId);
-        validateUniqueKeyCategoryName(child.getName(), parentKeyCategoryId);
-
         if (Objects.equals(parentKeyCategoryId, childKeyCategoryId)) {
             throw new KeyCategoryConflictException(
                 "parent key category ID '" + parentKeyCategoryId + "' equals child key category ID '" + childKeyCategoryId + "'");
@@ -90,6 +86,9 @@ public class KeyCategoryService {
             throw new KeyCategoryConflictException("key category with ID '" + parentKeyCategoryId + "' can not be set as own child reference");
         }
 
+        KeyCategory child = this.validate(childKeyCategoryId);
+        validateUniqueKeyCategoryName(child.getName(), parentKeyCategoryId);
+        KeyCategory parent = validate(parentKeyCategoryId);
         if (parent.addChild(child)) {
             ofNullable(child.getParent()).ifPresent(directParent -> {
                 keyCategoryChildrenMap.getMap().get(directParent.getId()).remove(childKeyCategoryId);
@@ -173,12 +172,13 @@ public class KeyCategoryService {
      * @throws UserNotFoundException if the user with the specified ID has not been found
      */
     public KeyCategory create(KeyCategoryPayload payload) throws KeyCategoryNotFoundException, UserNotFoundException {
-        validateUniqueKeyCategoryName(payload.getName(), null);
+        String name = payload.getName();
+        validateUniqueKeyCategoryName(name, null);
 
         KeyCategory keyCategory = new KeyCategory();
         User user = userService.validate(SecurityUtils.getCurrentUserLogin());
 
-        keyCategory.setName(payload.getName());
+        keyCategory.setName(name);
         keyCategory.setCreator(user);
         keyCategory = keyCategoryRepository.save(keyCategory);
         setResponsibleUser(keyCategory.getId(), user.getLogin());

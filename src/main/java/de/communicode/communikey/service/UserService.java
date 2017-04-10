@@ -103,10 +103,11 @@ public class UserService {
      * @throws UserConflictException if a user with the specified email already exists
      */
     public User create(UserPayload payload) throws UserConflictException {
-        validateUniqueEmail(payload.getEmail());
+        String email = payload.getEmail();
+        validateUniqueEmail(email);
 
         User user = new User();
-        user.setEmail(payload.getEmail().toLowerCase(Locale.ENGLISH));
+        user.setEmail(email.toLowerCase(Locale.ENGLISH));
         user.setLogin(extractLoginFromEmail(payload.getEmail()));
         user.setFirstName(payload.getFirstName());
         user.setLastName(payload.getLastName());
@@ -205,7 +206,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getWithAuthorities() {
-        return Optional.ofNullable(userRepository.findOneWithAuthoritiesByEmail(SecurityUtils.getCurrentUserLogin())).orElse(null);
+        return ofNullable(userRepository.findOneWithAuthoritiesByEmail(SecurityUtils.getCurrentUserLogin())).orElse(null);
     }
 
     /**
@@ -236,12 +237,13 @@ public class UserService {
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
     public User update(String login, UserPayload payload) throws UserNotFoundException {
-        validateUniqueEmail(payload.getEmail());
+        String email = payload.getEmail();
+        validateUniqueEmail(email);
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
-                if (!user.getEmail().equals(payload.getEmail())) {
-                    user.setEmail(payload.getEmail());
-                    user.setLogin(extractLoginFromEmail(payload.getEmail()));
+                if (!user.getEmail().equals(email)) {
+                    user.setEmail(email);
+                    user.setLogin(extractLoginFromEmail(email));
                     deactivate(login);
                     deleteOauth2AccessTokens(login);
                 }
