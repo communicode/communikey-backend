@@ -144,7 +144,7 @@ public class UserApiIntegrationTest extends IntegrationBaseTest {
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("login", testUser.getLogin())
         .when()
-                .get(RequestMappings.USERS + RequestMappings.USERS_LOGIN)
+                .delete(RequestMappings.USERS + RequestMappings.USERS_LOGIN)
         .then()
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
