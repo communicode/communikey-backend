@@ -27,6 +27,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Integration tests for the {@link User} REST API.
+ *
+ * @author sgreb@communicode.de
+ * @since 0.4.0
+ */
 public class UserApiIntegrationTest extends IntegrationBaseTest {
 
     private String testUserLogin = "test";
