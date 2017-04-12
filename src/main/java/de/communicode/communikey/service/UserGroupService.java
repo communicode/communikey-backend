@@ -14,7 +14,9 @@ import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.exception.UserGroupConflictException;
 import de.communicode.communikey.exception.UserGroupNotFoundException;
 import de.communicode.communikey.exception.UserNotFoundException;
+import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.UserGroupRepository;
+import de.communicode.communikey.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +35,16 @@ public class UserGroupService {
 
     private static final Logger log = LogManager.getLogger();
     private final UserGroupRepository userGroupRepository;
+    private final UserRepository userRepository;
+    private final KeyCategoryRepository keyCategoryRepository;
     private final UserService userService;
 
     @Autowired
-    public UserGroupService(UserGroupRepository userGroupRepository, UserService userService) {
+    public UserGroupService(UserGroupRepository userGroupRepository, UserService userService, UserRepository userRepository,
+            KeyCategoryRepository keyCategoryRepository) {
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
+        this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
+        this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
     }
 
@@ -87,7 +94,18 @@ public class UserGroupService {
      * @throws UserGroupNotFoundException if the user group with the specified name has not been found
      */
     public void delete(String userGroupName) {
-        userGroupRepository.delete(validate(userGroupName));
+        UserGroup userGroup = validate(userGroupName);
+        userGroup.getUsers().forEach(user -> {
+            user.removeGroup(userGroup);
+            userRepository.save(user);
+            log.debug("Removed user group with name '{}' from user with login '{}'", userGroup.getName(), user.getLogin());
+        });
+        userGroup.getCategories().forEach(keyCategory -> {
+            keyCategory.removeGroup(userGroup);
+            keyCategoryRepository.save(keyCategory);
+            log.debug("Removed user group with name '{}' from key category with ID '{}'", userGroup.getName(), keyCategory.getId());
+        });
+        userGroupRepository.delete(userGroup);
         log.debug("Deleted user group '{}'", userGroupName);
     }
 
@@ -97,7 +115,8 @@ public class UserGroupService {
      * @since 0.3.0
      */
     public void deleteAll() {
-        userGroupRepository.deleteAll();
+        userGroupRepository.findAll()
+                .forEach(userGroup -> delete(userGroup.getName()));
         log.debug("Deleted all user groups");
     }
 
