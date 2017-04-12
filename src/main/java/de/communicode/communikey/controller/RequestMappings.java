@@ -134,7 +134,7 @@ public final class RequestMappings {
      *
      * @since 0.3.0
      */
-    public static final String AUTHORITIES_NAME = "{authorityName}";
+    public static final String AUTHORITIES_NAME = "/{authorityName}";
 
     private RequestMappings() {}
 }
