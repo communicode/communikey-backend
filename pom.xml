@@ -23,6 +23,12 @@
         <name>communicode AG</name>
         <url>https://communicode.de</url>
     </organization>
+    <licenses>
+        <!-- Overrides the definition from spring-boot-starter-parent -->
+        <license>
+            <name>Copyright (C) communicode AG - All Rights Reserved</name>
+        </license>
+    </licenses>
 
     <developers>
         <developer>
@@ -198,7 +204,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -233,6 +238,30 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludedGroups>de.communicode.communikey.CommunikeyIntegrationTest</excludedGroups>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                    <groups>de.communicode.communikey.CommunikeyIntegrationTest</groups>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>integration-tests</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
