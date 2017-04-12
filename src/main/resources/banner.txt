@@ -1,0 +1,14 @@
+${AnsiColor.GREEN}${AnsiStyle.BOLD}
+                                  .--.
+                                 /.-. '----------.
+                                 \'-' .--"--""-"-'
+                                  '--'${AnsiColor.BLUE}${AnsiStyle.NORMAL}
+ ██████╗ ██████╗ ${AnsiColor.GREEN}███╗   ███╗███╗   ███╗${AnsiColor.BLUE}██╗   ██╗███╗   ██╗██╗██╗  ██╗███████╗██╗   ██╗
+██╔════╝██╔═══██╗${AnsiColor.GREEN}████╗ ████║████╗ ████║${AnsiColor.BLUE}██║   ██║████╗  ██║██║██║ ██╔╝██╔════╝╚██╗ ██╔╝
+██║     ██║   ██║${AnsiColor.GREEN}██╔████╔██║██╔████╔██║${AnsiColor.BLUE}██║   ██║██╔██╗ ██║██║█████╔╝ █████╗   ╚████╔╝
+██║     ██║   ██║${AnsiColor.GREEN}██║╚██╔╝██║██║╚██╔╝██║${AnsiColor.BLUE}██║   ██║██║╚██╗██║██║██╔═██╗ ██╔══╝    ╚██╔╝
+╚██████╗╚██████╔╝${AnsiColor.GREEN}██║ ╚═╝ ██║██║ ╚═╝ ██║${AnsiColor.BLUE}╚██████╔╝██║ ╚████║██║██║  ██╗███████╗   ██║
+ ╚═════╝ ╚═════╝ ${AnsiColor.GREEN}╚═╝     ╚═╝╚═╝     ╚═╝ ${AnsiColor.BLUE}╚═════╝ ╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝
+
+${AnsiColor.GREEN}❱${AnsiColor.WHITE}${AnsiStyle.BOLD} Version: ${AnsiStyle.NORMAL}${application.version}
+${AnsiColor.GREEN}❱${AnsiColor.WHITE}${AnsiStyle.BOLD} Spring Boot: ${AnsiStyle.NORMAL}${spring-boot.version}
