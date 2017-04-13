@@ -1,3 +1,6 @@
+application:
+  version: 0.3.0
+
 spring:
   application:
     name: communikey

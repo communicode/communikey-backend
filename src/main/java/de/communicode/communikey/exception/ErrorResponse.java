@@ -62,7 +62,7 @@ public class ErrorResponse {
     }
 
     public List<String> getErrors() {
-        return new ArrayList<>(errors);
+        return errors;
     }
 
     public String getReason() {
@@ -82,7 +82,7 @@ public class ErrorResponse {
     }
 
     public void setErrors(List<String> errors) {
-        this.errors = new ArrayList<>(errors);
+        this.errors = errors;
     }
 
     public void setReason(String reason) {

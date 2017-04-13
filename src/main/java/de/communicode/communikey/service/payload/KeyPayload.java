@@ -9,7 +9,6 @@ package de.communicode.communikey.service.payload;
 import de.communicode.communikey.domain.Key;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**

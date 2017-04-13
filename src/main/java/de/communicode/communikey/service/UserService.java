@@ -35,7 +35,6 @@ import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -293,6 +292,20 @@ public class UserService {
      */
     public User validate(String login) throws UserNotFoundException {
         return ofNullable(userRepository.findOneByLogin(login)).orElseThrow(() -> new UserNotFoundException(login));
+    }
+
+    /**
+     * Validates the specified user credentials.
+     *
+     * @param login the login of the user to validate
+     * @param password the password of the user to validate
+     * @return {@code true} if the user credentials are valid, {@code false} otherwise
+     * @since 0.4.0
+     */
+    public boolean validateCredentials(String login, String password) {
+        return ofNullable(userRepository.findOneByLogin(login))
+            .map(user -> passwordEncoder.matches(password, user.getPassword()))
+            .orElse(Boolean.FALSE);
     }
 
     /**

@@ -24,5 +24,12 @@ public final class RequestParameter {
      */
     public static final String API_VERSION = "version";
 
+    /**
+     * The request parameter for the {@value RequestMappings#API} endpoint to validate a the credentials of a user.
+     *
+     * @since 0.4.0
+     */
+    public static final String API_VALIDATE_USER_CREDENTIALS = "validate_user";
+
     private RequestParameter() {}
 }

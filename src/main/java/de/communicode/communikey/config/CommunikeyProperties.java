@@ -52,6 +52,8 @@ public final class CommunikeyProperties {
             private int accessTokenValidity = 604800;
             @NotNull
             private String secret = "secret";
+            @NotBlank
+            private String redirectUrl = "http://localhost";
 
             public int getAccessTokenValidity() {
                 return accessTokenValidity;
@@ -72,6 +74,14 @@ public final class CommunikeyProperties {
             @Override
             public String toString() {
                 return "OAuth2{" + "accessTokenValidity=" + accessTokenValidity + '}';
+            }
+
+            public String getRedirectUrl() {
+                return redirectUrl;
+            }
+
+            public void setRedirectUrl(String redirectUrl) {
+                this.redirectUrl = redirectUrl;
             }
         }
 
