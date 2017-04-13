@@ -37,9 +37,9 @@ public class ApplicationDataBootstrap {
     private final AuthorityRepository authorityRepository;
     private final CommunikeyProperties communikeyProperties;
 
-    private Authority roleUser = new Authority();
-    private Authority roleAdmin = new Authority();
-    private User rootUser = new User();
+    private final Authority roleUser = new Authority();
+    private final Authority roleAdmin = new Authority();
+    private final User rootUser = new User();
 
     @Autowired
     public ApplicationDataBootstrap(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository,
