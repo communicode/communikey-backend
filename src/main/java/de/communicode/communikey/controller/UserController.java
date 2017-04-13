@@ -16,10 +16,8 @@ import static de.communicode.communikey.controller.RequestMappings.USERS_LOGIN;
 import static de.communicode.communikey.controller.RequestMappings.USERS_REGISTER;
 import static de.communicode.communikey.controller.RequestMappings.USERS_PASSWORD_RESET;
 import static de.communicode.communikey.controller.RequestMappings.USER_AUTHORITIES;
-import static de.communicode.communikey.controller.RequestMappings.USER_KEYS;
 import static java.util.Objects.requireNonNull;
 
-import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.UserService;
@@ -184,9 +182,9 @@ public class UserController {
      * @return the random generated reset key
      */
     @PostMapping(value = USERS_PASSWORD_RESET)
-    public ResponseEntity<Void> resetPassword(@Valid @RequestBody UserPasswordResetPayload payload) {
+    public ResponseEntity resetPassword(@Valid @RequestBody UserPasswordResetPayload payload) {
         userService.resetPassword(payload.getPassword(), payload.getResetKey());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
