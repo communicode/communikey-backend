@@ -34,6 +34,7 @@ import static de.communicode.communikey.controller.RequestMappings.USERS;
 import static de.communicode.communikey.controller.RequestMappings.USERS_ACTIVATE;
 import static de.communicode.communikey.controller.RequestMappings.USERS_PASSWORD_RESET;
 import static de.communicode.communikey.controller.RequestMappings.USERS_REGISTER;
+import static de.communicode.communikey.controller.RequestParameter.API_VALIDATE_USER_CREDENTIALS;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -99,6 +100,7 @@ public class OAuth2Config {
                 .antMatchers(USERS + USERS_ACTIVATE).permitAll()
                 .antMatchers(USERS + USERS_PASSWORD_RESET).permitAll()
                 .antMatchers("/oauth/authorize").permitAll()
+                .antMatchers(API + "{" + API_VALIDATE_USER_CREDENTIALS + "}").permitAll()
                 .antMatchers(API + "/**").authenticated()
             .and()
                 .csrf().disable();
