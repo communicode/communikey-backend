@@ -33,7 +33,7 @@ import java.util.Set;
  * @author sgreb@communicode.de
  * @since 0.4.0
  */
-public class UserApiIntegrationTest extends IntegrationBaseTest {
+public class UserApiIT extends IntegrationBaseTest {
 
     private String testUserLogin = "test";
     private String testUserEmail = testUserLogin + "@communicode.de";

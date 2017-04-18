@@ -25,7 +25,7 @@ import java.util.Map;
  * @author sgreb@communicode.de
  * @since 0.4.0
  */
-public class KeyApiIntegrationTest extends IntegrationBaseTest {
+public class KeyApiIT extends IntegrationBaseTest {
 
     private Map<String, String> keyPayload = new HashMap<>();
 

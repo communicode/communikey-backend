@@ -22,7 +22,7 @@ import org.springframework.http.HttpStatus;
  * @author sgreb@communicode.de
  * @since 0.4.0
  */
-public class ApiRootIntegrationTest extends IntegrationBaseTest {
+public class ApiRootIT extends IntegrationBaseTest {
 
     @Test
     public void testGetVersionAsAdmin() {
