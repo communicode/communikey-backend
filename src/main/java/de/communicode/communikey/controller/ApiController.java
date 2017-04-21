@@ -22,6 +22,7 @@ import de.communicode.communikey.service.payload.UserCredentialPayload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -82,6 +83,7 @@ public class ApiController {
      * @return {@code true} if the current user is privileged, {@code false} otherwise
      */
     @GetMapping(params = API_PRIVILEGED)
+    @Secured(value = {AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER})
     ResponseEntity isUserPrivileged(@RequestParam(value = API_PRIVILEGED) String privileged) {
         return new ResponseEntity<>(ImmutableMap.of(API_PRIVILEGED, SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)), HttpStatus.OK);
     }
