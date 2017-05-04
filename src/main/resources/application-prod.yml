@@ -4,8 +4,6 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://localhost:3306/communikey?useUnicode=true&characterEncoding=utf8&createDatabaseIfNotExist=true
-    username: root
-    password:
     hikari:
       data-source-properties:
         cachePrepStmts: true
