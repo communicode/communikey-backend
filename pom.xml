@@ -12,7 +12,7 @@
 
     <groupId>de.communicode</groupId>
     <artifactId>communikey</artifactId>
-    <version>0.1.0</version>
+    <version>${cckey.backend.version}</version>
     <packaging>jar</packaging>
 
     <name>communikey</name>
