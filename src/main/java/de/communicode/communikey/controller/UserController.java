@@ -21,6 +21,7 @@ import static java.util.Objects.requireNonNull;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.UserService;
+import de.communicode.communikey.service.payload.UserCreationPayload;
 import de.communicode.communikey.service.payload.UserPasswordResetPayload;
 import de.communicode.communikey.service.payload.UserPayload;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,7 +112,7 @@ public class UserController {
      */
     @PostMapping(value = USERS_REGISTER)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<User> create(@Valid @RequestBody UserPayload payload) {
+    public ResponseEntity<User> create(@Valid @RequestBody UserCreationPayload payload) {
         return new ResponseEntity<>(userService.create(payload), HttpStatus.CREATED);
     }
 

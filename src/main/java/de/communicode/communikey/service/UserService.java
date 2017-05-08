@@ -22,6 +22,7 @@ import de.communicode.communikey.repository.AuthorityRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
+import de.communicode.communikey.service.payload.UserCreationPayload;
 import de.communicode.communikey.service.payload.UserPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -101,7 +102,7 @@ public class UserService {
      * @return the created user
      * @throws UserConflictException if a user with the specified email already exists
      */
-    public User create(UserPayload payload) throws UserConflictException {
+    public User create(UserCreationPayload payload) throws UserConflictException {
         String email = payload.getEmail();
         validateUniqueEmail(email);
 
@@ -248,7 +249,6 @@ public class UserService {
                 }
                 user.setFirstName(payload.getFirstName());
                 user.setLastName(payload.getLastName());
-                user.setPassword(passwordEncoder.encode(payload.getPassword()));
 
                 userRepository.save(user);
                 log.debug("Updated user with login '{}'", user.getLogin());
