@@ -3,7 +3,7 @@ spring:
     active: test
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://localhost:3306/communikey?useUnicode=true&characterEncoding=utf8&createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/communikey?useUnicode=true&characterEncoding=utf8&createDatabaseIfNotExist=true&autoReconnect=true
     username: root
     password: root
     hikari:
