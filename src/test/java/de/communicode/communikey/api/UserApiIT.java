@@ -17,6 +17,7 @@ import de.communicode.communikey.controller.RequestMappings;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.UserCreationPayload;
+import de.communicode.communikey.service.payload.UserPayload;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.Test;
@@ -268,7 +269,7 @@ public class UserApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
-                .body(new UserCreationPayload(testUser))
+                .body(new UserPayload(testUser))
                 .pathParam("login", testUser.getLogin())
         .when()
                 .put(RequestMappings.USERS + RequestMappings.USERS_LOGIN)

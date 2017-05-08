@@ -13,7 +13,7 @@ import de.communicode.communikey.IntegrationBaseTest;
 import de.communicode.communikey.controller.RequestMappings;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
-import de.communicode.communikey.service.payload.UserPayload;
+import de.communicode.communikey.service.payload.UserCreationPayload;
 import io.restassured.http.ContentType;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -40,7 +40,7 @@ public class UserGroupApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
-                .body(new UserPayload(user))
+                .body(new UserCreationPayload(user))
         .when()
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER);
 
@@ -73,7 +73,7 @@ public class UserGroupApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
-                .body(new UserPayload(user))
+                .body(new UserCreationPayload(user))
         .when()
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER);
 
@@ -336,7 +336,7 @@ public class UserGroupApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
-                .body(new UserPayload(user))
+                .body(new UserCreationPayload(user))
         .when()
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER);
 
@@ -402,7 +402,7 @@ public class UserGroupApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
-                .body(new UserPayload(user))
+                .body(new UserCreationPayload(user))
         .when()
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER);
 
