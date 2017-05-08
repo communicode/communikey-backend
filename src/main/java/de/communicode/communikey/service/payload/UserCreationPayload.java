@@ -15,12 +15,12 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 /**
- * A payload object for a {@link User}.
+ * A payload object to create a {@link User}.
  *
  * @author sgreb@communicode.de
- * @since 0.2.0
+ * @since 0.5.0
  */
-public class UserPayload {
+public class UserCreationPayload {
 
     private Long id;
     private String login;
@@ -30,6 +30,10 @@ public class UserPayload {
     private String email;
 
     @NotBlank
+    @Size(min = 8)
+    private String password;
+
+    @NotBlank
     @Size(max = 50)
     private String firstName;
 
@@ -37,12 +41,13 @@ public class UserPayload {
     @Size(max = 50)
     private String lastName;
 
-    public UserPayload() {}
+    public UserCreationPayload() {}
 
-    public UserPayload(User user) {
+    public UserCreationPayload(User user) {
         this.id = user.getId();
         this.login = user.getLogin();
         this.email = user.getEmail();
+        this.password = user.getPassword();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
     }
@@ -65,6 +70,10 @@ public class UserPayload {
 
     public String getEmail() {
         return email.trim();
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String getFirstName() {
