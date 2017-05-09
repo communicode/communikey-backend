@@ -238,10 +238,10 @@ public class UserService {
      */
     public User update(String login, UserPayload payload) throws UserNotFoundException {
         String email = payload.getEmail();
-        validateUniqueEmail(email);
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
                 if (!user.getEmail().equals(email)) {
+                    validateUniqueEmail(email);
                     user.setEmail(email);
                     user.setLogin(extractLoginFromEmail(email));
                     deactivate(login);
