@@ -30,33 +30,44 @@ public final class CommunikeyProperties {
     private final Security security = new Security();
 
     public Security getSecurity() {
-        return security;
+        return this.security;
     }
 
+    /**
+     * Provides communikey specific security properties.
+     */
     public static class Security {
 
         private final OAuth2 oAuth2 = new OAuth2();
         private final Root root = new Root();
 
         public OAuth2 getoAuth2() {
-            return oAuth2;
+            return this.oAuth2;
         }
 
         public Root getRoot() {
-            return root;
+            return this.root;
         }
 
+        /**
+         * Provides communikey specific OAuth2 security properties.
+         */
         public static class OAuth2 {
 
+            /**
+             * The default validity of a communikey OAuth2 access token in seconds.
+             */
+            public int COMMUNIKEY_SECURITY_OAUTH2_DEFAULT_ACCESS_TOKEN_VALIDITY = 604800;
+
             @NotNull
-            private int accessTokenValidity = 604800;
+            private int accessTokenValidity = COMMUNIKEY_SECURITY_OAUTH2_DEFAULT_ACCESS_TOKEN_VALIDITY;
             @NotNull
             private String secret = "secret";
             @NotBlank
             private String redirectUrl = "http://localhost";
 
             public int getAccessTokenValidity() {
-                return accessTokenValidity;
+                return this.accessTokenValidity;
             }
 
             public void setAccessTokenValidity(int accessTokenValidity) {
@@ -64,7 +75,7 @@ public final class CommunikeyProperties {
             }
 
             public String getSecret() {
-                return secret;
+                return this.secret;
             }
 
             public void setSecret(String secret) {
@@ -73,11 +84,11 @@ public final class CommunikeyProperties {
 
             @Override
             public String toString() {
-                return "OAuth2{" + "accessTokenValidity=" + accessTokenValidity + '}';
+                return "OAuth2{" + "accessTokenValidity=" + this.accessTokenValidity + '}';
             }
 
             public String getRedirectUrl() {
-                return redirectUrl;
+                return this.redirectUrl;
             }
 
             public void setRedirectUrl(String redirectUrl) {
@@ -85,6 +96,9 @@ public final class CommunikeyProperties {
             }
         }
 
+        /**
+         * Provides communikey specific root user properties.
+         */
         public static class Root {
 
             @NotBlank
@@ -102,7 +116,7 @@ public final class CommunikeyProperties {
             private String lastName;
 
             public String getLogin() {
-                return login;
+                return this.login;
             }
 
             public void setLogin(String login) {
@@ -110,7 +124,7 @@ public final class CommunikeyProperties {
             }
 
             public String getEmail() {
-                return email;
+                return this.email;
             }
 
             public void setEmail(String email) {
@@ -118,7 +132,7 @@ public final class CommunikeyProperties {
             }
 
             public String getPassword() {
-                return password;
+                return this.password;
             }
 
             public void setPassword(String password) {
@@ -126,7 +140,7 @@ public final class CommunikeyProperties {
             }
 
             public String getFirstName() {
-                return firstName;
+                return this.firstName;
             }
 
             public void setFirstName(String firstName) {
@@ -134,7 +148,7 @@ public final class CommunikeyProperties {
             }
 
             public String getLastName() {
-                return lastName;
+                return this.lastName;
             }
 
             public void setLastName(String lastName) {
@@ -144,10 +158,10 @@ public final class CommunikeyProperties {
             @Override
             public String toString() {
                 return "Root{" +
-                    "login='" + login + '\'' +
-                    ", email='" + email + '\'' +
-                    ", firstName='" + firstName + '\'' +
-                    ", lastName='" + lastName + '\'' +
+                    "login='" + this.login + '\'' +
+                    ", email='" + this.email + '\'' +
+                    ", firstName='" + this.firstName + '\'' +
+                    ", lastName='" + this.lastName + '\'' +
                     '}';
             }
         }
@@ -155,13 +169,13 @@ public final class CommunikeyProperties {
         @Override
         public String toString() {
             return "Security{" +
-                "oAuth2=" + oAuth2 +
-                ", root=" + root +
+                "oAuth2=" + this.oAuth2 +
+                ", root=" + this.root +
                 '}';
         }
     }
 
     @Override public String toString() {
-        return "CommunikeyProperties{" + "security=" + security + '}';
+        return "CommunikeyProperties{" + "security=" + this.security + '}';
     }
 }
