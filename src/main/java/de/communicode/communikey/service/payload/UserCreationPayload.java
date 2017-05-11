@@ -25,7 +25,7 @@ public class UserCreationPayload extends UserPayload {
     public UserCreationPayload() {}
 
     public UserCreationPayload(User user) {
-        super();
+        super(user);
         this.password = user.getPassword();
     }
 
