@@ -214,17 +214,16 @@ public class UserService {
      *
      * @param newPassword the new password
      * @param resetKey the reset key of a user to reset the password of
-     * @return {@code true} if the password has been reset, {@code false} otherwise
      */
-    public boolean resetPassword(String newPassword, String resetKey) {
-        return ofNullable(userRepository.findOneByResetKey(resetKey))
+    public void resetPassword(String newPassword, String resetKey) {
+        ofNullable(userRepository.findOneByResetKey(resetKey))
             .map(user -> {
                 user.setPassword(passwordEncoder.encode(newPassword));
                 user.setResetKey(null);
                 user.setResetDate(null);
                 userRepository.save(user);
                 log.debug("Reset password with reset key '{}' for user with login '{}'", resetKey, user.getLogin());
-                return true;
+                return user;
             }).orElseThrow(() -> new ResetKeyNotFoundException(resetKey));
     }
 
