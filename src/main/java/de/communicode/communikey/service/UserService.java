@@ -22,6 +22,7 @@ import de.communicode.communikey.repository.AuthorityRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
+import de.communicode.communikey.service.payload.UserCreationPayload;
 import de.communicode.communikey.service.payload.UserPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -101,7 +102,7 @@ public class UserService {
      * @return the created user
      * @throws UserConflictException if a user with the specified email already exists
      */
-    public User create(UserPayload payload) throws UserConflictException {
+    public User create(UserCreationPayload payload) throws UserConflictException {
         String email = payload.getEmail();
         validateUniqueEmail(email);
 
@@ -213,17 +214,16 @@ public class UserService {
      *
      * @param newPassword the new password
      * @param resetKey the reset key of a user to reset the password of
-     * @return {@code true} if the password has been reset, {@code false} otherwise
      */
-    public boolean resetPassword(String newPassword, String resetKey) {
-        return ofNullable(userRepository.findOneByResetKey(resetKey))
+    public void resetPassword(String newPassword, String resetKey) {
+        ofNullable(userRepository.findOneByResetKey(resetKey))
             .map(user -> {
                 user.setPassword(passwordEncoder.encode(newPassword));
                 user.setResetKey(null);
                 user.setResetDate(null);
                 userRepository.save(user);
                 log.debug("Reset password with reset key '{}' for user with login '{}'", resetKey, user.getLogin());
-                return true;
+                return user;
             }).orElseThrow(() -> new ResetKeyNotFoundException(resetKey));
     }
 
@@ -248,7 +248,6 @@ public class UserService {
                 }
                 user.setFirstName(payload.getFirstName());
                 user.setLastName(payload.getLastName());
-                user.setPassword(passwordEncoder.encode(payload.getPassword()));
 
                 userRepository.save(user);
                 log.debug("Updated user with login '{}'", user.getLogin());
