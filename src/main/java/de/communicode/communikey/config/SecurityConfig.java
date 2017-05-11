@@ -49,14 +49,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @PostConstruct
-    public void init() {
-        try {
-            authenticationManagerBuilder
+    public void init() throws Exception {
+        authenticationManagerBuilder
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(passwordEncoder());
-        } catch (Exception e) {
-            throw new BeanInitializationException("Security configuration initialization failed", e);
-        }
     }
 
     @Override
