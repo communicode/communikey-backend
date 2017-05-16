@@ -82,7 +82,9 @@ public class KeyCategoryService {
             throw new KeyCategoryConflictException(
                 "parent key category ID '" + parentKeyCategoryId + "' equals child key category ID '" + childKeyCategoryId + "'");
         }
-        if (keyCategoryChildrenMap.getMap().get(childKeyCategoryId).contains(parentKeyCategoryId)) {
+        if (ofNullable(keyCategoryChildrenMap.getMap().get(childKeyCategoryId))
+            .map(children -> children.contains(parentKeyCategoryId))
+            .orElse(false)) {
             throw new KeyCategoryConflictException("key category with ID '" + parentKeyCategoryId + "' can not be set as own child reference");
         }
 
