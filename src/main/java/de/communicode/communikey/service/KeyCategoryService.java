@@ -353,6 +353,23 @@ public class KeyCategoryService {
     }
 
     /**
+     * Updates a key category with the specified payload.
+     *
+     * @param keyCategoryId the ID of the key category to update
+     * @param payload the payload to update the key category with
+     * @return the updated key category
+     * @since 0.6.0
+     */
+    public KeyCategory update(Long keyCategoryId, KeyCategoryPayload payload) {
+        KeyCategory keyCategory = validate(keyCategoryId);
+        validateUniqueKeyCategoryName(payload.getName(), ofNullable(keyCategory.getParent()).map(KeyCategory::getId).orElse(null));
+        keyCategory.setName(payload.getName());
+        keyCategory = keyCategoryRepository.save(keyCategory);
+        log.debug("Updated key category with ID '{}'", keyCategory.getId());
+        return keyCategory;
+    }
+
+    /**
      * Validates the specified key category.
      *
      * @param keyCategoryId the ID of the key category to validate
