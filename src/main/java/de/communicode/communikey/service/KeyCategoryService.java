@@ -82,7 +82,9 @@ public class KeyCategoryService {
             throw new KeyCategoryConflictException(
                 "parent key category ID '" + parentKeyCategoryId + "' equals child key category ID '" + childKeyCategoryId + "'");
         }
-        if (keyCategoryChildrenMap.getMap().get(childKeyCategoryId).contains(parentKeyCategoryId)) {
+        if (ofNullable(keyCategoryChildrenMap.getMap().get(childKeyCategoryId))
+            .map(children -> children.contains(parentKeyCategoryId))
+            .orElse(false)) {
             throw new KeyCategoryConflictException("key category with ID '" + parentKeyCategoryId + "' can not be set as own child reference");
         }
 
@@ -362,7 +364,7 @@ public class KeyCategoryService {
     }
 
     /**
-     * Validates that the specified key category name is unique.
+     * Validates that the specified key category name is unique within the tree level including the root.
      *
      * @param name the name of the key category to validate
      * @param parentKeyCategoryId the ID of the parent key category to validate
@@ -370,8 +372,10 @@ public class KeyCategoryService {
      */
     private void validateUniqueKeyCategoryName(String name, Long parentKeyCategoryId) throws KeyCategoryConflictException {
         if (Objects.nonNull(parentKeyCategoryId)) {
-            if (keyCategoryRepository.findOne(parentKeyCategoryId).getChildren().stream()
-                    .anyMatch(keyCategory -> keyCategory.getName().equals(name))) {
+            if (ofNullable(keyCategoryRepository.findOne(parentKeyCategoryId))
+                .map(keyCategory -> keyCategory.getChildren().stream()
+                    .anyMatch(children -> children.getName().equals(name)))
+                .orElse(true)) {
                 throw new KeyCategoryConflictException("key category '" + name + "' already exists");
             }
         } else if (keyCategoryRepository.findAllByParentIsNull().stream()
