@@ -220,4 +220,20 @@ public class KeyCategoryController {
     public ResponseEntity<KeyCategory> setResponsibleUser(@PathVariable Long keyCategoryId, @RequestParam String userLogin) {
         return new ResponseEntity<>(keyCategoryService.setResponsibleUser(keyCategoryId, userLogin), HttpStatus.OK);
     }
+
+    /**
+     * Updates a key category with the specified payload.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORIES_ID}".
+     *
+     * @param keyCategoryId the ID of the key category to update
+     * @param payload the key request payload to update the key category with
+     * @return the updated key category as response entity
+     * @since 0.6.0
+     */
+    @PutMapping(value = KEY_CATEGORIES_ID)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<KeyCategory> update(@PathVariable Long keyCategoryId, @Valid @RequestBody KeyCategoryPayload payload) {
+        return new ResponseEntity<>(keyCategoryService.update(keyCategoryId, payload), HttpStatus.OK);
+    }
 }
