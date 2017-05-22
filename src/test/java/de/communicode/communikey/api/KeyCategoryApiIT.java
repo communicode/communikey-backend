@@ -250,6 +250,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
 
         Map<String, String> keyPayload = new HashMap<>();
         keyPayload.put("name", fairy.textProducer().word(1));
+        keyPayload.put("login", fairy.person().getEmail());
         keyPayload.put("password", fairy.person().getPassword());
         Long createdKeyId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -858,6 +859,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
      */
     private void initializeTestKeyPayload() {
         keyPayload.put("name", fairy.textProducer().word(1));
+        keyPayload.put("login", fairy.person().getEmail());
         keyPayload.put("password", fairy.person().getPassword());
     }
 }
