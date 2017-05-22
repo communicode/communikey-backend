@@ -58,6 +58,10 @@ public class Key extends AbstractEntity implements Serializable {
 
     @NotNull
     @Column(nullable = false)
+    private String login;
+
+    @NotNull
+    @Column(nullable = false)
     private String password;
 
     public Long getId() {
@@ -90,6 +94,14 @@ public class Key extends AbstractEntity implements Serializable {
 
     public void setCreator(User creator) {
         this.creator = creator;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getPassword() {

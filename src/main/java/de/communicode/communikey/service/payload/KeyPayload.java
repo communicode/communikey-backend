@@ -20,6 +20,9 @@ import javax.validation.constraints.Size;
 public class KeyPayload {
 
     @NotBlank
+    private String login;
+
+    @NotBlank
     private String password;
 
     @NotBlank
@@ -27,6 +30,10 @@ public class KeyPayload {
     private String name;
 
     public KeyPayload() {}
+
+    public String getLogin() {
+        return login;
+    }
 
     public String getPassword() {
         return password;
