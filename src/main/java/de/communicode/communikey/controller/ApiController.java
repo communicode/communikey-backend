@@ -8,7 +8,9 @@ package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.CommunikeyApplication.COMMUNIKEY_REST_API_VERSION;
 import static de.communicode.communikey.controller.RequestMappings.API;
-import static de.communicode.communikey.controller.RequestParameter.*;
+import static de.communicode.communikey.controller.RequestParameter.API_VALIDATE_USER_CREDENTIALS;
+import static de.communicode.communikey.controller.RequestParameter.API_VERSION;
+import static de.communicode.communikey.controller.RequestParameter.API_ME;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
