@@ -15,11 +15,6 @@ package de.communicode.communikey.controller;
 public final class RequestParameter {
 
     /**
-     * The request parameter for the {@value RequestMappings#API} endpoint to get the privilege status of the current user.
-     */
-    public static final String API_PRIVILEGED = "privileged";
-
-    /**
      * The request parameter for the {@value RequestMappings#API} endpoint to get the version of the REST API.
      */
     public static final String API_VERSION = "version";
@@ -30,6 +25,11 @@ public final class RequestParameter {
      * @since 0.4.0
      */
     public static final String API_VALIDATE_USER_CREDENTIALS = "validate_user";
+
+    /**
+     * The request parameter for the {@value RequestMappings#API} endpoint to get information about the current user.
+     */
+    public static final String API_ME = "me";
 
     private RequestParameter() {}
 }
