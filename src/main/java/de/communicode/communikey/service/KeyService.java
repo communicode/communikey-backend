@@ -53,6 +53,7 @@ public class KeyService {
         User user = userService.validate(userLogin);
         key.setCreator(user);
         key.setName(payload.getName());
+        key.setLogin(payload.getLogin());
         key.setPassword(payload.getPassword());
         key = keyRepository.save(key);
         userService.addKey(userLogin, key);
@@ -109,7 +110,9 @@ public class KeyService {
      */
     public Key update(Long keyId, KeyPayload payload) {
         Key key = validate(keyId);
+        key.setLogin(payload.getLogin());
         key.setName(payload.getName());
+        key.setLogin(payload.getLogin());
         key.setPassword(payload.getPassword());
         key = keyRepository.save(key);
         log.debug("Updated key with ID '{}'", key.getId());

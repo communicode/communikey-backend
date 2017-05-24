@@ -277,6 +277,7 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .extract().body().as(Key.class).getId();
 
         keyPayload.replace("name", "newName");
+        keyPayload.replace("login", "newLogin");
         keyPayload.replace("password", "newPassword");
 
         given()
@@ -289,6 +290,7 @@ public class KeyApiIT extends IntegrationBaseTest {
         .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("name", equalTo(keyPayload.get("name")))
+                .body("login", equalTo(keyPayload.get("login")))
                 .body("password", equalTo(keyPayload.get("password")));
     }
 
@@ -306,6 +308,7 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .extract().body().as(Key.class).getId();
 
         keyPayload.replace("name", "newName");
+        keyPayload.replace("login", "login");
         keyPayload.replace("password", "newPassword");
 
         given()
@@ -324,6 +327,7 @@ public class KeyApiIT extends IntegrationBaseTest {
      */
     private void initializeTestKeyPayload() {
         keyPayload.put("name", "key");
+        keyPayload.put("login", "login");
         keyPayload.put("password", "password");
     }
 }
