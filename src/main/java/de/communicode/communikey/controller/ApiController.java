@@ -15,6 +15,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
+import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * The REST API controller to provide information about the communikey API.
@@ -108,11 +110,14 @@ public class ApiController {
     @Secured(value = {AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER})
     ResponseEntity getUserInformation(@RequestParam(value = API_ME) String me) {
         User user = userService.getWithAuthoritiesByLogin(SecurityUtils.getCurrentUserLogin());
-        return new ResponseEntity<>(ImmutableMap.of("login", user.getLogin(),
-                                                    "email", user.getEmail(),
-                                                    "firstName", user.getFirstName(),
-                                                    "lastName", isNull(user.getLastName()) ? "" : user.getLastName(),
-                                                    "privileged", SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)),
-                                                    HttpStatus.OK);
+        Map response = ImmutableMap.builder()
+            .put("login", user.getLogin())
+            .put("email", user.getEmail())
+            .put("firstName", user.getFirstName())
+            .put("lastName", isNull(user.getLastName()) ? "" : user.getLastName())
+            .put("privileged", SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN))
+            .put("authorities", user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toList()))
+            .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
