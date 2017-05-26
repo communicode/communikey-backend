@@ -8,12 +8,14 @@ package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.CommunikeyApplication.COMMUNIKEY_REST_API_VERSION;
 import static de.communicode.communikey.controller.RequestMappings.API;
-import static de.communicode.communikey.controller.RequestParameter.API_PRIVILEGED;
 import static de.communicode.communikey.controller.RequestParameter.API_VALIDATE_USER_CREDENTIALS;
 import static de.communicode.communikey.controller.RequestParameter.API_VERSION;
+import static de.communicode.communikey.controller.RequestParameter.API_ME;
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
+import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * The REST API controller to provide information about the communikey API.
@@ -70,25 +73,6 @@ public class ApiController {
     }
 
     /**
-     * Checks if the current {@link User} is privileged.
-     *
-     * <p>This endpoint is mapped to "{@value RequestMappings#API}".
-     *
-     * <p>Required parameter:
-     * <ul>
-     *     <li>{@value RequestParameter#API_PRIVILEGED}</li>
-     * </ul>
-     *
-     * @param privileged the request parameter to get the privilege status
-     * @return {@code true} if the current user is privileged, {@code false} otherwise
-     */
-    @GetMapping(params = API_PRIVILEGED)
-    @Secured(value = {AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER})
-    ResponseEntity isUserPrivileged(@RequestParam(value = API_PRIVILEGED) String privileged) {
-        return new ResponseEntity<>(ImmutableMap.of(API_PRIVILEGED, SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)), HttpStatus.OK);
-    }
-
-    /**
      * Checks if the {@link User} credentials are valid.
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#API}".
@@ -107,5 +91,33 @@ public class ApiController {
             return new ResponseEntity(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Outputs information about the current {@link User}.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#API}".
+     *
+     * <p>Required parameter:
+     * <ul>
+     *     <li>{@value RequestParameter#API_ME}</li>
+     * </ul>
+     *
+     * @param me the request parameter to get the user object information
+     * @return information about the current user
+     */
+    @GetMapping(params = API_ME)
+    @Secured(value = {AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER})
+    ResponseEntity getUserInformation(@RequestParam(value = API_ME) String me) {
+        User user = userService.getWithAuthoritiesByLogin(SecurityUtils.getCurrentUserLogin());
+        Map response = ImmutableMap.builder()
+            .put("login", user.getLogin())
+            .put("email", user.getEmail())
+            .put("firstName", user.getFirstName())
+            .put("lastName", isNull(user.getLastName()) ? "" : user.getLastName())
+            .put("privileged", SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN))
+            .put("authorities", user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toList()))
+            .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

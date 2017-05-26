@@ -52,7 +52,7 @@ public class ApiRootIT extends IntegrationBaseTest {
     public void testIsPrivilegedAsAdmin() {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .param(RequestParameter.API_PRIVILEGED)
+                .param(RequestParameter.API_ME)
         .when()
                 .get(RequestMappings.API)
         .then()
@@ -64,7 +64,7 @@ public class ApiRootIT extends IntegrationBaseTest {
     public void testIsPrivilegedAsUser() {
         given()
                 .auth().oauth2(userOAuth2AccessToken)
-                .param(RequestParameter.API_PRIVILEGED)
+                .param(RequestParameter.API_ME)
         .when()
                 .get(RequestMappings.API)
         .then()
