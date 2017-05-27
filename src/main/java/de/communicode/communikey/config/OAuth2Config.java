@@ -149,7 +149,9 @@ public class OAuth2Config {
 
         @Override
         public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
-            oauthServer.realm(APP_ID);
+            oauthServer
+                .realm(APP_ID)
+                .checkTokenAccess("permitAll()");
         }
     }
 }
