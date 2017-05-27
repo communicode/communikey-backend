@@ -7,8 +7,9 @@
 package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.CommunikeyApplication.COMMUNIKEY_REST_API_VERSION;
+import static de.communicode.communikey.config.SecurityConfig.APP_ID;
 import static de.communicode.communikey.controller.RequestMappings.API;
-import static de.communicode.communikey.controller.RequestParameter.API_VALIDATE_USER_CREDENTIALS;
+import static de.communicode.communikey.controller.RequestParameter.API_AUTHORIZE;
 import static de.communicode.communikey.controller.RequestParameter.API_VERSION;
 import static de.communicode.communikey.controller.RequestParameter.API_ME;
 import static java.util.Objects.isNull;
@@ -25,6 +26,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.OAuth2Request;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +43,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
+
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -48,10 +62,72 @@ import java.util.stream.Collectors;
 public class ApiController {
 
     private final UserService userService;
+    private final UserDetailsService restUserDetailsService;
+
+    private final AuthorizationServerTokenServices defaultAuthorizationServerTokenServices;
+
 
     @Autowired
-    public ApiController(UserService userService) {
+    public ApiController(UserService userService,
+                         AuthorizationServerTokenServices defaultAuthorizationServerTokenServices,
+                         UserDetailsService restUserDetailsService) {
         this.userService = requireNonNull(userService, "userService must not be null!");
+        this.restUserDetailsService = requireNonNull(restUserDetailsService, "restUserDetailsService must not be null!");
+        this.defaultAuthorizationServerTokenServices = requireNonNull(
+            defaultAuthorizationServerTokenServices, "defaultAuthorizationServerTokenServices must not be null!");
+    }
+
+    /**
+     * Authorizes a user if the specified {@link User} credentials are valid and returns a OAuth2 access token.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#API}".
+     *
+     * <p>Required parameter:
+     * <ul>
+     *     <li>{@value RequestParameter#API_AUTHORIZE}</li>
+     * </ul>
+     *
+     * @param payload the payload containing the user credentials
+     * @return a JSON payload of {@link OAuth2AccessToken} attributes if the user credentials are valid, a {@link HttpStatus#UNAUTHORIZED} otherwise
+     * @since 0.8.0
+     */
+    @PostMapping(params = API_AUTHORIZE)
+    ResponseEntity authorizeOAuth2(@Valid @RequestBody UserCredentialPayload payload) {
+        if (!userService.validateCredentials(payload.getLogin(), payload.getPassword())) {
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+        }
+
+        HashMap<String, String> authorizationParameters = new HashMap<>();
+        authorizationParameters.put("scope", "read,write");
+        authorizationParameters.put("client_id", APP_ID);
+        authorizationParameters.put("grant", "password");
+
+        User user = userService.validate(payload.getLogin());
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        user.getAuthorities().forEach(authority -> authorities.add(new SimpleGrantedAuthority(authority.getName())));
+
+        Set<String> responseType = new HashSet<>();
+        responseType.add("token");
+        Set<String> scopes = new HashSet<>();
+        scopes.add("read");
+        scopes.add("write");
+
+        UserDetails userDetails = restUserDetailsService.loadUserByUsername(payload.getLogin());
+        OAuth2Request authorizationRequest = new OAuth2Request(authorizationParameters, APP_ID, authorities, true, scopes, null, "", responseType, null);
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+
+        OAuth2Authentication authenticationRequest = new OAuth2Authentication(authorizationRequest, authenticationToken);
+        authenticationRequest.setAuthenticated(true);
+
+        OAuth2AccessToken accessToken = defaultAuthorizationServerTokenServices.createAccessToken(authenticationRequest);
+
+        return new ResponseEntity<>(ImmutableMap.builder()
+            .put(OAuth2AccessToken.ACCESS_TOKEN, accessToken.getValue())
+            .put(OAuth2AccessToken.TOKEN_TYPE, accessToken.getTokenType())
+            .put(OAuth2AccessToken.EXPIRES_IN, accessToken.getExpiresIn())
+            .build(),
+            HttpStatus.OK);
     }
 
     /**
@@ -70,27 +146,6 @@ public class ApiController {
     @GetMapping(params = API_VERSION)
     ResponseEntity<Map<String, String>> getRestApiVersion(@RequestParam(value = API_VERSION) String version) {
         return new ResponseEntity<>(ImmutableMap.of(API_VERSION, COMMUNIKEY_REST_API_VERSION), HttpStatus.OK);
-    }
-
-    /**
-     * Checks if the {@link User} credentials are valid.
-     *
-     * <p>This endpoint is mapped to "{@value RequestMappings#API}".
-     *
-     * <p>Required parameter:
-     * <ul>
-     *     <li>{@value RequestParameter#API_VALIDATE_USER_CREDENTIALS}</li>
-     * </ul>
-     *
-     * @param payload the payload containing the user credentials
-     * @return {@code true} if the user credentials are valid, {@code false} otherwise
-     */
-    @PostMapping(params = API_VALIDATE_USER_CREDENTIALS)
-    ResponseEntity isValidUserCredentials(@Valid @RequestBody UserCredentialPayload payload) {
-        if (userService.validateCredentials(payload.getLogin(), payload.getPassword())) {
-            return new ResponseEntity(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     /**
