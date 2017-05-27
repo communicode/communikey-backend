@@ -97,7 +97,7 @@ public class OAuth2Config {
                 .antMatchers(USERS + USERS_REGISTER).permitAll()
                 .antMatchers(USERS + USERS_ACTIVATE).permitAll()
                 .antMatchers(USERS + USERS_PASSWORD_RESET).permitAll()
-                .antMatchers("/oauth/authorize").permitAll()
+                .antMatchers("/oauth/authorize").denyAll()
             .and()
                 .csrf().disable();
         }
