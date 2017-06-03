@@ -97,7 +97,7 @@ public class UserGroupController {
      */
     @DeleteMapping(value = USER_GROUPS_NAME)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<UserGroup> delete(@PathVariable String userGroupName) {
+    public ResponseEntity<Void> delete(@PathVariable String userGroupName) {
         userGroupService.delete(userGroupName);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -112,7 +112,7 @@ public class UserGroupController {
      */
     @DeleteMapping
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<UserGroup> deleteAll() {
+    public ResponseEntity<Void> deleteAll() {
         userGroupService.deleteAll();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
