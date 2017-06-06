@@ -6,12 +6,11 @@
  */
 package de.communicode.communikey;
 
+import static io.restassured.RestAssured.given;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 import de.communicode.communikey.config.CommunikeyProperties;
-import de.communicode.communikey.config.SecurityConfig;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.repository.UserRepository;
@@ -23,6 +22,7 @@ import de.communicode.communikey.service.KeyService;
 import de.communicode.communikey.service.UserGroupService;
 import de.communicode.communikey.service.UserService;
 import io.codearte.jfairy.Fairy;
+import io.restassured.http.ContentType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.experimental.categories.Category;
@@ -31,10 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.common.util.OAuth2Utils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -90,10 +88,10 @@ public abstract class IntegrationBaseTest {
     public void setup() {
         fairy = Fairy.create();
         user = userRepository.save(createUser());
-        adminUserOAuth2AccessToken = generateOAuth2ImplicitGrantTypeFlowAccessToken(
+        adminUserOAuth2AccessToken = generateOAuth2AccessToken(
                 communikeyProperties.getSecurity().getRoot().getLogin(),
                 communikeyProperties.getSecurity().getRoot().getPassword());
-        userOAuth2AccessToken = generateOAuth2ImplicitGrantTypeFlowAccessToken(userLogin, decodedUserPassword);
+        userOAuth2AccessToken = generateOAuth2AccessToken(userLogin, decodedUserPassword);
     }
 
     @After
@@ -115,23 +113,20 @@ public abstract class IntegrationBaseTest {
      * @see <a href="https://tools.ietf.org/html/rfc6749#section-1.3.2"></a>RFC6749 - The OAuth 2.0 Authorization Framework</a>
      * @see <a href="http://oauthlib.readthedocs.io/en/latest/oauth2/grants/implicit.html"></a>oauthlib - Read The Docs</a>
      */
-    protected String generateOAuth2ImplicitGrantTypeFlowAccessToken(String login, String password) {
-        StringBuilder requestUrlBuilder = new StringBuilder();
+    protected String generateOAuth2AccessToken(String login, String password) {
         Map<String, String> oAuth2TokenRequestParam = new HashMap<>();
-        testRestTemplate = new TestRestTemplate(login, password);
+        oAuth2TokenRequestParam.put("login", login);
+        oAuth2TokenRequestParam.put("password", password);
 
-        oAuth2TokenRequestParam.put(OAuth2Utils.RESPONSE_TYPE, "token");
-        oAuth2TokenRequestParam.put(OAuth2Utils.CLIENT_ID, SecurityConfig.APP_ID);
-        oAuth2TokenRequestParam.put(OAuth2Utils.SCOPE, "read");
-        oAuth2TokenRequestParam.put(OAuth2Utils.REDIRECT_URI, communikeyProperties.getSecurity().getoAuth2().getRedirectUrl());
+        String url = "http://localhost:" + definedServerPort + "/api?authorize";
 
-        ResponseEntity oAuth2AccessTokenResponse = testRestTemplate.getForEntity(
-                requestUrlBuilder.append("http://localhost:").append(definedServerPort)
-                        .append("/oauth/authorize?")
-                        .append(Joiner.on("&").withKeyValueSeparator("=").join(oAuth2TokenRequestParam)).toString(),
-                String.class
-        );
-        return extractOAuth2AccessTokenFromRedirectUrl(oAuth2AccessTokenResponse.getHeaders().getLocation().toString());
+        return given()
+                .contentType(ContentType.JSON)
+                .body(oAuth2TokenRequestParam)
+        .when()
+                .post(url)
+        .then()
+                .extract().response().getBody().jsonPath().get(OAuth2AccessToken.ACCESS_TOKEN);
     }
 
     private User createUser() {
