@@ -105,7 +105,7 @@ public abstract class IntegrationBaseTest {
     }
 
     /**
-     * Generates a OAuth2 access token for the user with the specified login- and password using the "implicit" grant type flow.
+     * Generates a OAuth2 access token for the user with the specified login- and password.
      *
      * @param login the login of the user to generate the OAuth2 access token for
      * @param password the password of the user

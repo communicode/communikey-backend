@@ -59,7 +59,7 @@ public class UserApiIT extends IntegrationBaseTest {
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_ACTIVATE)
         .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.OK.value());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class UserApiIT extends IntegrationBaseTest {
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_DEACTIVATE)
         .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.OK.value());
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
