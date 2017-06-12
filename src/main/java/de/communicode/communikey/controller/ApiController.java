@@ -16,6 +16,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.security.AuthoritiesConstants;
@@ -97,29 +98,21 @@ public class ApiController {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
 
-        HashMap<String, String> authorizationParameters = new HashMap<>();
-        authorizationParameters.put("scope", "read,write");
-        authorizationParameters.put("client_id", APP_ID);
-        authorizationParameters.put("grant", "password");
-
         User user = userService.validate(payload.getLogin());
-        Set<GrantedAuthority> authorities = new HashSet<>();
-        user.getAuthorities().forEach(authority -> authorities.add(new SimpleGrantedAuthority(authority.getName())));
-
-        Set<String> responseType = new HashSet<>();
-        responseType.add("token");
-        Set<String> scopes = new HashSet<>();
-        scopes.add("read");
-        scopes.add("write");
-
         UserDetails userDetails = restUserDetailsService.loadUserByUsername(payload.getLogin());
+
+        Map<String, String> authorizationParameters = ImmutableMap.of("scope", "read,write", "client_id", APP_ID, "grant", "password");
+        Set<GrantedAuthority> authorities = user.getAuthorities().stream()
+                .map(Authority::getName)
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toSet());
+        Set<String> responseType = ImmutableSet.of("token");
+        Set<String> scopes = ImmutableSet.of("read", "write");
+
         OAuth2Request authorizationRequest = new OAuth2Request(authorizationParameters, APP_ID, authorities, true, scopes, null, "", responseType, null);
-
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
-
         OAuth2Authentication authenticationRequest = new OAuth2Authentication(authorizationRequest, authenticationToken);
         authenticationRequest.setAuthenticated(true);
-
         OAuth2AccessToken accessToken = defaultAuthorizationServerTokenServices.createAccessToken(authenticationRequest);
 
         return new ResponseEntity<>(ImmutableMap.builder()
