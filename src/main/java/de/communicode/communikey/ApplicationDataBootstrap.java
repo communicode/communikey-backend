@@ -7,8 +7,8 @@
 package de.communicode.communikey;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toSet;
 
-import com.google.common.collect.Sets;
 import de.communicode.communikey.config.CommunikeyProperties;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.repository.AuthorityRepository;
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Component
 public class ApplicationDataBootstrap {
@@ -81,11 +82,9 @@ public class ApplicationDataBootstrap {
             this.rootUser.setPassword(passwordEncoder.encode(communikeyProperties.getSecurity().getRoot().getPassword()));
             this.rootUser.setActivationKey(SecurityUtils.generateRandomActivationKey());
             this.rootUser.setActivated(true);
-            Set<Authority> authorities = Sets.newConcurrentHashSet();
-            final Authority authorityAdmin = authorityRepository.findOne(AuthoritiesConstants.ADMIN);
-            final Authority authorityUser = authorityRepository.findOne(AuthoritiesConstants.USER);
-            authorities.add(authorityAdmin);
-            authorities.add(authorityUser);
+            final Set<Authority> authorities = Stream.of(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
+                    .map(authorityRepository::findOne)
+                    .collect(toSet());
             this.rootUser.addAuthorities(authorities);
 
             this.userRepository.save(rootUser);
