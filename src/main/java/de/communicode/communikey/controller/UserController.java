@@ -77,9 +77,8 @@ public class UserController {
      */
     @GetMapping(value = USERS_ACTIVATE)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<Void> activate(@RequestParam(value = USER_ACTIVATION_KEY) String activationKey) {
-        userService.activate(activationKey);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<User> activate(@RequestParam(value = USER_ACTIVATION_KEY) String activationKey) {
+        return new ResponseEntity<>(userService.activate(activationKey), HttpStatus.OK);
     }
 
     /**
@@ -97,9 +96,8 @@ public class UserController {
      */
     @GetMapping(value = USERS_DEACTIVATE)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<Void> deactivate(@RequestParam(value = USER_LOGIN) String login) {
-        userService.deactivate(login);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<User> deactivate(@RequestParam(value = USER_LOGIN) String login) {
+        return new ResponseEntity<>(userService.deactivate(login), HttpStatus.OK);
     }
 
     /**

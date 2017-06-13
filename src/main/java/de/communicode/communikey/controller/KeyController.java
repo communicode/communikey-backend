@@ -90,7 +90,7 @@ public class KeyController {
      */
     @DeleteMapping
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<Key> deleteAll() {
+    public ResponseEntity<Void> deleteAll() {
         keyService.deleteAll();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

@@ -158,8 +158,8 @@ public class KeyCategoryController {
      */
     @GetMapping(value = KEY_CATEGORIES_ID)
     @Secured(AuthoritiesConstants.ADMIN)
-    KeyCategory get(@PathVariable Long keyCategoryId) throws KeyCategoryNotFoundException {
-        return keyCategoryService.get(keyCategoryId);
+    ResponseEntity<KeyCategory> get(@PathVariable Long keyCategoryId) throws KeyCategoryNotFoundException {
+        return new ResponseEntity<>(keyCategoryService.get(keyCategoryId), HttpStatus.OK);
     }
 
     /**
@@ -170,8 +170,8 @@ public class KeyCategoryController {
      * @return a collection of key categories
      */
     @GetMapping
-    Set<KeyCategory> getAll() {
-        return keyCategoryService.getAll();
+    ResponseEntity<Set<KeyCategory>> getAll() {
+        return new ResponseEntity<>(keyCategoryService.getAll(), HttpStatus.OK);
     }
 
     /**
