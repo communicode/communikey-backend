@@ -59,7 +59,7 @@ public class UserApiIT extends IntegrationBaseTest {
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_ACTIVATE)
         .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.OK.value());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class UserApiIT extends IntegrationBaseTest {
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_DEACTIVATE)
         .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+                .statusCode(HttpStatus.OK.value());
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -299,7 +299,7 @@ public class UserApiIT extends IntegrationBaseTest {
                 .body("authorities.name", hasItem(not(containsString(AuthoritiesConstants.ADMIN))))
                 .root("authorities")
                 .body("size()", equalTo(1));
-        String invalidatedTestUserOAuth2AccessToken = generateOAuth2ImplicitGrantTypeFlowAccessToken(testUser.getLogin(), testUser.getPassword());
+        String invalidatedTestUserOAuth2AccessToken = generateOAuth2AccessToken(testUser.getLogin(), testUser.getPassword());
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
