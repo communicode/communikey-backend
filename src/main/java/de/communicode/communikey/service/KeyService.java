@@ -19,6 +19,7 @@ import de.communicode.communikey.repository.KeyRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -34,11 +35,13 @@ public class KeyService {
 
     private static final Logger log = LogManager.getLogger();
     private final KeyRepository keyRepository;
+    private final KeyCategoryService keyCategoryService;
     private final UserService userService;
 
     @Autowired
-    public KeyService(KeyRepository keyRepository, UserService userRestService) {
+    public KeyService(KeyRepository keyRepository, @Lazy KeyCategoryService keyCategoryService, UserService userRestService) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
+        this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
         this.userService = requireNonNull(userRestService, "userService must not be null!");
     }
 
@@ -55,10 +58,16 @@ public class KeyService {
         key.setName(payload.getName());
         key.setLogin(payload.getLogin());
         key.setPassword(payload.getPassword());
-        key = keyRepository.save(key);
-        userService.addKey(userLogin, key);
-        log.debug("Created new key with ID '{}'", key.getId());
-        return key;
+        Key persistedKey = keyRepository.save(key);
+        log.debug("Created new key with ID '{}'", persistedKey.getId());
+
+        if (ofNullable(payload.getCategoryId()).isPresent()) {
+            keyCategoryService.addKey(payload.getCategoryId(), persistedKey.getId());
+            persistedKey = keyRepository.findOne(persistedKey.getId());
+        }
+
+        userService.addKey(userLogin, persistedKey);
+        return persistedKey;
     }
 
     /**
