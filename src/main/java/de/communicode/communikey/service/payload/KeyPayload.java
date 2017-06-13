@@ -19,27 +19,34 @@ import javax.validation.constraints.Size;
  */
 public class KeyPayload {
 
+    private Long categoryId;
     @NotBlank
     private String login;
-
-    @NotBlank
-    private String password;
-
     @NotBlank
     @Size(max = 100)
     private String name;
+    @NotBlank
+    private String password;
 
     public KeyPayload() {}
+
+    /**
+     * @return the category ID
+     * @since 0.8.0
+     */
+    public Long getCategoryId() {
+        return this.categoryId;
+    }
 
     public String getLogin() {
         return login;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public String getName() {
         return name.trim();
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
