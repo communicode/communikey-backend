@@ -8,12 +8,13 @@ package de.communicode.communikey.domain;
 
 import static de.communicode.communikey.config.SecurityConfig.EMAIL_REGEX;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.collect.Sets;
 import de.communicode.communikey.service.view.AuthoritiesRestView;
-import org.hibernate.annotations.BatchSize;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
@@ -103,28 +104,31 @@ public class User extends AbstractEntity implements Serializable {
         name = "users_authorities",
         joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
-    @BatchSize(size = 20)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
+    @JsonIdentityReference(alwaysAsId = true)
     @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<Authority> authorities = Sets.newConcurrentHashSet();
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
-    @JsonIgnoreProperties(value = {"users", "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "categories"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<UserGroup> groups = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
-    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "category", "creator", "password"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private final Set<Key> keys = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
-    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "parent", "children", "creator", "responsible", "groups",
-            "keys"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<KeyCategory> keyCategories = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "responsible")
-    @JsonIgnoreProperties(value = {"children", "responsible", "keys", "parent", "groups", "creator", "createdBy", "createdDate", "lastModifiedBy",
-        "lastModifiedDate"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<KeyCategory> responsibleKeyCategories = Sets.newConcurrentHashSet();
 

@@ -6,7 +6,9 @@
  */
 package de.communicode.communikey.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.collect.Sets;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -49,24 +51,26 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     private String name;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "category")
-    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "creator", "category"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private final Set<Key> keys = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn
-    @JsonIgnoreProperties(value = {"groups", "children", "keys"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private KeyCategory parent;
 
     @NotNull
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "parent")
-    @JsonIgnoreProperties(value = {"groups", "parent"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private final Set<KeyCategory> children = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn(name = "creator_user_id", nullable = false)
-    @JsonIgnoreProperties(value = {
-        "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
-        "authorities", "groups", "keyCategories", "responsibleKeyCategories", "keys"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private User creator;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -74,14 +78,14 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         name = "key_categories_user_groups",
         joinColumns = {@JoinColumn(name = "key_category_id", referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(name = "user_group_id", referencedColumnName = "id")})
-    @JsonIgnoreProperties(value = {"categories", "users"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private final Set<UserGroup> groups = Sets.newConcurrentHashSet();
 
     @ManyToOne
     @JoinColumn(name = "responsible_user_id")
-    @JsonIgnoreProperties(value = {
-        "createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
-        "authorities", "groups", "keyCategories", "responsibleKeyCategories", "keys"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     private User responsible;
 
     public Long getId() {
