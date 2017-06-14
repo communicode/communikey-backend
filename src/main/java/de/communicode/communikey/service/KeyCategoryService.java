@@ -8,8 +8,8 @@ package de.communicode.communikey.service;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toCollection;
 
-import com.google.common.collect.Sets;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
@@ -26,16 +26,14 @@ import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
-import de.communicode.communikey.support.KeyCategoryChildrenMap;
-import de.communicode.communikey.support.KeyCategoryParentMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * The REST API service to process {@link KeyCategory} entities via a {@link KeyCategoryRepository}.
@@ -54,8 +52,6 @@ public class KeyCategoryService {
     private final KeyService keyService;
     private final UserGroupService userGroupService;
     private final UserGroupRepository userGroupRepository;
-    private final KeyCategoryChildrenMap keyCategoryChildrenMap = KeyCategoryChildrenMap.getInstance();
-    private final KeyCategoryParentMap keyCategoryParentMap = KeyCategoryParentMap.getInstance();
 
     @Autowired
     public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService, KeyService keyService, KeyRepository keyRepository,
@@ -82,42 +78,14 @@ public class KeyCategoryService {
             throw new KeyCategoryConflictException(
                 "parent key category ID '" + parentKeyCategoryId + "' equals child key category ID '" + childKeyCategoryId + "'");
         }
-        if (ofNullable(keyCategoryChildrenMap.getMap().get(childKeyCategoryId))
-            .map(children -> children.contains(parentKeyCategoryId))
-            .orElse(false)) {
-            throw new KeyCategoryConflictException("key category with ID '" + parentKeyCategoryId + "' can not be set as own child reference");
-        }
 
         KeyCategory child = this.validate(childKeyCategoryId);
-        validateUniqueKeyCategoryName(child.getName(), parentKeyCategoryId);
         KeyCategory parent = validate(parentKeyCategoryId);
-        if (parent.addChild(child)) {
-            ofNullable(child.getParent()).ifPresent(directParent -> {
-                keyCategoryChildrenMap.getMap().get(directParent.getId()).remove(childKeyCategoryId);
-                keyCategoryParentMap.getMap().get(directParent.getId())
-                    .forEach(subParentId -> keyCategoryChildrenMap.getMap().get(subParentId).remove(childKeyCategoryId));
-                keyCategoryParentMap.getMap().get(childKeyCategoryId)
-                    .forEach(subChildId -> keyCategoryChildrenMap.getMap().get(subChildId).removeAll(keyCategoryChildrenMap.getMap().get(childKeyCategoryId)));
-                keyCategoryParentMap.getMap().get(childKeyCategoryId).retainAll(keyCategoryParentMap.getMap().get(parentKeyCategoryId));
-                keyCategoryChildrenMap.getMap().get(childKeyCategoryId)
-                    .forEach(subChildId -> {
-                        keyCategoryParentMap.getMap().get(subChildId).retainAll(keyCategoryParentMap.getMap().get(validate(subChildId).getParent().getId()));
-                        keyCategoryParentMap.getMap().get(subChildId).add(validate(subChildId).getParent().getId());
-                    });
-                keyCategoryParentMap.getMap().get(childKeyCategoryId).add(parentKeyCategoryId);
-            });
+        validateUniqueKeyCategoryName(child.getName(), parentKeyCategoryId);
 
+        if (parent.addChild(child)) {
             child.setParent(parent);
             log.debug("Added key category with ID '{}' as child to key category with ID '{}'", child.getId(), parent.getId());
-
-            keyCategoryChildrenMap.getMap().get(parentKeyCategoryId).add(childKeyCategoryId);
-            keyCategoryChildrenMap.getMap().get(parentKeyCategoryId).addAll(keyCategoryChildrenMap.getMap().get(childKeyCategoryId));
-            keyCategoryParentMap.getMap().get(childKeyCategoryId).add(parentKeyCategoryId);
-            keyCategoryParentMap.getMap().get(childKeyCategoryId).addAll(keyCategoryParentMap.getMap().get(parentKeyCategoryId));
-            keyCategoryChildrenMap.getMap().get(parentKeyCategoryId)
-                .forEach(childId -> keyCategoryParentMap.getMap().get(childId).addAll(keyCategoryParentMap.getMap().get(childKeyCategoryId)));
-            keyCategoryParentMap.getMap().get(childKeyCategoryId)
-                .forEach(parentId -> keyCategoryChildrenMap.getMap().get(parentId).addAll(keyCategoryChildrenMap.getMap().get(parentKeyCategoryId)));
             return keyCategoryRepository.save(parent);
         }
         return parent;
@@ -188,8 +156,6 @@ public class KeyCategoryService {
 
         user.addResponsibleKeyCategory(keyCategory);
         userRepository.save(user);
-        keyCategoryChildrenMap.getMap().put(keyCategory.getId(), Sets.newConcurrentHashSet());
-        keyCategoryParentMap.getMap().put(keyCategory.getId(), Sets.newConcurrentHashSet());
         log.debug("Created new key category with ID '{}'", keyCategory.getId());
         return keyCategory;
     }
@@ -204,15 +170,7 @@ public class KeyCategoryService {
      */
     public void delete(Long keyCategoryId) throws KeyCategoryNotFoundException {
         KeyCategory keyCategory = validate(keyCategoryId);
-
-        keyCategoryChildrenMap.getMap().get(keyCategoryId)
-                .forEach(childKeyCategoryId -> dissolveReferences(validate(childKeyCategoryId)));
-        keyCategoryChildrenMap.getMap().get(keyCategoryId)
-                .forEach(childKeyCategoryId -> keyCategoryRepository.delete(validate(childKeyCategoryId)));
-
         keyCategory = dissolveReferences(keyCategory);
-        updateReferenceMapsOnDelete(keyCategoryId);
-
         keyCategoryRepository.delete(keyCategory);
         log.debug("Deleted key category with ID '{}'", keyCategoryId);
     }
@@ -222,59 +180,22 @@ public class KeyCategoryService {
      */
     public void deleteAll() {
         keyCategoryRepository.deleteAll();
-        keyCategoryChildrenMap.getMap().clear();
-        keyCategoryParentMap.getMap().clear();
         log.debug("Deleted all key categories");
     }
 
     /**
      * Gets all key category entities the current user is authorized to receive.
      *
-     * <p>If a key category is already included as direct- or indirect child of another key category, only the parent key category should be added to the return
-     * collection.
-     *
-     * <p>Example of a collection with multiple indirect key category children references:
-     * <pre>
-     *     |-- category1
-     *     |   |-- category2
-     *     |   |   |-- category3
-     *     |   |-- category4
-     *     |   |   |-- category5
-     *     |-- category2
-     *     |   |-- category3
-     *     |-- category3
-     *     |-- category4
-     *     |   |-- category5
-     *     |-- category5
-     *     |-- category6
-     * </pre>
-     *
-     * <p>This will be reduced to contain no more duplicated key categories:
-     * <pre>
-     *     |-- category1
-     *     |   |-- category2
-     *     |   |   |-- category3
-     *     |   |-- category4
-     *     |   |   |-- category5
-     *     |-- category6
-     * </pre>
-     *
      * @return a collection of key categories
      */
     public Set<KeyCategory> getAll() {
-        Set<KeyCategory> authorizedKeyCategories = Sets.newConcurrentHashSet();
-
         if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
-            authorizedKeyCategories.addAll(keyCategoryRepository.findAll());
+            return new HashSet<>(keyCategoryRepository.findAll());
         } else {
-            userService.validate(SecurityUtils.getCurrentUserLogin()).getGroups().stream()
+            return userService.validate(SecurityUtils.getCurrentUserLogin()).getGroups().stream()
                     .flatMap(userGroup -> userGroup.getCategories().stream())
-                    .forEach(authorizedKeyCategories::add);
+                    .collect(toCollection(HashSet::new));
         }
-        return authorizedKeyCategories.stream()
-            .filter(childCategory -> authorizedKeyCategories.stream()
-                .noneMatch(parentCategory -> keyCategoryChildrenMap.getMap().get(parentCategory.getId()).contains(childCategory.getId())))
-            .collect(Collectors.toSet());
     }
 
     /**
@@ -415,46 +336,21 @@ public class KeyCategoryService {
                 .forEach(key -> {
                     key.setCategory(null);
                     keyRepository.save(key);
-                    log.debug("Removed key category with ID '{}' from key with ID '{}'", keyCategory.getId(), key.getId());
+                    log.debug("Unbind key category with ID '{}' from key with ID '{}'", keyCategory.getId(), key.getId());
                 });
         keyCategory.getGroups()
                 .forEach(userGroup -> {
                     userGroup.removeCategory(keyCategory);
                     userGroupRepository.save(userGroup);
-                    log.debug("Removed key category with ID '{}' from user group with name '{}'", keyCategory.getId(), userGroup.getName());
+                    log.debug("Unbind key category with ID '{}' from user group with name '{}'", keyCategory.getId(), userGroup.getName());
                 });
+        keyCategory.getChildren().forEach(child -> delete(child.getId()));
+
+        KeyCategory parent = keyCategory.getParent();
         keyCategory.setParent(null);
         keyCategory.removeAllChildren();
+        parent.removeChild(keyCategory);
+        keyCategoryRepository.save(parent);
         return keyCategoryRepository.save(keyCategory);
-    }
-
-    /**
-     * Deletes the key category with the specified ID from the {@link KeyCategoryParentMap} and {@link KeyCategoryChildrenMap}.
-     *
-     * <p>Used to prepare the deletion of a key category.
-     *
-     * @param keyCategoryId the ID of the key category to delete from the reference maps
-     * @since 0.3.0
-     */
-    private void updateReferenceMapsOnDelete(Long keyCategoryId) {
-        keyCategoryParentMap.getMap().get(keyCategoryId)
-                .forEach(parentId -> {
-                    keyCategoryChildrenMap.getMap().get(parentId).removeAll(keyCategoryChildrenMap.getMap().get(keyCategoryId));
-                    log.debug("Removed children key categories with the IDs {} from the key category with the ID '{}'",
-                            keyCategoryChildrenMap.getMap().get(keyCategoryId), parentId);
-                    keyCategoryChildrenMap.getMap().get(parentId).remove(keyCategoryId);
-                    log.debug("Removed children key category with the ID '{}' from the key category with the ID '{}'", keyCategoryId, parentId);
-                });
-        keyCategoryChildrenMap.getMap().get(keyCategoryId)
-                .forEach(childId -> {
-                    keyCategoryParentMap.getMap().remove(childId);
-                    log.debug("Removed children key category with the ID '{}' from the key category parent map", childId);
-                    keyCategoryChildrenMap.getMap().remove(childId);
-                    log.debug("Removed children key category with the ID '{}' from the key category children map", childId);
-                });
-        keyCategoryParentMap.getMap().remove(keyCategoryId);
-        log.debug("Removed children key category with the ID '{}' from the key category parent map", keyCategoryId);
-        keyCategoryChildrenMap.getMap().remove(keyCategoryId);
-        log.debug("Removed children key category with the ID '{}' from the key category children map", keyCategoryId);
     }
 }

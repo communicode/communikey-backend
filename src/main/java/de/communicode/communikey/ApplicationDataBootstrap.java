@@ -16,8 +16,6 @@ import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
-import de.communicode.communikey.support.KeyCategoryChildrenMap;
-import de.communicode.communikey.support.KeyCategoryParentMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import de.communicode.communikey.domain.User;
@@ -56,11 +54,6 @@ public class ApplicationDataBootstrap {
     public final void initialize() {
         this.initializeAuthorities();
         this.initializeUser();
-
-        final KeyCategoryChildrenMap keyCategoryChildrenMap = KeyCategoryChildrenMap.getInstance();
-        keyCategoryChildrenMap.initialize(keyCategoryRepository.findAll());
-        final KeyCategoryParentMap keyCategoryParentMap = KeyCategoryParentMap.getInstance();
-        keyCategoryParentMap.initialize(keyCategoryRepository.findAll());
     }
 
     private void initializeAuthorities() {
