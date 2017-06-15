@@ -74,13 +74,16 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if a key category with specified ID has not been found
      */
     public KeyCategory addChild(Long parentKeyCategoryId, Long childKeyCategoryId) throws KeyCategoryNotFoundException {
+        KeyCategory child = this.validate(childKeyCategoryId);
+        KeyCategory parent = validate(parentKeyCategoryId);
+
         if (Objects.equals(parentKeyCategoryId, childKeyCategoryId)) {
             throw new KeyCategoryConflictException(
                 "parent key category ID '" + parentKeyCategoryId + "' equals child key category ID '" + childKeyCategoryId + "'");
         }
-
-        KeyCategory child = this.validate(childKeyCategoryId);
-        KeyCategory parent = validate(parentKeyCategoryId);
+        if (parent.getTreeLevel() > child.getTreeLevel()) {
+            throw new KeyCategoryConflictException("key category with ID '" + parentKeyCategoryId + "' can not be set as own child reference");
+        }
         validateUniqueKeyCategoryName(child.getName(), parentKeyCategoryId);
 
         if (parent.addChild(child)) {
