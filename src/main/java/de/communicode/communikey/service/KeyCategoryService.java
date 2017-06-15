@@ -351,11 +351,8 @@ public class KeyCategoryService {
                 });
         keyCategory.getChildren().forEach(child -> delete(child.getId()));
 
-        KeyCategory parent = keyCategory.getParent();
         keyCategory.setParent(null);
         keyCategory.removeAllChildren();
-        parent.removeChild(keyCategory);
-        keyCategoryRepository.save(parent);
         return keyCategoryRepository.save(keyCategory);
     }
 
