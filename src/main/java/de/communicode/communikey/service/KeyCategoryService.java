@@ -81,13 +81,15 @@ public class KeyCategoryService {
             throw new KeyCategoryConflictException(
                 "parent key category ID '" + parentKeyCategoryId + "' equals child key category ID '" + childKeyCategoryId + "'");
         }
-        if (parent.getTreeLevel() > child.getTreeLevel()) {
-            throw new KeyCategoryConflictException("key category with ID '" + parentKeyCategoryId + "' can not be set as own child reference");
+        if (child.getTreeLevel() < parent.getTreeLevel()) {
+            checkPathCollision(parent, childKeyCategoryId);
         }
         validateUniqueKeyCategoryName(child.getName(), parentKeyCategoryId);
 
         if (parent.addChild(child)) {
             child.setParent(parent);
+            child.setTreeLevel(parent.getTreeLevel() + 1);
+            updateChildrenTreeLevel(child);
             log.debug("Added key category with ID '{}' as child to key category with ID '{}'", child.getId(), parent.getId());
             return keyCategoryRepository.save(parent);
         }
@@ -355,5 +357,37 @@ public class KeyCategoryService {
         parent.removeChild(keyCategory);
         keyCategoryRepository.save(parent);
         return keyCategoryRepository.save(keyCategory);
+    }
+
+    /**
+     * Checks for a path collision when the level of the parent key category is higher than the level of the child key category.
+     *
+     * @param parent the parent key category
+     * @param childKeyCategoryId the ID of the child key category
+     * @since 0.9.0
+     */
+    private void checkPathCollision(KeyCategory parent, Long childKeyCategoryId) {
+        ofNullable(parent.getParent()).ifPresent(higherLevelParent -> {
+            if (Objects.equals(higherLevelParent.getId(), childKeyCategoryId)) {
+                throw new KeyCategoryConflictException("key category with ID '" + higherLevelParent.getId() + "' can not be set as own child reference");
+            } else {
+                checkPathCollision(parent.getParent(), childKeyCategoryId);
+            }
+        });
+    }
+
+    /**
+     * Recursively updates all direct- and indirect key category children tree level of the specified key category.
+     *
+     * @param keyCategory the key category to update all direct- and indirect children of
+     * @since 0.9.0
+     */
+    private void updateChildrenTreeLevel(KeyCategory keyCategory) {
+        if (!keyCategory.getChildren().isEmpty()) {
+            for (KeyCategory child : keyCategory.getChildren()) {
+                child.setTreeLevel(keyCategory.getTreeLevel() + 1);
+                updateChildrenTreeLevel(child);
+            }
+        }
     }
 }
