@@ -67,6 +67,9 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     @JsonIdentityReference(alwaysAsId = true)
     private final Set<KeyCategory> children = Sets.newConcurrentHashSet();
 
+    @NotNull
+    private int treeLevel = 0;
+
     @ManyToOne
     @JoinColumn(name = "creator_user_id", nullable = false)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
@@ -158,6 +161,14 @@ public class KeyCategory extends AbstractEntity implements Serializable {
 
     public Set<KeyCategory> getChildren() {
         return Sets.newConcurrentHashSet(children);
+    }
+
+    public int getTreeLevel() {
+        return treeLevel;
+    }
+
+    public void setTreeLevel(int treeLevel) {
+        this.treeLevel = treeLevel;
     }
 
     public User getCreator() {
