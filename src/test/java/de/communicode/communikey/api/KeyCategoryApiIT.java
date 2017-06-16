@@ -49,7 +49,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         keyCategoryPayload.replace("name", fairy.textProducer().word(1));
         Long createdChildKeyCategoryId = given()
@@ -59,7 +59,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
                 .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -83,7 +83,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         keyCategoryPayload.replace("name", fairy.textProducer().word(1));
         Long createdChildKeyCategoryId = given()
@@ -93,7 +93,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
@@ -117,7 +117,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         String createdUserGroupName = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -161,7 +161,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         String createdUserGroupName = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -203,7 +203,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         Long createdKeyId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -212,7 +212,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEYS)
         .then()
-                .extract().body().as(Key.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -232,7 +232,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .get(RequestMappings.KEYS + RequestMappings.KEYS_ID)
         .then()
                 .body("category", notNullValue())
-                .body("category.id", equalTo(createdKeyCategoryId.intValue()));
+                .body("category", equalTo(createdKeyCategoryId.intValue()));
     }
 
     @Test
@@ -246,7 +246,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         Map<String, String> keyPayload = new HashMap<>();
         keyPayload.put("name", fairy.textProducer().word(1));
@@ -259,7 +259,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEYS)
         .then()
-                .extract().body().as(Key.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
@@ -327,7 +327,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -358,7 +358,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
@@ -448,7 +448,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -472,7 +472,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
@@ -516,7 +516,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         String createdUserGroupName = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -564,7 +564,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         String createdUserGroupName = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -604,7 +604,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         String createdUserGroupName = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -648,7 +648,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         String createdUserGroupName = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -700,7 +700,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         Long createdKeyId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -709,7 +709,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEYS)
         .then()
-                .extract().body().as(Key.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -744,7 +744,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         Long createdKeyId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -753,7 +753,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEYS)
         .then()
-                .extract().body().as(Key.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -795,9 +795,9 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
-        given()
+        Long responsibleUserId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
                 .param("userLogin", userLogin)
@@ -805,7 +805,16 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .put(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_RESPONSIBLE)
         .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("responsible.login", equalTo(userLogin));
+                .extract().jsonPath().getLong("responsible");
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .pathParam("keyCategoryId", createdKeyCategoryId)
+        .when()
+                .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORIES_ID)
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("responsible", equalTo(responsibleUserId.intValue()));
     }
 
     @Test
@@ -819,7 +828,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.KEY_CATEGORIES)
         .then()
-                .extract().body().as(KeyCategory.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
@@ -837,7 +846,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORIES_ID)
         .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("responsible.login", not(equalTo(userLogin)));
+                .body("responsible", not(equalTo(createdKeyCategoryId.intValue())));
     }
 
     /**

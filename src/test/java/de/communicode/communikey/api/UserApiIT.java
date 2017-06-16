@@ -295,8 +295,8 @@ public class UserApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .body("authorities.name", hasItem(containsString(AuthoritiesConstants.USER)))
-                .body("authorities.name", hasItem(not(containsString(AuthoritiesConstants.ADMIN))))
+                .body("authorities", hasItem(containsString(AuthoritiesConstants.USER)))
+                .body("authorities", hasItem(not(containsString(AuthoritiesConstants.ADMIN))))
                 .root("authorities")
                 .body("size()", equalTo(1));
         String invalidatedTestUserOAuth2AccessToken = generateOAuth2AccessToken(testUser.getLogin(), testUser.getPassword());
@@ -312,8 +312,8 @@ public class UserApiIT extends IntegrationBaseTest {
                 .statusCode(HttpStatus.OK.value())
                 .body("email", equalTo(testUser.getEmail()))
                 .body("activated", equalTo(true))
-                .body("authorities.name", hasItem(containsString(AuthoritiesConstants.USER)))
-                .body("authorities.name", hasItem(containsString(AuthoritiesConstants.ADMIN)))
+                .body("authorities", hasItem(containsString(AuthoritiesConstants.USER)))
+                .body("authorities", hasItem(containsString(AuthoritiesConstants.ADMIN)))
                 .root("authorities")
                 .body("size()", equalTo(2));
 
