@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -95,18 +96,29 @@ public class KeyService {
     }
 
     /**
-     * Gets the key with the specified ID.
+     * Gets the key with the specified ID if the current user is authorized to receive.
+     *
+     * <p> The returned key is based on the linked {@link KeyCategory} which is filtered by the {@link UserGroup} the user is assigned to.
      *
      * @param keyId the ID of the key to get
-     * @return the key
+     * @return the key, {@link Optional#empty()} otherwise
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    public Key get(Long keyId) throws KeyNotFoundException {
-        return validate(keyId);
+    public Optional<Key> get(Long keyId) throws KeyNotFoundException {
+        if (isCurrentUserInRole(ADMIN)) {
+            return Optional.ofNullable(validate(keyId));
+        }
+
+        Key key = validate(keyId);
+        if (userService.validate(getCurrentUserLogin()).getGroups().stream()
+            .anyMatch(userGroup -> ofNullable(key.getCategory()).map(cat -> cat.getGroups().contains(userGroup)).orElse(false))) {
+            return Optional.of(key);
+        }
+        return Optional.empty();
     }
 
     /**
-     * Gets all keys the current user is authorized to.
+     * Gets all keys the current user is authorized to receive.
      *
      * <p> The returned keys are based on their linked {@link KeyCategory} which are filtered by the {@link UserGroup} the user is assigned to.
      *
