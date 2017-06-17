@@ -8,8 +8,10 @@ package de.communicode.communikey.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.collect.Sets;
+import de.communicode.communikey.service.view.AuthoritiesRestView;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
@@ -53,6 +55,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "category")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
+    @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<Key> keys = Sets.newConcurrentHashSet();
 
     @ManyToOne
@@ -83,6 +86,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
         inverseJoinColumns = {@JoinColumn(name = "user_group_id", referencedColumnName = "id")})
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
+    @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<UserGroup> groups = Sets.newConcurrentHashSet();
 
     @ManyToOne

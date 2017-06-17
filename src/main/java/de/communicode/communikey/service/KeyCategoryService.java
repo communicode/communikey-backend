@@ -8,7 +8,6 @@ package de.communicode.communikey.service;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toCollection;
 
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
@@ -23,7 +22,6 @@ import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserGroupRepository;
 import de.communicode.communikey.repository.UserRepository;
-import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
 import org.apache.logging.log4j.LogManager;
@@ -189,18 +187,12 @@ public class KeyCategoryService {
     }
 
     /**
-     * Gets all key category entities the current user is authorized to receive.
+     * Gets all key categories.
      *
      * @return a collection of key categories
      */
     public Set<KeyCategory> getAll() {
-        if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
-            return new HashSet<>(keyCategoryRepository.findAll());
-        } else {
-            return userService.validate(SecurityUtils.getCurrentUserLogin()).getGroups().stream()
-                    .flatMap(userGroup -> userGroup.getCategories().stream())
-                    .collect(toCollection(HashSet::new));
-        }
+        return new HashSet<>(keyCategoryRepository.findAll());
     }
 
     /**
