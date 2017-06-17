@@ -7,7 +7,9 @@
 package de.communicode.communikey.repository;
 
 import de.communicode.communikey.domain.Authority;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
+
+import java.util.Set;
 
 /**
  * A repository for {@link Authority} entities.
@@ -15,7 +17,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
-public interface AuthorityRepository extends JpaRepository<Authority, String> {
+public interface AuthorityRepository extends CrudRepository<Authority, String> {
+    /**
+     * Finds all authority entities of the repository.
+     *
+     * @return a collection of found authority entities
+     * @since 0.9.0
+     */
+    @Override
+    Set<Authority> findAll();
+
     /**
      * Finds the authority entity with the specified name.
      *

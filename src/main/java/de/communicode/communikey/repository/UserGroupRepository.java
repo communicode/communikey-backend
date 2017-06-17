@@ -7,7 +7,7 @@
 package de.communicode.communikey.repository;
 
 import de.communicode.communikey.domain.UserGroup;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
  * @since 0.2.0
  */
 @Repository
-public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
+public interface UserGroupRepository extends CrudRepository<UserGroup, Long> {
 
     /**
      * Finds the user group with the specified name.

@@ -7,9 +7,11 @@
 package de.communicode.communikey.repository;
 
 import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
 import de.communicode.communikey.domain.User;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Set;
 
 /**
  * A repository for {@link User} entities.
@@ -18,7 +20,15 @@ import org.springframework.stereotype.Repository;
  * @since 0.2.0
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends CrudRepository<User, Long> {
+    /**
+     * Finds all user entities of the repository.
+     *
+     * @return a collection of found user entities
+     * @since 0.9.0
+     */
+    @Override
+    Set<User> findAll();
 
     /**
      * Finds the user entity with the specified activation key.
