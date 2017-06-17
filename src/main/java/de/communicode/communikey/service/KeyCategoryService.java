@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.service;
 
+import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLogin;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -22,7 +23,6 @@ import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserGroupRepository;
 import de.communicode.communikey.repository.UserRepository;
-import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -149,7 +149,7 @@ public class KeyCategoryService {
         validateUniqueKeyCategoryName(name, null);
 
         KeyCategory keyCategory = new KeyCategory();
-        User user = userService.validate(SecurityUtils.getCurrentUserLogin());
+        User user = userService.validate(getCurrentUserLogin());
 
         keyCategory.setName(name);
         keyCategory.setCreator(user);

@@ -157,7 +157,6 @@ public class KeyCategoryController {
      * @throws KeyCategoryNotFoundException if the key category entity with the specified ID has not been found
      */
     @GetMapping(value = KEY_CATEGORIES_ID)
-    @Secured(AuthoritiesConstants.ADMIN)
     ResponseEntity<KeyCategory> get(@PathVariable Long keyCategoryId) throws KeyCategoryNotFoundException {
         return new ResponseEntity<>(keyCategoryService.get(keyCategoryId), HttpStatus.OK);
     }
