@@ -98,19 +98,19 @@ public class KeyCategoryService {
      * Adds a user group to a key category with the specified ID.
      *
      * @param keyCategoryId the ID of the key category to add the user group to
-     * @param userGroupName the name of the user group to be added to the key category
+     * @param userGroupId the ID of the user group to be added to the key category
      * @return the updated key category
      * @throws KeyCategoryNotFoundException if the key category with specified ID has not been found
      * @throws UserGroupNotFoundException if the user group with specified name has not been found
      */
-    public KeyCategory addUserGroup(Long keyCategoryId, String userGroupName) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
+    public KeyCategory addUserGroup(Long keyCategoryId, Long userGroupId) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
         KeyCategory keyCategory = validate(keyCategoryId);
-        UserGroup userGroup = userGroupService.validate(userGroupName);
+        UserGroup userGroup = userGroupService.validate(userGroupId);
 
         if (keyCategory.addGroup(userGroup)) {
             userGroup.addCategory(keyCategory);
             userGroupRepository.save(userGroup);
-            log.debug("Added user group '{}' to key category with ID '{}'", userGroupName, keyCategoryId);
+            log.debug("Added user group '{}' to key category with ID '{}'", userGroup.getName(), keyCategoryId);
             return keyCategoryRepository.save(keyCategory);
         }
          return keyCategory;
@@ -210,19 +210,19 @@ public class KeyCategoryService {
      * Removes a user group from the key category with the specified ID.
      *
      * @param keyCategoryId the ID of the key category to remove the user group from
-     * @param userGroupName the name of the user group to be removed from the key category
+     * @param userGroupId the ID of the user group to be removed from the key category
      * @return the updated key category
      * @throws KeyCategoryNotFoundException if the key category with specified ID has not been found
      * @throws UserGroupNotFoundException if the user group with specified name has not been found
      */
-    public KeyCategory removeUserGroup(Long keyCategoryId, String userGroupName) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
+    public KeyCategory removeUserGroup(Long keyCategoryId, Long userGroupId) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
         KeyCategory keyCategory = validate(keyCategoryId);
-        UserGroup userGroup = userGroupService.validate(userGroupName);
+        UserGroup userGroup = userGroupService.validate(userGroupId);
 
         if (keyCategory.removeGroup(userGroup)) {
             userGroup.removeCategory(keyCategory);
             userGroupRepository.save(userGroup);
-            log.debug("Removed user group with name '{}' from key category with ID '{}'", userGroupName, keyCategoryId);
+            log.debug("Removed user group with name '{}' from key category with ID '{}'", userGroup.getName(), keyCategoryId);
             return keyCategoryRepository.save(keyCategory);
         }
         return keyCategory;

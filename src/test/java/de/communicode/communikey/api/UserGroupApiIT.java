@@ -44,18 +44,18 @@ public class UserGroupApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER);
 
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
                 .param("login", user.getLogin())
         .when()
                 .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_USERS)
@@ -77,18 +77,18 @@ public class UserGroupApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER);
 
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
                 .param("login", user.getLogin())
         .when()
                 .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_USERS)
@@ -125,28 +125,28 @@ public class UserGroupApiIT extends IntegrationBaseTest {
     @Test
     public void testDeleteAsAdmin() {
         initializeTestUserGroupPayload();
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
         .when()
-                .delete(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .delete(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
         .when()
-                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
@@ -154,28 +154,28 @@ public class UserGroupApiIT extends IntegrationBaseTest {
     @Test
     public void testDeleteAsUser() {
         initializeTestUserGroupPayload();
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
         .when()
-                .delete(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .delete(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .statusCode(HttpStatus.FORBIDDEN.value());
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
         .when()
-                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .statusCode(HttpStatus.OK.value());
     }
@@ -251,42 +251,42 @@ public class UserGroupApiIT extends IntegrationBaseTest {
     @Test
     public void testGetAsAdmin() {
         initializeTestUserGroupPayload();
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
         .when()
-                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("name", equalTo(createdUserGroupName));
+                .body("id", equalTo(createdUserGroupId.intValue()));
     }
 
     @Test
     public void testGetAsUser() {
         initializeTestUserGroupPayload();
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
         .when()
-                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .statusCode(HttpStatus.FORBIDDEN.value());
     }
@@ -340,18 +340,18 @@ public class UserGroupApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER);
 
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
                 .param("login", user.getLogin())
         .when()
                 .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_USERS)
@@ -373,7 +373,7 @@ public class UserGroupApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
                 .param("login", user.getLogin())
         .when()
                 .delete(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_USERS)
@@ -406,18 +406,18 @@ public class UserGroupApiIT extends IntegrationBaseTest {
         .when()
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER);
 
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
                 .param("login", user.getLogin())
         .when()
                 .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_USERS)
@@ -438,7 +438,7 @@ public class UserGroupApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
                 .param("login", user.getLogin())
         .when()
                 .delete(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_USERS)
@@ -447,9 +447,9 @@ public class UserGroupApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
         .when()
-                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .statusCode(HttpStatus.OK.value())
                 .root("users")
@@ -469,14 +469,14 @@ public class UserGroupApiIT extends IntegrationBaseTest {
     @Test
     public void testUpdateAsAdmin() {
         initializeTestUserGroupPayload();
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         String newUserGroupName = fairy.textProducer().word(1);
         userGroupPayload.replace("name", newUserGroupName);
@@ -484,42 +484,34 @@ public class UserGroupApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
                 .body(userGroupPayload)
         .when()
-                .put(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .put(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("name", equalTo(newUserGroupName));
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", newUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
         .when()
-                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .statusCode(HttpStatus.OK.value());
-
-        given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
-        .when()
-                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
-        .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
     @Test
     public void testUpdateAsUser() {
         initializeTestUserGroupPayload();
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         String newUserGroupName = fairy.textProducer().word(1);
         userGroupPayload.replace("name", newUserGroupName);
@@ -527,28 +519,20 @@ public class UserGroupApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(userOAuth2AccessToken)
                 .contentType(ContentType.JSON)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
                 .body(userGroupPayload)
         .when()
-                .put(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .put(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .statusCode(HttpStatus.FORBIDDEN.value());
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
         .when()
-                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .statusCode(HttpStatus.OK.value());
-
-        given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", newUserGroupName)
-        .when()
-                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
-        .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
     /**

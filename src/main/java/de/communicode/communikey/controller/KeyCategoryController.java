@@ -78,13 +78,13 @@ public class KeyCategoryController {
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_GROUPS}".
      *
      * @param keyCategoryId the ID of the parent key category to add the child to
-     * @param userGroupName the name of the user group to be added
+     * @param userGroupId the ID of the user group to be added
      * @return the updated parent key category as response entity
      */
     @GetMapping(value = KEY_CATEGORY_GROUPS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> addUserGroup(@PathVariable Long keyCategoryId, @RequestParam String userGroupName) {
-        return new ResponseEntity<>(keyCategoryService.addUserGroup(keyCategoryId, userGroupName), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> addUserGroup(@PathVariable Long keyCategoryId, @RequestParam Long userGroupId) {
+        return new ResponseEntity<>(keyCategoryService.addUserGroup(keyCategoryId, userGroupId), HttpStatus.OK);
     }
 
     /**
@@ -179,13 +179,13 @@ public class KeyCategoryController {
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_GROUPS}".
      *
      * @param keyCategoryId the ID of the key category to remove the user group from
-     * @param userGroupName the name of the user group to be removed from the key category
+     * @param userGroupId the ID of the user group to be removed from the key category
      * @return the updated key category as response entity
      */
     @DeleteMapping(value = KEY_CATEGORY_GROUPS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> removeUserGroup(@PathVariable Long keyCategoryId, @RequestParam String userGroupName) {
-        return new ResponseEntity<>(keyCategoryService.removeUserGroup(keyCategoryId, userGroupName), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> removeUserGroup(@PathVariable Long keyCategoryId, @RequestParam Long userGroupId) {
+        return new ResponseEntity<>(keyCategoryService.removeUserGroup(keyCategoryId, userGroupId), HttpStatus.OK);
     }
 
     /**

@@ -49,16 +49,16 @@ public class UserGroupService {
     }
 
     /**
-     * Add a user to the user group with the specified name.
+     * Add a user to the user group with the specified ID.
      *
-     * @param userGroupName the name of the user group to add the user to
+     * @param userGroupId the ID of the user group to add the user to
      * @param login the login of the user to be added
      * @return the updated user group
      * @throws UserNotFoundException if the user with the specified login has not been found
-     * @throws UserGroupNotFoundException if the user group with the specified name has not been found
+     * @throws UserGroupNotFoundException if the user group with the specified ID has not been found
      */
-    public UserGroup addUser(String userGroupName, String login) {
-        return ofNullable(userGroupRepository.findOneByName(userGroupName))
+    public UserGroup addUser(Long userGroupId, String login) {
+        return ofNullable(userGroupRepository.findOne(userGroupId))
             .map(userGroup -> {
                 if (userGroup.addUser(userService.validate(login))) {
                     userGroupRepository.save(userGroup);
@@ -66,7 +66,7 @@ public class UserGroupService {
                     return userGroup;
                 }
                 return userGroup;
-            }).orElseThrow(() -> new UserGroupNotFoundException(userGroupName));
+            }).orElseThrow(() -> new UserGroupNotFoundException(userGroupId));
     }
 
     /**
@@ -90,11 +90,11 @@ public class UserGroupService {
     /**
      * Deletes the user group with the specified name.
      *
-     * @param userGroupName the name of the user group to delete
-     * @throws UserGroupNotFoundException if the user group with the specified name has not been found
+     * @param userGroupId the ID of the user group to delete
+     * @throws UserGroupNotFoundException if the user group with the specified ID has not been found
      */
-    public void delete(String userGroupName) {
-        UserGroup userGroup = validate(userGroupName);
+    public void delete(Long userGroupId) {
+        UserGroup userGroup = validate(userGroupId);
         userGroup.getUsers().forEach(user -> {
             user.removeGroup(userGroup);
             userRepository.save(user);
@@ -106,7 +106,7 @@ public class UserGroupService {
             log.debug("Removed user group with name '{}' from key category with ID '{}'", userGroup.getName(), keyCategory.getId());
         });
         userGroupRepository.delete(userGroup);
-        log.debug("Deleted user group '{}'", userGroupName);
+        log.debug("Deleted user group with ID '{}'", userGroupId);
     }
 
     /**
@@ -116,8 +116,20 @@ public class UserGroupService {
      */
     public void deleteAll() {
         userGroupRepository.findAll()
-                .forEach(userGroup -> delete(userGroup.getName()));
+                .forEach(userGroup -> delete(userGroup.getId()));
         log.debug("Deleted all user groups");
+    }
+
+    /**
+     * Gets the user group with the specified ID.
+     *
+     * @param userGroupId the ID of the user group to get
+     * @return the user group
+     * @throws UserGroupNotFoundException if the user group with the specified ID has not been found
+     * @since 0.9.0
+     */
+    public UserGroup get(Long userGroupId) throws UserGroupNotFoundException {
+        return validate(userGroupId);
     }
 
     /**
@@ -141,36 +153,36 @@ public class UserGroupService {
     }
 
     /**
-     * Removes a user from the user group with the specified name.
+     * Removes a user from the user group with the specified ID.
      *
-     * @param userGroupName the name of the user group to remove the user from
+     * @param userGroupId the ID of the user group to remove the user from
      * @param login the login of the user to be removed
      * @return the updated user group
      * @throws UserNotFoundException if the user with the specified login has not been found
-     * @throws UserGroupNotFoundException if the user group with the specified name has not been found
+     * @throws UserGroupNotFoundException if the user group with the specified ID has not been found
      */
-    public UserGroup removeUser(String userGroupName, String login) {
-        return ofNullable(userGroupRepository.findOneByName(userGroupName))
+    public UserGroup removeUser(Long userGroupId, String login) {
+        return ofNullable(userGroupRepository.findOne(userGroupId))
             .map(userGroup -> {
                 if (userGroup.removeUser(userService.validate(login))) {
                     userGroupRepository.save(userGroup);
                     log.debug("Removed user with login '{}' from user group '{}'", login, userGroup.getName());
                 }
                 return userGroup;
-            }).orElseThrow(() -> new UserGroupNotFoundException(userGroupName));
+            }).orElseThrow(() -> new UserGroupNotFoundException(userGroupId));
     }
 
     /**
      * Updates the user group with the specified payload.
      *
-     * @param name the name of the user group to update
+     * @param userGroupId the ID of the user group to update
      * @param payload the payload to update the user group with
      * @return the updated user group
      * @throws UserGroupNotFoundException if the user group with the specified name has not been found
      */
-    public UserGroup update(String name, UserGroup payload) throws UserGroupNotFoundException {
+    public UserGroup update(Long userGroupId, UserGroup payload) throws UserGroupNotFoundException {
         validateUniqueName(payload.getName());
-        return ofNullable(validate(name))
+        return ofNullable(validate(userGroupId))
             .map(userGroup -> {
                 if (!userGroup.getName().equals(payload.getName())) {
                     userGroup.setName(payload.getName());
@@ -178,7 +190,7 @@ public class UserGroupService {
                     log.debug("Updated user group '{}'", userGroup.getName());
                 }
                 return userGroup;
-            }).orElseThrow(() -> new UserGroupNotFoundException(name));
+            }).orElseThrow(() -> new UserGroupNotFoundException(userGroupId));
     }
 
     /**
@@ -190,6 +202,18 @@ public class UserGroupService {
      */
     public UserGroup validate(String name) throws UserGroupNotFoundException {
         return ofNullable(userGroupRepository.findOneByName(name)).orElseThrow(() -> new UserGroupNotFoundException(name));
+    }
+
+    /**
+     * Validates the specified user group.
+     *
+     * @param userGroupId the ID of the user group to validate
+     * @return the user group if validated
+     * @throws UserGroupNotFoundException if the user group with the specified name has not been found
+     * @since 0.9.0
+     */
+    public UserGroup validate(Long userGroupId) throws UserGroupNotFoundException {
+        return ofNullable(userGroupRepository.findOne(userGroupId)).orElseThrow(() -> new UserGroupNotFoundException(userGroupId));
     }
 
     /**

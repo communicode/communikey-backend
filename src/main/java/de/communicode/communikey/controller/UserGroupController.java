@@ -8,7 +8,7 @@ package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.controller.PathVariables.USER_LOGIN;
 import static de.communicode.communikey.controller.RequestMappings.USER_GROUPS;
-import static de.communicode.communikey.controller.RequestMappings.USER_GROUPS_NAME;
+import static de.communicode.communikey.controller.RequestMappings.USER_GROUPS_ID;
 import static de.communicode.communikey.controller.RequestMappings.USER_GROUPS_USERS;
 import static java.util.Objects.requireNonNull;
 
@@ -55,21 +55,21 @@ public class UserGroupController {
     /**
      * Adds a user to a user group.
      *
-     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}{@value RequestMappings#USER_GROUPS_USERS}".
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_ID}{@value RequestMappings#USER_GROUPS_USERS}".
      *
      * <p>Required parameter:
      * <ul>
      *   <li>{@value PathVariables#USER_LOGIN}</li>
      * </ul>
      *
-     * @param userGroupName the name of the user group to add the user to
+     * @param userGroupId the ID of the user group to add the user to
      * @param login the login of the user to be added
      * @return the user group as response entity
      */
     @GetMapping(value = USER_GROUPS_USERS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<UserGroup> addUser(@PathVariable String userGroupName, @RequestParam(name = USER_LOGIN) String login) {
-        return new ResponseEntity<>(userGroupService.addUser(userGroupName, login), HttpStatus.OK);
+    public ResponseEntity<UserGroup> addUser(@PathVariable Long userGroupId, @RequestParam(name = USER_LOGIN) String login) {
+        return new ResponseEntity<>(userGroupService.addUser(userGroupId, login), HttpStatus.OK);
     }
 
     /**
@@ -90,15 +90,15 @@ public class UserGroupController {
     /**
      * Deletes the user group with the specified ID.
      *
-     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}".
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_ID}".
      *
-     * @param userGroupName the name of the user group to delete
+     * @param userGroupId the ID of the user group to delete
      * @return the user group as response entity
      */
-    @DeleteMapping(value = USER_GROUPS_NAME)
+    @DeleteMapping(value = USER_GROUPS_ID)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<Void> delete(@PathVariable String userGroupName) {
-        userGroupService.delete(userGroupName);
+    public ResponseEntity<Void> delete(@PathVariable Long userGroupId) {
+        userGroupService.delete(userGroupId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -120,15 +120,15 @@ public class UserGroupController {
     /**
      * Gets the user group with the specified name.
      *
-     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}".
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_ID}".
      *
-     * @param userGroupName the name of the user group to get
+     * @param userGroupId the ID of the user group to get
      * @return the user group as response entity
      */
-    @GetMapping(value = USER_GROUPS_NAME)
+    @GetMapping(value = USER_GROUPS_ID)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<UserGroup> get(@PathVariable String userGroupName) {
-        return new ResponseEntity<>(userGroupService.getByName(userGroupName), HttpStatus.OK);
+    public ResponseEntity<UserGroup> get(@PathVariable Long userGroupId) {
+        return new ResponseEntity<>(userGroupService.get(userGroupId), HttpStatus.OK);
     }
 
     /**
@@ -152,28 +152,28 @@ public class UserGroupController {
      *   <li>{@value PathVariables#USER_LOGIN}</li>
      * </ul>
      *
-     * @param userGroupName the name of the user group to remove the user from
+     * @param userGroupId the IS of the user group to remove the user from
      * @param login the login of the user to be removed
      * @return the user group as response entity
      */
     @DeleteMapping(value = USER_GROUPS_USERS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<UserGroup> removeUser(@PathVariable String userGroupName, @RequestParam(name = USER_LOGIN) String login) {
-        return new ResponseEntity<>(userGroupService.removeUser(userGroupName, login), HttpStatus.OK);
+    public ResponseEntity<UserGroup> removeUser(@PathVariable Long userGroupId, @RequestParam(name = USER_LOGIN) String login) {
+        return new ResponseEntity<>(userGroupService.removeUser(userGroupId, login), HttpStatus.OK);
     }
 
     /**
      * Updates a user group with the specified payload.
      *
-     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_NAME}".
+     * <p>This endpoint is mapped to "{@value RequestMappings#USER_GROUPS}{@value RequestMappings#USER_GROUPS_ID}".
      *
-     * @param userGroupName the name of the user group to update
+     * @param userGroupId the ID of the user group to update
      * @param payload the user group payload to update the user group with
      * @return the updated user group as response entity
      */
-    @PutMapping(value = USER_GROUPS_NAME)
+    @PutMapping(value = USER_GROUPS_ID)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<UserGroup> update(@PathVariable String userGroupName, @Valid @RequestBody UserGroup payload) {
-        return new ResponseEntity<>(userGroupService.update(userGroupName, payload), HttpStatus.OK);
+    public ResponseEntity<UserGroup> update(@PathVariable Long userGroupId, @Valid @RequestBody UserGroup payload) {
+        return new ResponseEntity<>(userGroupService.update(userGroupId, payload), HttpStatus.OK);
     }
 }
