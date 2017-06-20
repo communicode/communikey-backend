@@ -77,7 +77,7 @@ public class UserApiIT extends IntegrationBaseTest {
                 .body("email", equalTo(testUser.getEmail()))
                 .body("firstName", equalTo(testUser.getFirstName()))
                 .body("lastName", equalTo(testUser.getLastName()))
-                .body("activated", equalTo(testUser.isActivated()));
+                .body("activated", equalTo(false));
     }
 
     @Test
@@ -311,7 +311,7 @@ public class UserApiIT extends IntegrationBaseTest {
         .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("email", equalTo(testUser.getEmail()))
-                .body("activated", equalTo(true))
+                .body("activated", equalTo(false))
                 .body("authorities", hasItem(containsString(AuthoritiesConstants.USER)))
                 .body("authorities", hasItem(containsString(AuthoritiesConstants.ADMIN)))
                 .root("authorities")
