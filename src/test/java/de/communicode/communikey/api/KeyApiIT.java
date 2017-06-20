@@ -260,7 +260,8 @@ public class KeyApiIT extends IntegrationBaseTest {
         .when()
                 .get(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+                .statusCode(HttpStatus.OK.value())
+                .body("size()", equalTo(0));
     }
 
     @Test

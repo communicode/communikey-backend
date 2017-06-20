@@ -200,14 +200,23 @@ public class UserApiIT extends IntegrationBaseTest {
     @Test
     public void testGetPasswordResetKeyAsUser() {
         initializeTestUser(true);
-        given()
+        String activationKey = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(new UserCreationPayload(testUser))
         .when()
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER)
         .then()
-                .statusCode(HttpStatus.CREATED.value());
+                .statusCode(HttpStatus.CREATED.value())
+                .extract().jsonPath().getString("activationKey");
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .queryParam("activation_key", activationKey)
+        .when()
+                .get(RequestMappings.USERS + RequestMappings.USERS_ACTIVATE)
+        .then()
+                .statusCode(HttpStatus.OK.value());
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
@@ -224,25 +233,34 @@ public class UserApiIT extends IntegrationBaseTest {
         Map<String, String> userPasswordResetPayload = new HashMap<>();
         userPasswordResetPayload.put("password", "newPassword");
 
-        given()
+        String activationKey = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(new UserCreationPayload(testUser))
         .when()
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER)
         .then()
-                .statusCode(HttpStatus.CREATED.value());
+                .statusCode(HttpStatus.CREATED.value())
+                .extract().jsonPath().getString("activationKey");
 
-        Response resetKeyResponse = given()
-                .auth().oauth2(userOAuth2AccessToken)
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .queryParam("activation_key", activationKey)
+        .when()
+                .get(RequestMappings.USERS + RequestMappings.USERS_ACTIVATE)
+        .then()
+                .statusCode(HttpStatus.OK.value());
+
+        String resetKey = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
                 .queryParam("email", testUser.getEmail())
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_PASSWORD_RESET)
         .then()
                 .statusCode(HttpStatus.OK.value())
-                .extract().response();
+                .extract().jsonPath().getString("resetKey");
 
-        userPasswordResetPayload.put("resetKey", resetKeyResponse.path("resetKey"));
+        userPasswordResetPayload.put("resetKey", resetKey);
         given()
                 .auth().oauth2(userOAuth2AccessToken)
                 .contentType(ContentType.JSON)
@@ -287,7 +305,7 @@ public class UserApiIT extends IntegrationBaseTest {
         authorities.add(AuthoritiesConstants.ADMIN);
         authorities.add(AuthoritiesConstants.USER);
 
-        given()
+        String activationKey = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(new UserCreationPayload(testUser))
@@ -298,7 +316,18 @@ public class UserApiIT extends IntegrationBaseTest {
                 .body("authorities", hasItem(containsString(AuthoritiesConstants.USER)))
                 .body("authorities", hasItem(not(containsString(AuthoritiesConstants.ADMIN))))
                 .root("authorities")
-                .body("size()", equalTo(1));
+                .body("size()", equalTo(1))
+                .extract().jsonPath().getString("activationKey");
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .queryParam("activation_key", activationKey)
+        .when()
+                .get(RequestMappings.USERS + RequestMappings.USERS_ACTIVATE)
+        .then()
+                .statusCode(HttpStatus.OK.value());
+
+
         String invalidatedTestUserOAuth2AccessToken = generateOAuth2AccessToken(testUser.getLogin(), testUser.getPassword());
 
         given()
@@ -311,7 +340,7 @@ public class UserApiIT extends IntegrationBaseTest {
         .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("email", equalTo(testUser.getEmail()))
-                .body("activated", equalTo(false))
+                .body("activated", equalTo(true))
                 .body("authorities", hasItem(containsString(AuthoritiesConstants.USER)))
                 .body("authorities", hasItem(containsString(AuthoritiesConstants.ADMIN)))
                 .root("authorities")

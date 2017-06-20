@@ -476,7 +476,8 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORIES_ID)
         .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(createdKeyCategoryId.intValue()));
     }
 
     @Test
@@ -585,7 +586,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .get(RequestMappings.KEY_CATEGORIES)
         .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("size()", equalTo(0));
+                .body("size()", equalTo(1));
     }
 
     @Test
