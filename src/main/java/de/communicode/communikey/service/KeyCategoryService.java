@@ -356,13 +356,25 @@ public class KeyCategoryService {
      * @since 0.9.0
      */
     private void checkPathCollision(KeyCategory parent, Long childKeyCategoryId) {
-        ofNullable(parent.getParent()).ifPresent(higherLevelParent -> {
-            if (Objects.equals(higherLevelParent.getId(), childKeyCategoryId)) {
-                throw new KeyCategoryConflictException("key category with ID '" + higherLevelParent.getId() + "' can not be set as own child reference");
-            } else {
-                checkPathCollision(parent.getParent(), childKeyCategoryId);
-            }
-        });
+        if (parent.getParent() != null) {
+            checkPathCollisionRecursively(parent.getParent(), childKeyCategoryId);
+        }
+    }
+
+    /**
+     * Checks recursively for a path collision when the level of the parent key category is higher than the level of the child key category.
+     *
+     * @param parent the parent key category
+     * @param childKeyCategoryId the ID of the child key category
+     * @since 0.9.0
+     */
+    private void checkPathCollisionRecursively(KeyCategory parent, Long childKeyCategoryId) {
+        if (Objects.equals(parent.getId(), childKeyCategoryId)) {
+            throw new KeyCategoryConflictException("key category with ID '" + parent.getId() + "' can not be set as own child reference");
+        }
+        if (parent.getParent() != null) {
+            checkPathCollisionRecursively(parent.getParent(), childKeyCategoryId);
+        }
     }
 
     /**
