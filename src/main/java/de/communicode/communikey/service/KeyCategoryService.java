@@ -6,9 +6,9 @@
  */
 package de.communicode.communikey.service;
 
+import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLogin;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toCollection;
 
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
@@ -23,8 +23,6 @@ import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserGroupRepository;
 import de.communicode.communikey.repository.UserRepository;
-import de.communicode.communikey.security.AuthoritiesConstants;
-import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -100,19 +98,19 @@ public class KeyCategoryService {
      * Adds a user group to a key category with the specified ID.
      *
      * @param keyCategoryId the ID of the key category to add the user group to
-     * @param userGroupName the name of the user group to be added to the key category
+     * @param userGroupId the ID of the user group to be added to the key category
      * @return the updated key category
      * @throws KeyCategoryNotFoundException if the key category with specified ID has not been found
      * @throws UserGroupNotFoundException if the user group with specified name has not been found
      */
-    public KeyCategory addUserGroup(Long keyCategoryId, String userGroupName) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
+    public KeyCategory addUserGroup(Long keyCategoryId, Long userGroupId) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
         KeyCategory keyCategory = validate(keyCategoryId);
-        UserGroup userGroup = userGroupService.validate(userGroupName);
+        UserGroup userGroup = userGroupService.validate(userGroupId);
 
         if (keyCategory.addGroup(userGroup)) {
             userGroup.addCategory(keyCategory);
             userGroupRepository.save(userGroup);
-            log.debug("Added user group '{}' to key category with ID '{}'", userGroupName, keyCategoryId);
+            log.debug("Added user group '{}' to key category with ID '{}'", userGroup.getName(), keyCategoryId);
             return keyCategoryRepository.save(keyCategory);
         }
          return keyCategory;
@@ -151,7 +149,7 @@ public class KeyCategoryService {
         validateUniqueKeyCategoryName(name, null);
 
         KeyCategory keyCategory = new KeyCategory();
-        User user = userService.validate(SecurityUtils.getCurrentUserLogin());
+        User user = userService.validate(getCurrentUserLogin());
 
         keyCategory.setName(name);
         keyCategory.setCreator(user);
@@ -189,18 +187,12 @@ public class KeyCategoryService {
     }
 
     /**
-     * Gets all key category entities the current user is authorized to receive.
+     * Gets all key categories.
      *
      * @return a collection of key categories
      */
     public Set<KeyCategory> getAll() {
-        if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
-            return new HashSet<>(keyCategoryRepository.findAll());
-        } else {
-            return userService.validate(SecurityUtils.getCurrentUserLogin()).getGroups().stream()
-                    .flatMap(userGroup -> userGroup.getCategories().stream())
-                    .collect(toCollection(HashSet::new));
-        }
+        return new HashSet<>(keyCategoryRepository.findAll());
     }
 
     /**
@@ -218,19 +210,19 @@ public class KeyCategoryService {
      * Removes a user group from the key category with the specified ID.
      *
      * @param keyCategoryId the ID of the key category to remove the user group from
-     * @param userGroupName the name of the user group to be removed from the key category
+     * @param userGroupId the ID of the user group to be removed from the key category
      * @return the updated key category
      * @throws KeyCategoryNotFoundException if the key category with specified ID has not been found
      * @throws UserGroupNotFoundException if the user group with specified name has not been found
      */
-    public KeyCategory removeUserGroup(Long keyCategoryId, String userGroupName) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
+    public KeyCategory removeUserGroup(Long keyCategoryId, Long userGroupId) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
         KeyCategory keyCategory = validate(keyCategoryId);
-        UserGroup userGroup = userGroupService.validate(userGroupName);
+        UserGroup userGroup = userGroupService.validate(userGroupId);
 
         if (keyCategory.removeGroup(userGroup)) {
             userGroup.removeCategory(keyCategory);
             userGroupRepository.save(userGroup);
-            log.debug("Removed user group with name '{}' from key category with ID '{}'", userGroupName, keyCategoryId);
+            log.debug("Removed user group with name '{}' from key category with ID '{}'", userGroup.getName(), keyCategoryId);
             return keyCategoryRepository.save(keyCategory);
         }
         return keyCategory;
@@ -364,13 +356,25 @@ public class KeyCategoryService {
      * @since 0.9.0
      */
     private void checkPathCollision(KeyCategory parent, Long childKeyCategoryId) {
-        ofNullable(parent.getParent()).ifPresent(higherLevelParent -> {
-            if (Objects.equals(higherLevelParent.getId(), childKeyCategoryId)) {
-                throw new KeyCategoryConflictException("key category with ID '" + higherLevelParent.getId() + "' can not be set as own child reference");
-            } else {
-                checkPathCollision(parent.getParent(), childKeyCategoryId);
-            }
-        });
+        if (parent.getParent() != null) {
+            checkPathCollisionRecursively(parent.getParent(), childKeyCategoryId);
+        }
+    }
+
+    /**
+     * Checks recursively for a path collision when the level of the parent key category is higher than the level of the child key category.
+     *
+     * @param parent the parent key category
+     * @param childKeyCategoryId the ID of the child key category
+     * @since 0.9.0
+     */
+    private void checkPathCollisionRecursively(KeyCategory parent, Long childKeyCategoryId) {
+        if (Objects.equals(parent.getId(), childKeyCategoryId)) {
+            throw new KeyCategoryConflictException("key category with ID '" + parent.getId() + "' can not be set as own child reference");
+        }
+        if (parent.getParent() != null) {
+            checkPathCollisionRecursively(parent.getParent(), childKeyCategoryId);
+        }
     }
 
     /**
@@ -380,11 +384,9 @@ public class KeyCategoryService {
      * @since 0.9.0
      */
     private void updateChildrenTreeLevel(KeyCategory keyCategory) {
-        if (!keyCategory.getChildren().isEmpty()) {
-            for (KeyCategory child : keyCategory.getChildren()) {
-                child.setTreeLevel(keyCategory.getTreeLevel() + 1);
-                updateChildrenTreeLevel(child);
-            }
+        for (KeyCategory child : keyCategory.getChildren()) {
+            child.setTreeLevel(keyCategory.getTreeLevel() + 1);
+            updateChildrenTreeLevel(child);
         }
     }
 }

@@ -24,4 +24,14 @@ public class UserGroupNotFoundException extends RuntimeException {
     public UserGroupNotFoundException(String name) {
         super("user group '" + name + "' not found");
     }
+
+    /**
+     * Constructs a {@code UserGroupNotFoundException} for the specified {@link UserGroup}.
+     *
+     * @param userGroupId the ID of the user group that has not been found
+     * @since 0.9.0
+     */
+    public UserGroupNotFoundException(Long userGroupId) {
+        super("user group with ID '" + userGroupId + "' not found");
+    }
 }

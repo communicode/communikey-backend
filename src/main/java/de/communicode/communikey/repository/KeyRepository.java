@@ -7,8 +7,10 @@
 package de.communicode.communikey.repository;
 
 import de.communicode.communikey.domain.Key;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Set;
 
 /**
  * A repository for {@link Key} entities.
@@ -17,5 +19,12 @@ import org.springframework.stereotype.Repository;
  * @since 0.1.0
  */
 @Repository
-public interface KeyRepository extends JpaRepository<Key, Long> {
+public interface KeyRepository extends CrudRepository<Key, Long> {
+    /**
+     * Finds all key entities of the repository.
+     *
+     * @return a collection of found key entities
+     */
+    @Override
+    Set<Key> findAll();
 }

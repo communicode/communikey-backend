@@ -6,13 +6,17 @@
  */
 package de.communicode.communikey.service;
 
+import static de.communicode.communikey.security.AuthoritiesConstants.ADMIN;
+import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLogin;
+import static de.communicode.communikey.security.SecurityUtils.isCurrentUserInRole;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
 
-import com.google.common.collect.Sets;
 import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
-import de.communicode.communikey.security.SecurityUtils;
+import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.repository.KeyRepository;
@@ -22,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -52,7 +58,7 @@ public class KeyService {
      */
     public Key create(KeyPayload payload) {
         Key key = new Key();
-        String userLogin = SecurityUtils.getCurrentUserLogin();
+        String userLogin = getCurrentUserLogin();
         User user = userService.validate(userLogin);
         key.setCreator(user);
         key.setName(payload.getName());
@@ -90,23 +96,42 @@ public class KeyService {
     }
 
     /**
-     * Gets the key with the specified ID.
+     * Gets the key with the specified ID if the current user is authorized to receive.
+     *
+     * <p> The returned key is based on the linked {@link KeyCategory} which is filtered by the {@link UserGroup} the user is assigned to.
      *
      * @param keyId the ID of the key to get
-     * @return the key
+     * @return the key, {@link Optional#empty()} otherwise
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    public Key get(Long keyId) throws KeyNotFoundException {
-        return validate(keyId);
+    public Optional<Key> get(Long keyId) throws KeyNotFoundException {
+        if (isCurrentUserInRole(ADMIN)) {
+            return Optional.ofNullable(validate(keyId));
+        }
+
+        Key key = validate(keyId);
+        if (userService.validate(getCurrentUserLogin()).getGroups().stream()
+            .anyMatch(userGroup -> ofNullable(key.getCategory()).map(cat -> cat.getGroups().contains(userGroup)).orElse(false))) {
+            return Optional.of(key);
+        }
+        return Optional.empty();
     }
 
     /**
-     * Gets all keys the current user is authorized to.
+     * Gets all keys the current user is authorized to receive.
+     *
+     * <p> The returned keys are based on their linked {@link KeyCategory} which are filtered by the {@link UserGroup} the user is assigned to.
      *
      * @return a collection of keys
      */
     public Set<Key> getAll() {
-        return Sets.newConcurrentHashSet(keyRepository.findAll());
+        if (isCurrentUserInRole(ADMIN)) {
+            return new HashSet<>(keyRepository.findAll());
+        }
+        return userService.validate(getCurrentUserLogin()).getGroups().stream()
+            .flatMap(userGroup -> userGroup.getCategories().stream())
+            .flatMap(keyCategory -> keyCategory.getKeys().stream())
+            .collect(toSet());
     }
 
     /**

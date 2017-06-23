@@ -8,18 +8,14 @@ package de.communicode.communikey.api;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import de.communicode.communikey.IntegrationBaseTest;
 import de.communicode.communikey.controller.RequestMappings;
-import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
-import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
-import de.communicode.communikey.service.payload.UserPayload;
 import io.restassured.http.ContentType;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -119,19 +115,19 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .then()
                 .extract().jsonPath().getLong("id");
 
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("userGroupName", createdUserGroupName)
+                .param("userGroupId", createdUserGroupId)
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_GROUPS)
         .then()
@@ -141,9 +137,9 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
         .when()
-                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .root("categories")
                 .body("size()", equalTo(1));
@@ -163,19 +159,19 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .then()
                 .extract().jsonPath().getLong("id");
 
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("userGroupName", createdUserGroupName)
+                .param("userGroupId", createdUserGroupId)
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_GROUPS)
         .then()
@@ -183,9 +179,9 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
         .when()
-                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_NAME)
+                .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_ID)
         .then()
                 .root("categories")
                 .body("size()", equalTo(0));
@@ -480,7 +476,8 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORIES_ID)
         .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(createdKeyCategoryId.intValue()));
     }
 
     @Test
@@ -518,7 +515,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getLong("id");
 
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
@@ -526,18 +523,18 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.USER_GROUPS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("userGroupName", createdUserGroupName)
+                .param("userGroupId", createdUserGroupId)
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_GROUPS);
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupName", createdUserGroupName)
+                .pathParam("userGroupId", createdUserGroupId)
                 .param("login", userLogin)
         .when()
                 .get(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_USERS);
@@ -566,7 +563,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getLong("id");
 
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
@@ -574,12 +571,12 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.USER_GROUPS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("userGroupName", createdUserGroupName)
+                .param("userGroupId", createdUserGroupId)
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_GROUPS);
 
@@ -589,7 +586,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .get(RequestMappings.KEY_CATEGORIES)
         .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("size()", equalTo(0));
+                .body("size()", equalTo(1));
     }
 
     @Test
@@ -606,19 +603,19 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .then()
                 .extract().jsonPath().getLong("id");
 
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("userGroupName", createdUserGroupName)
+                .param("userGroupId", createdUserGroupId)
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_GROUPS)
         .then()
@@ -627,7 +624,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("userGroupName", createdUserGroupName)
+                .param("userGroupId", createdUserGroupId)
         .when()
                 .delete(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_GROUPS)
         .then()
@@ -650,19 +647,19 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .then()
                 .extract().jsonPath().getLong("id");
 
-        String createdUserGroupName = given()
+        Long createdUserGroupId = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(userGroupPayload)
         .when()
                 .post(RequestMappings.USER_GROUPS)
         .then()
-                .extract().body().as(UserGroup.class).getName();
+                .extract().body().as(UserGroup.class).getId();
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("userGroupName", createdUserGroupName)
+                .param("userGroupId", createdUserGroupId)
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_GROUPS)
         .then()
@@ -671,7 +668,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(userOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("userGroupName", createdUserGroupName)
+                .param("userGroupId", createdUserGroupId)
         .when()
                 .delete(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_GROUPS)
         .then()

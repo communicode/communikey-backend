@@ -11,14 +11,20 @@ import static java.util.Optional.ofNullable;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import de.communicode.communikey.config.CommunikeyProperties;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
+import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.exception.ActivationKeyNotFoundException;
 import de.communicode.communikey.exception.ResetKeyNotFoundException;
 import de.communicode.communikey.exception.UserConflictException;
 import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.repository.AuthorityRepository;
+import de.communicode.communikey.repository.KeyCategoryRepository;
+import de.communicode.communikey.repository.KeyRepository;
+import de.communicode.communikey.repository.UserGroupRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
@@ -27,6 +33,7 @@ import de.communicode.communikey.service.payload.UserPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.stereotype.Service;
@@ -49,18 +56,36 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private static final Logger log = LogManager.getLogger();
+    private final KeyRepository keyRepository;
+    private final KeyCategoryRepository keyCategoryRepository;
+    private final UserGroupRepository userGroupRepository;
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final JdbcTokenStore jdbcTokenStore;
+    private final UserService userService;
+    private final CommunikeyProperties communikeyProperties;
 
     @Autowired
-    public UserService(UserRepository userRepository, AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder, JdbcTokenStore jdbcTokenStore) {
+    public UserService(
+            KeyRepository keyRepository,
+            KeyCategoryRepository keyCategoryRepository,
+            UserGroupRepository userGroupRepository,
+            UserRepository userRepository,
+            AuthorityRepository authorityRepository,
+            PasswordEncoder passwordEncoder,
+            JdbcTokenStore jdbcTokenStore,
+            @Lazy UserService userService,
+            CommunikeyProperties communikeyProperties) {
+        this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
+        this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
+        this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.authorityRepository = requireNonNull(authorityRepository, "authorityRepository must not be null!");
         this.passwordEncoder = requireNonNull(passwordEncoder, "passwordEncoder must not be null!");
         this.jdbcTokenStore = requireNonNull(jdbcTokenStore, "jdbcTokenStore must not be null!");
+        this.userService = requireNonNull(userService, "userService must not be null!");
+        this.communikeyProperties = requireNonNull(communikeyProperties, "communikeyProperties must not be null!");
     }
 
     /**
@@ -113,7 +138,6 @@ public class UserService {
         user.setLastName(payload.getLastName());
         user.setPassword(passwordEncoder.encode(payload.getPassword()));
         user.setActivationKey(SecurityUtils.generateRandomActivationKey());
-        user.setActivated(true);
         Set<Authority> authorities = Sets.newConcurrentHashSet();
         Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
         authorities.add(authority);
@@ -152,7 +176,8 @@ public class UserService {
      */
     public void delete(String login) throws UserNotFoundException {
         deleteOauth2AccessTokens(login);
-        userRepository.delete(ofNullable(validate(login)).orElseThrow(() -> new UserNotFoundException(login)));
+        User user = dissolveReferences(validate(login));
+        userRepository.delete(user);
         log.debug("Deleted user with login '{}'", login);
     }
 
@@ -329,6 +354,47 @@ public class UserService {
             jdbcTokenStore.removeAccessToken(accessToken);
             log.debug("Removed OAuth2 access token '{}' of user with login '{}'", accessToken.getValue(), login);
         });
+    }
+
+    /**
+     * Dissolves all references to connected {@link KeyCategory}-, {@link Key}- and {@link UserGroup} entities.
+     *
+     * <p>Used to prepare the deletion of a user.
+     *
+     * @param user the user to dissolve all references of
+     * @return the updated user
+     * @since 0.9.0
+     */
+    private User dissolveReferences(User user) {
+        user.getKeyCategories()
+                .forEach(keyCategory -> {
+                    keyCategory.setCreator(userService.validate(communikeyProperties.getSecurity().getRoot().getLogin()));
+                    keyCategoryRepository.save(keyCategory);
+                    log.debug("Assigned key category with ID '{}' created by user '{}' to user '{}'",
+                            keyCategory.getId(), user.getLogin(), communikeyProperties.getSecurity().getRoot().getLogin()
+                    );
+                });
+        user.getResponsibleKeyCategories()
+                .forEach(keyCategory -> {
+                    keyCategory.setResponsible(null);
+                    keyCategoryRepository.save(keyCategory);
+                    log.debug("Unbind responsible user '{}' from key category with ID '{}'", user.getLogin(), keyCategory.getId());
+                });
+        user.getGroups()
+                .forEach(userGroup -> {
+                    userGroup.removeUser(user);
+                    userGroupRepository.save(userGroup);
+                    log.debug("Removed user '{}' from user group with ID '{}' ", user.getLogin(), userGroup.getId());
+                });
+        user.getKeys()
+                .forEach(key -> {
+                    key.setCreator(userService.validate(communikeyProperties.getSecurity().getRoot().getLogin()));
+                    keyRepository.save(key);
+                    log.debug("Assigned key with ID '{}' (created by user '{}') to user '{}'",
+                            key.getId(), user.getLogin(), communikeyProperties.getSecurity().getRoot().getLogin()
+                    );
+                });
+        return userRepository.save(user);
     }
 
     /**
