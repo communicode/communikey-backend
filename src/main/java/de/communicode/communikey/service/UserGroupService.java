@@ -223,7 +223,7 @@ public class UserGroupService {
      * @throws UserGroupConflictException if the specified name is not unique
      */
     private void validateUniqueName(String name) throws UserGroupConflictException {
-        if (ofNullable(userGroupRepository.findOneByName(name)).isPresent()) {
+        if (userGroupRepository.findOneByName(name) != null) {
             throw new UserGroupConflictException("user group '" + name +"' already exists");
         }
     }
