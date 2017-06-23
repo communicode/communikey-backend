@@ -384,11 +384,9 @@ public class KeyCategoryService {
      * @since 0.9.0
      */
     private void updateChildrenTreeLevel(KeyCategory keyCategory) {
-        if (!keyCategory.getChildren().isEmpty()) {
-            for (KeyCategory child : keyCategory.getChildren()) {
-                child.setTreeLevel(keyCategory.getTreeLevel() + 1);
-                updateChildrenTreeLevel(child);
-            }
+        for (KeyCategory child : keyCategory.getChildren()) {
+            child.setTreeLevel(keyCategory.getTreeLevel() + 1);
+            updateChildrenTreeLevel(child);
         }
     }
 }
