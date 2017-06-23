@@ -80,7 +80,7 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().response().getBody().as(Key.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -110,7 +110,7 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().response().getBody().as(Key.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
@@ -188,7 +188,7 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(Key.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -211,7 +211,7 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(Key.class).getId();
+                .extract().jsonPath().getLong("id");
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
@@ -274,7 +274,7 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(Key.class).getId();
+                .extract().jsonPath().getLong("id");
 
         keyPayload.replace("name", "newName");
         keyPayload.replace("login", "newLogin");
@@ -305,7 +305,7 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().body().as(Key.class).getId();
+                .extract().jsonPath().getLong("id");
 
         keyPayload.replace("name", "newName");
         keyPayload.replace("login", "login");

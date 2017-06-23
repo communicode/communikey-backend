@@ -6,8 +6,10 @@
  */
 package de.communicode.communikey.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.collect.Sets;
 import de.communicode.communikey.service.view.AuthoritiesRestView;
 import org.hibernate.validator.constraints.NotBlank;
@@ -54,14 +56,14 @@ public class UserGroup extends AbstractEntity implements Serializable {
         name = "user_groups_users",
         joinColumns = @JoinColumn(name = "user_group_id", referencedColumnName = "id"),
         inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")})
-    @JsonIgnoreProperties(value = {"createdBy", "createdDate", "lastModifiedBy", "lastModifiedDate", "activated", "activationKey", "resetKey", "resetDate",
-            "authorities", "groups", "keyCategories", "responsibleKeyCategories"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<User> users = Sets.newConcurrentHashSet();
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")
-    @JsonIgnoreProperties(value = {"children", "responsible", "keys", "parent", "groups", "creator", "createdBy", "createdDate", "lastModifiedBy",
-            "lastModifiedDate"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
     @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<KeyCategory> categories = Sets.newConcurrentHashSet();
 
