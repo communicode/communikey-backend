@@ -114,7 +114,7 @@ public final class CommunikeyProperties {
 
             private String firstName = "communikey";
 
-            private String lastName;
+            private String lastName = "root";
 
             public String getLogin() {
                 return this.login;
