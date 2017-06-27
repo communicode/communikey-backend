@@ -280,10 +280,12 @@ public class KeyCategoryService {
      */
     public KeyCategory update(Long keyCategoryId, KeyCategoryPayload payload) {
         KeyCategory keyCategory = validate(keyCategoryId);
-        validateUniqueKeyCategoryName(payload.getName(), ofNullable(keyCategory.getParent()).map(KeyCategory::getId).orElse(null));
-        keyCategory.setName(payload.getName());
-        keyCategory = keyCategoryRepository.save(keyCategory);
-        log.debug("Updated key category with ID '{}'", keyCategory.getId());
+        if (!keyCategory.getName().equals(payload.getName())) {
+            validateUniqueKeyCategoryName(payload.getName(), ofNullable(keyCategory.getParent()).map(KeyCategory::getId).orElse(null));
+            keyCategory.setName(payload.getName());
+            keyCategory = keyCategoryRepository.save(keyCategory);
+            log.debug("Updated key category with ID '{}'", keyCategory.getId());
+        }
         return keyCategory;
     }
 

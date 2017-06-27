@@ -181,10 +181,10 @@ public class UserGroupService {
      * @throws UserGroupNotFoundException if the user group with the specified name has not been found
      */
     public UserGroup update(Long userGroupId, UserGroup payload) throws UserGroupNotFoundException {
-        validateUniqueName(payload.getName());
         return ofNullable(validate(userGroupId))
             .map(userGroup -> {
                 if (!userGroup.getName().equals(payload.getName())) {
+                    validateUniqueName(payload.getName());
                     userGroup.setName(payload.getName());
                     userGroupRepository.save(userGroup);
                     log.debug("Updated user group '{}'", userGroup.getName());
