@@ -12,7 +12,6 @@ import de.communicode.communikey.domain.User;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 /**
  * A payload object for a {@link User}.
@@ -23,18 +22,17 @@ import javax.validation.constraints.Size;
 public class UserPayload {
 
     private Long id;
+
     private String login;
+
     @NotBlank
     @Pattern(regexp = EMAIL_REGEX, message = "not a well-formed email address")
-    @Size(max = 115)
     private String email;
 
     @NotBlank
-    @Size(max = 50)
     private String firstName;
 
     @NotBlank
-    @Size(max = 50)
     private String lastName;
 
     public UserPayload() {}

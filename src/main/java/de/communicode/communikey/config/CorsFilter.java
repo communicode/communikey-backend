@@ -6,11 +6,7 @@
  */
 package de.communicode.communikey.config;
 
-import static java.util.Optional.ofNullable;
-
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;

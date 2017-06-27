@@ -8,7 +8,6 @@ package de.communicode.communikey.config;
 
 import static java.util.Objects.requireNonNull;
 
-import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

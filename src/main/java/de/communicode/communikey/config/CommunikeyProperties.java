@@ -14,7 +14,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 /**
  * communikey (default) configuration properties.
@@ -61,8 +60,10 @@ public final class CommunikeyProperties {
 
             @NotNull
             private int accessTokenValidity = COMMUNIKEY_SECURITY_OAUTH2_DEFAULT_ACCESS_TOKEN_VALIDITY;
+
             @NotNull
             private String secret = "secret";
+
             @NotBlank
             private String redirectUrl = "http://localhost";
 
@@ -102,17 +103,17 @@ public final class CommunikeyProperties {
         public static class Root {
 
             @NotBlank
-            @Size(max = 100)
             private String login = "root";
+
             @NotBlank
             @Pattern(regexp = EMAIL_REGEX, message = "not a well-formed email address")
-            @Size(max = 100)
             private String email = "cckey_root@communicode.de";
+
             @NotNull
             private String password;
-            @Size(max = 50)
+
             private String firstName = "communikey";
-            @Size(max = 50)
+
             private String lastName;
 
             public String getLogin() {

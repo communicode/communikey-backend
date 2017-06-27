@@ -9,8 +9,6 @@ package de.communicode.communikey.service.payload;
 import de.communicode.communikey.domain.User;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.Size;
-
 /**
  * A payload object to create a {@link User}.
  *
@@ -18,8 +16,8 @@ import javax.validation.constraints.Size;
  * @since 0.5.0
  */
 public class UserCreationPayload extends UserPayload {
+
     @NotBlank
-    @Size(min = 8)
     private String password;
 
     public UserCreationPayload() {}

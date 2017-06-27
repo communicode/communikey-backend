@@ -24,7 +24,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -47,8 +46,7 @@ public class UserGroup extends AbstractEntity implements Serializable {
     private Long id;
 
     @NotBlank
-    @Size(max = 100)
-    @Column(length = 100, unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER)

@@ -9,8 +9,6 @@ package de.communicode.communikey.service.payload;
 import de.communicode.communikey.domain.Key;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.Size;
-
 /**
  * A payload object for a {@link Key}.
  *
@@ -20,11 +18,13 @@ import javax.validation.constraints.Size;
 public class KeyPayload {
 
     private Long categoryId;
+
     @NotBlank
     private String login;
+
     @NotBlank
-    @Size(max = 100)
     private String name;
+
     @NotBlank
     private String password;
 
