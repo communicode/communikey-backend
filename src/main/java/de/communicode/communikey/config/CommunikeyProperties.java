@@ -56,16 +56,13 @@ public final class CommunikeyProperties {
             /**
              * The default validity of a communikey OAuth2 access token in seconds.
              */
-            public int COMMUNIKEY_SECURITY_OAUTH2_DEFAULT_ACCESS_TOKEN_VALIDITY = 604800;
+            public final int COMMUNIKEY_SECURITY_OAUTH2_DEFAULT_ACCESS_TOKEN_VALIDITY = 604800;
 
             @NotNull
             private int accessTokenValidity = COMMUNIKEY_SECURITY_OAUTH2_DEFAULT_ACCESS_TOKEN_VALIDITY;
 
             @NotNull
             private String secret = "secret";
-
-            @NotBlank
-            private String redirectUrl = "http://localhost";
 
             public int getAccessTokenValidity() {
                 return this.accessTokenValidity;
@@ -86,14 +83,6 @@ public final class CommunikeyProperties {
             @Override
             public String toString() {
                 return "OAuth2{" + "accessTokenValidity=" + this.accessTokenValidity + '}';
-            }
-
-            public String getRedirectUrl() {
-                return this.redirectUrl;
-            }
-
-            public void setRedirectUrl(String redirectUrl) {
-                this.redirectUrl = redirectUrl;
             }
         }
 
