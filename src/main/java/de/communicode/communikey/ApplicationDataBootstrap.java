@@ -72,6 +72,7 @@ public class ApplicationDataBootstrap {
             this.rootUser.setEmail(communikeyProperties.getSecurity().getRoot().getEmail());
             this.rootUser.setLogin(communikeyProperties.getSecurity().getRoot().getLogin());
             this.rootUser.setFirstName(communikeyProperties.getSecurity().getRoot().getFirstName());
+            this.rootUser.setLastName(communikeyProperties.getSecurity().getRoot().getLastName());
             this.rootUser.setPassword(passwordEncoder.encode(communikeyProperties.getSecurity().getRoot().getPassword()));
             this.rootUser.setActivationKey(SecurityUtils.generateRandomActivationKey());
             this.rootUser.setActivated(true);
