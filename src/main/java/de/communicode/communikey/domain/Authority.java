@@ -27,7 +27,7 @@ public class Authority extends AbstractEntity implements Serializable {
 
     @NotNull
     @Id
-    @Column
+    @Column(length = 50)
     private String name;
 
     public String getName() {
