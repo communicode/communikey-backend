@@ -9,9 +9,6 @@ package de.communicode.communikey.service.payload;
 import de.communicode.communikey.domain.KeyCategory;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Size;
-
 /**
  * A payload object for a {@link KeyCategory}.
  *
@@ -21,7 +18,6 @@ import javax.validation.constraints.Size;
 public class KeyCategoryPayload {
 
     @NotBlank
-    @Size(max = 100)
     private String name;
 
     public KeyCategoryPayload() {}

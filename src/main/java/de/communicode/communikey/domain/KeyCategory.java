@@ -48,7 +48,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 100, nullable = false)
+    @Column(nullable = false)
     @NotBlank
     private String name;
 

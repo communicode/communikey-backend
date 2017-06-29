@@ -9,8 +9,6 @@ package de.communicode.communikey.service.payload;
 import de.communicode.communikey.domain.User;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.Size;
-
 /**
  * A payload object to reset the password of a {@link User} with a specified reset key.
  *
@@ -20,11 +18,9 @@ import javax.validation.constraints.Size;
 public class UserPasswordResetPayload {
 
     @NotBlank
-    @Size(min = 8)
     private String password;
 
     @NotBlank
-    @Size(max = 20)
     private String resetKey;
 
     public String getPassword() {

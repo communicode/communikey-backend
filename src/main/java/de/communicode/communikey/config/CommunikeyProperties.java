@@ -14,7 +14,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 /**
  * communikey (default) configuration properties.
@@ -57,14 +56,13 @@ public final class CommunikeyProperties {
             /**
              * The default validity of a communikey OAuth2 access token in seconds.
              */
-            public int COMMUNIKEY_SECURITY_OAUTH2_DEFAULT_ACCESS_TOKEN_VALIDITY = 604800;
+            public final int COMMUNIKEY_SECURITY_OAUTH2_DEFAULT_ACCESS_TOKEN_VALIDITY = 604800;
 
             @NotNull
             private int accessTokenValidity = COMMUNIKEY_SECURITY_OAUTH2_DEFAULT_ACCESS_TOKEN_VALIDITY;
+
             @NotNull
             private String secret = "secret";
-            @NotBlank
-            private String redirectUrl = "http://localhost";
 
             public int getAccessTokenValidity() {
                 return this.accessTokenValidity;
@@ -86,14 +84,6 @@ public final class CommunikeyProperties {
             public String toString() {
                 return "OAuth2{" + "accessTokenValidity=" + this.accessTokenValidity + '}';
             }
-
-            public String getRedirectUrl() {
-                return this.redirectUrl;
-            }
-
-            public void setRedirectUrl(String redirectUrl) {
-                this.redirectUrl = redirectUrl;
-            }
         }
 
         /**
@@ -102,18 +92,18 @@ public final class CommunikeyProperties {
         public static class Root {
 
             @NotBlank
-            @Size(max = 100)
             private String login = "root";
+
             @NotBlank
             @Pattern(regexp = EMAIL_REGEX, message = "not a well-formed email address")
-            @Size(max = 100)
             private String email = "cckey_root@communicode.de";
+
             @NotNull
             private String password;
-            @Size(max = 50)
+
             private String firstName = "communikey";
-            @Size(max = 50)
-            private String lastName;
+
+            private String lastName = "root";
 
             public String getLogin() {
                 return this.login;

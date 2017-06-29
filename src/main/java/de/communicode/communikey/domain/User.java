@@ -30,7 +30,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -54,30 +53,25 @@ public class User extends AbstractEntity implements Serializable {
     private Long id;
 
     @NotBlank
-    @Size(max = 100)
-    @Column(length = 100, unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     @JsonView(AuthoritiesRestView.Admin.class)
     private String login;
 
     @NotBlank
     @Pattern(regexp = EMAIL_REGEX, message = "not a well-formed email address")
-    @Size(max = 115)
-    @Column(length = 115, unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     @JsonView(AuthoritiesRestView.Admin.class)
     private String email;
 
     @NotNull
-    @Size(min = 60, max = 60)
-    @Column(name = "password_hash", length = 60)
+    @Column(name = "password_hash")
     @JsonIgnore
     private String password;
 
-    @Size(max = 50)
-    @Column(name = "first_name", length = 50)
+    @Column(name = "first_name")
     private String firstName;
 
-    @Size(max = 50)
-    @Column(name = "last_name", length = 50)
+    @Column(name = "last_name")
     private String lastName;
 
     @NotNull
@@ -85,13 +79,11 @@ public class User extends AbstractEntity implements Serializable {
     @JsonView(AuthoritiesRestView.Admin.class)
     private boolean activated = false;
 
-    @Size(max = 20)
-    @Column(name = "activation_key", length = 20)
+    @Column(name = "activation_key")
     @JsonView(AuthoritiesRestView.Admin.class)
     private String activationKey;
 
-    @Size(max = 20)
-    @Column(name = "reset_key", length = 20)
+    @Column(name = "reset_key")
     @JsonView(AuthoritiesRestView.Admin.class)
     private String resetKey;
 

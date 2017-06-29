@@ -20,7 +20,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import java.io.Serializable;
 
@@ -41,8 +40,7 @@ public class Key extends AbstractEntity implements Serializable {
     private Long id;
 
     @NotBlank
-    @Size(max = 100)
-    @Column(length = 100, nullable = false)
+    @Column(nullable = false)
     private String name;
 
     @ManyToOne
