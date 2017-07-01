@@ -82,6 +82,22 @@ public class UserController {
     }
 
     /**
+     * Adds a authority to a user with the specified login.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USER_AUTHORITIES}".
+     *
+     * @param login the login of the user to add the authority to
+     * @param authorityName the name of the authority to be added
+     * @return the updated user as response entity
+     * @since 0.11.0
+     */
+    @GetMapping(value = USER_AUTHORITIES)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<User> addUserGroup(@PathVariable (value = USER_LOGIN) String login, @RequestParam String authorityName) {
+        return new ResponseEntity<>(userService.addAuthority(login, authorityName), HttpStatus.OK);
+    }
+
+    /**
      * Deactivates the user with the specified login.
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_DEACTIVATE}".
@@ -170,6 +186,22 @@ public class UserController {
     @GetMapping(value = USERS_PASSWORD_RESET)
     public ResponseEntity<Map<String, String>> getPasswordResetKey(@RequestParam(value = USER_EMAIL) String email) {
         return new ResponseEntity<>(userService.generatePasswordResetKey(email), HttpStatus.OK);
+    }
+
+    /**
+     * Removes a authority from a user with the specified login.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USER_AUTHORITIES}".
+     *
+     * @param login the login of the user to remove the authority from
+     * @param authorityName the name of the authority to be removed
+     * @return the updated user as response entity
+     * @since 0.11.0
+     */
+    @DeleteMapping(value = USER_AUTHORITIES)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<User> removeAuthority(@PathVariable (value = USER_LOGIN) String login, @RequestParam String authorityName) {
+        return new ResponseEntity<>(userService.removeAuthority(login, authorityName), HttpStatus.OK);
     }
 
     /**

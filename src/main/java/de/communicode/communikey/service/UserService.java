@@ -18,6 +18,7 @@ import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.exception.ActivationKeyNotFoundException;
+import de.communicode.communikey.exception.AuthorityNotFoundException;
 import de.communicode.communikey.exception.ResetKeyNotFoundException;
 import de.communicode.communikey.exception.UserConflictException;
 import de.communicode.communikey.exception.UserNotFoundException;
@@ -63,6 +64,7 @@ public class UserService {
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
     private final JdbcTokenStore jdbcTokenStore;
+    private final AuthorityService authorityService;
     private final UserService userService;
     private final CommunikeyProperties communikeyProperties;
 
@@ -75,6 +77,7 @@ public class UserService {
             AuthorityRepository authorityRepository,
             PasswordEncoder passwordEncoder,
             JdbcTokenStore jdbcTokenStore,
+            AuthorityService authorityService,
             @Lazy UserService userService,
             CommunikeyProperties communikeyProperties) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
@@ -84,6 +87,7 @@ public class UserService {
         this.authorityRepository = requireNonNull(authorityRepository, "authorityRepository must not be null!");
         this.passwordEncoder = requireNonNull(passwordEncoder, "passwordEncoder must not be null!");
         this.jdbcTokenStore = requireNonNull(jdbcTokenStore, "jdbcTokenStore must not be null!");
+        this.authorityService = requireNonNull(authorityService, "authorityService must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.communikeyProperties = requireNonNull(communikeyProperties, "communikeyProperties must not be null!");
     }
@@ -104,6 +108,27 @@ public class UserService {
                 log.debug("Activated user '{}' with activation key '{}'", user.getLogin(), activationKey);
                 return user;
             }).orElseThrow(() -> new ActivationKeyNotFoundException(activationKey));
+    }
+
+    /**
+     * Adds a authority to a user with the specified login.
+     *
+     * @param login the login of the user to add the authority to
+     * @param authorityName the name of the authority to be added to the user
+     * @return the updated user
+     * @throws UserNotFoundException if the user with specified login has not been found
+     * @throws AuthorityNotFoundException if the authority with specified name has not been found
+     */
+    public User addAuthority(String login, String authorityName) throws UserNotFoundException, AuthorityNotFoundException {
+        User user = validate(login);
+        Authority authority = authorityService.validate(authorityName);
+
+        if (user.addAuthority(authority)) {
+            log.debug("Added authority with name '{}' to user with login '{}'", authority.getName(), login);
+            deleteOauth2AccessTokens(login);
+            return userRepository.save(user);
+        }
+        return user;
     }
 
     /**
@@ -232,6 +257,27 @@ public class UserService {
     @Transactional(readOnly = true)
     public User getWithAuthorities() {
         return ofNullable(userRepository.findOneWithAuthoritiesByEmail(SecurityUtils.getCurrentUserLogin())).orElse(null);
+    }
+
+    /**
+     * Removes a authority from the user with the specified login.
+     *
+     * @param login the login of the user to remove the authority from
+     * @param authorityName the name of the authority to be removed from the user
+     * @return the updated user
+     * @throws UserNotFoundException if the user with specified login has not been found
+     * @throws AuthorityNotFoundException if the authority with specified name has not been found
+     */
+    public User removeAuthority(String login, String authorityName) throws UserNotFoundException, AuthorityNotFoundException {
+        User user = validate(login);
+        Authority authority = authorityService.validate(authorityName);
+
+        if (user.removeAuthority(authority)) {
+            log.debug("Removed authority with name '{}' from user with login '{}'", authority.getName(), login);
+            deleteOauth2AccessTokens(login);
+            return userRepository.save(user);
+        }
+        return user;
     }
 
     /**
