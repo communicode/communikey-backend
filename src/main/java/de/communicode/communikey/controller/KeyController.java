@@ -104,6 +104,7 @@ public class KeyController {
      * @return the key as response entity
      */
     @GetMapping(value = KEYS_ID)
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity get(@PathVariable Long keyId) {
         return keyService.get(keyId).map(key -> new ResponseEntity<>(key, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.FORBIDDEN));
     }
@@ -116,6 +117,7 @@ public class KeyController {
      * @return a collection of keys as response entity
      */
     @GetMapping
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Set<Key>> getAll() {
         return new ResponseEntity<>(keyService.getAll(), HttpStatus.OK);
     }
