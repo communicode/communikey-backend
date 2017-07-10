@@ -56,6 +56,7 @@
     <hibernate-envers.version>5.2.4.Final</hibernate-envers.version>
     <rest-assured.version>3.0.2</rest-assured.version>
     <jfairy.version>0.5.6</jfairy.version>
+    <springfox.swagger.version>2.6.1</springfox.swagger.version>
   </properties>
 
   <dependencies>
@@ -115,6 +116,12 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-configuration-processor</artifactId>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
+      <version>${springfox.swagger.version}</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>
