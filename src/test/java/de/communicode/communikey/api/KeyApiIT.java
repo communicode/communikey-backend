@@ -72,7 +72,7 @@ public class KeyApiIT extends IntegrationBaseTest {
     @Test
     public void testDeleteKeyAsAdmin() {
         initializeTestKeyPayload();
-        Long createdKeyId = given()
+        String createdKeyHashid = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(keyPayload)
@@ -80,21 +80,21 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getLong("id");
+                .extract().jsonPath().getString("id");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("keyId", createdKeyId)
+                .pathParam("keyHashid", createdKeyHashid)
         .when()
-                .delete(RequestMappings.KEYS + RequestMappings.KEYS_ID)
+                .delete(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("keyId", createdKeyId)
+                .pathParam("keyHashid", createdKeyHashid)
         .when()
-                .get(RequestMappings.KEYS + RequestMappings.KEYS_ID)
+                .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
                 .statusCode(HttpStatus.NOT_FOUND.value());
     }
@@ -102,7 +102,7 @@ public class KeyApiIT extends IntegrationBaseTest {
     @Test
     public void testDeleteKeyAsUser() {
         initializeTestKeyPayload();
-        Long createdKeyId = given()
+        String createdKeyHashid = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(keyPayload)
@@ -110,13 +110,13 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getLong("id");
+                .extract().jsonPath().getString("id");
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
-                .pathParam("keyId", createdKeyId)
+                .pathParam("keyHashid", createdKeyHashid)
         .when()
-                .delete(RequestMappings.KEYS + RequestMappings.KEYS_ID)
+                .delete(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
                 .statusCode(HttpStatus.FORBIDDEN.value());
     }
@@ -180,7 +180,7 @@ public class KeyApiIT extends IntegrationBaseTest {
     @Test
     public void testGetKeyAsAdmin() {
         initializeTestKeyPayload();
-        Long createdKeyId = given()
+        String createdKeyHashid = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(keyPayload)
@@ -188,22 +188,22 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getLong("id");
+                .extract().jsonPath().getString("id");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("keyId", createdKeyId)
+                .pathParam("keyHashid", createdKeyHashid)
         .when()
-                .get(RequestMappings.KEYS + RequestMappings.KEYS_ID)
+                .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("id", equalTo(createdKeyId.intValue()));
+                .body("id", equalTo(createdKeyHashid));
     }
 
     @Test
     public void testGetKeyAsUser() {
         initializeTestKeyPayload();
-        Long createdKeyId = given()
+        String createdKeyHashid = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(keyPayload)
@@ -211,13 +211,13 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getLong("id");
+                .extract().jsonPath().getString("id");
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
-                .pathParam("keyId", createdKeyId)
+                .pathParam("keyHashid", createdKeyHashid)
         .when()
-                .get(RequestMappings.KEYS + RequestMappings.KEYS_ID)
+                .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
                 .statusCode(HttpStatus.FORBIDDEN.value());
     }
@@ -267,7 +267,7 @@ public class KeyApiIT extends IntegrationBaseTest {
     @Test
     public void testUpdateKeyAsAdmin() {
         initializeTestKeyPayload();
-        Long createdKeyId = given()
+        String createdKeyHashid = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(keyPayload)
@@ -275,7 +275,7 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getLong("id");
+                .extract().jsonPath().getString("id");
 
         keyPayload.replace("name", "newName");
         keyPayload.replace("login", "newLogin");
@@ -284,10 +284,10 @@ public class KeyApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
-                .pathParam("keyId", createdKeyId)
+                .pathParam("keyHashid", createdKeyHashid)
                 .body(keyPayload)
         .when()
-                .put(RequestMappings.KEYS + RequestMappings.KEYS_ID)
+                .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("name", equalTo(keyPayload.get("name")))
@@ -298,7 +298,7 @@ public class KeyApiIT extends IntegrationBaseTest {
     @Test
     public void testUpdateKeyAsUser() {
         initializeTestKeyPayload();
-        Long createdKeyId = given()
+        String createdKeyHashid = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(keyPayload)
@@ -306,7 +306,7 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.KEYS)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getLong("id");
+                .extract().jsonPath().getString("id");
 
         keyPayload.replace("name", "newName");
         keyPayload.replace("login", "login");
@@ -315,10 +315,10 @@ public class KeyApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(userOAuth2AccessToken)
                 .contentType(ContentType.JSON)
-                .pathParam("keyId", createdKeyId)
+                .pathParam("keyHashid", createdKeyHashid)
                 .body(keyPayload)
         .when()
-                .put(RequestMappings.KEYS + RequestMappings.KEYS_ID)
+                .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
                 .statusCode(HttpStatus.FORBIDDEN.value());
     }
