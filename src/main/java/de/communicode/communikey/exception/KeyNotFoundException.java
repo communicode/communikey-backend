@@ -17,11 +17,19 @@ import de.communicode.communikey.domain.Key;
 public class KeyNotFoundException extends RuntimeException {
 
     /**
-     * Constructs a {@code KeyNotFoundException} with the specified {@link Key} ID.
-     *
-     * @param keyId the ID of the key that has not been found
+     * Constructs a {@code KeyNotFoundException}.
      */
-    public KeyNotFoundException(Long keyId) {
-        super("key with ID '" + keyId + "' not found");
+    public KeyNotFoundException() {
+        super("key not found");
+    }
+
+    /**
+     * Constructs a {@code KeyNotFoundException} with the specified {@link Key} Hashid.
+     *
+     * @param keyHashid the Hashid of the key that has not been found
+     * @since 0.12.0
+     */
+    public KeyNotFoundException(String keyHashid) {
+        super("key with ID '" + keyHashid + "' not found");
     }
 }

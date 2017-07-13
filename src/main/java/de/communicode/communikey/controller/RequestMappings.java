@@ -63,9 +63,9 @@ public final class RequestMappings {
     public static final String KEY_CATEGORY_RESPONSIBLE = KEY_CATEGORIES_ID + "/responsible";
 
     /**
-     * The request parameter for a {@link Key} entity ID.
+     * The request parameter for a {@link Key} entity Hashid.
      */
-    public static final String KEYS_ID = "/{keyId}";
+    public static final String KEY_HASHID = "/{keyHashid}";
 
     /**
      * The endpoint for {@link User} entities.
