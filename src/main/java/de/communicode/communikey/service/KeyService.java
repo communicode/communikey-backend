@@ -22,6 +22,7 @@ import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.repository.KeyRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -43,12 +44,14 @@ public class KeyService {
     private final KeyRepository keyRepository;
     private final KeyCategoryService keyCategoryService;
     private final UserService userService;
+    private final Hashids hashids;
 
     @Autowired
-    public KeyService(KeyRepository keyRepository, @Lazy KeyCategoryService keyCategoryService, UserService userRestService) {
+    public KeyService(KeyRepository keyRepository, @Lazy KeyCategoryService keyCategoryService, UserService userRestService, Hashids hashids) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
         this.userService = requireNonNull(userRestService, "userService must not be null!");
+        this.hashids = requireNonNull(hashids, "hashids must not be null!");
     }
 
     /**
@@ -65,6 +68,8 @@ public class KeyService {
         key.setLogin(payload.getLogin());
         key.setPassword(payload.getPassword());
         Key persistedKey = keyRepository.save(key);
+        persistedKey.setHashid(hashids.encode(persistedKey.getId()));
+        persistedKey = keyRepository.save(persistedKey);
         log.debug("Created new key with ID '{}'", persistedKey.getId());
 
         if (ofNullable(payload.getCategoryId()).isPresent()) {
@@ -154,13 +159,13 @@ public class KeyService {
     }
 
     /**
-     * Validates a key.
+     * Validates a key with the specified ID.
      *
      * @param keyId the ID of the key to validate
      * @return the key if validated
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
     public Key validate(Long keyId) throws KeyNotFoundException {
-        return ofNullable(keyRepository.findOne(keyId)).orElseThrow(() -> new KeyNotFoundException(keyId));
+        return ofNullable(keyRepository.findOne(keyId)).orElseThrow(KeyNotFoundException::new);
     }
 }
