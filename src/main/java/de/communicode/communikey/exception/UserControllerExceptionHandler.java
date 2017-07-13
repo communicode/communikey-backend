@@ -26,24 +26,24 @@ import java.util.Calendar;
 public class UserControllerExceptionHandler extends GlobalControllerExceptionHandler {
 
     /**
-     * Handles all exceptions of type {@link ResetKeyNotFoundException}.
+     * Handles all exceptions of type {@link ResetTokenNotFoundException}.
      *
      * @param exception the exception to handle
      * @return the error as response entity
      */
-    @ExceptionHandler(ResetKeyNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResetKeyNotFoundException(final ResetKeyNotFoundException exception) {
+    @ExceptionHandler(ResetTokenNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResetTokenNotFoundException(final ResetTokenNotFoundException exception) {
         return createErrorResponse(HttpStatus.NOT_FOUND, new Timestamp(Calendar.getInstance().getTimeInMillis()), exception.getMessage());
     }
 
     /**
-     * Handles all exceptions of type {@link ActivationKeyNotFoundException}.
+     * Handles all exceptions of type {@link ActivationTokenNotFoundException}.
      *
      * @param exception the exception to handle
      * @return the error as response entity
      */
-    @ExceptionHandler(ActivationKeyNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleActivationKeyNotFoundException(final ActivationKeyNotFoundException exception) {
+    @ExceptionHandler(ActivationTokenNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleActivationTokenNotFoundException(final ActivationTokenNotFoundException exception) {
         return createErrorResponse(HttpStatus.NOT_FOUND, new Timestamp(Calendar.getInstance().getTimeInMillis()), exception.getMessage());
     }
 

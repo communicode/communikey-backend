@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.api;
 
+import static de.communicode.communikey.controller.PathVariables.USER_ACTIVATION_TOKEN;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
@@ -55,7 +56,7 @@ public class UserApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .queryParam("activation_key", response.path("activationKey").toString())
+                .queryParam(USER_ACTIVATION_TOKEN, response.path("activationToken").toString())
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_ACTIVATE)
         .then()
@@ -198,9 +199,9 @@ public class UserApiIT extends IntegrationBaseTest {
     }
 
     @Test
-    public void testGetPasswordResetKeyAsUser() {
+    public void testGetPasswordResetTokenAsUser() {
         initializeTestUser(true);
-        String activationKey = given()
+        String activationToken = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(new UserCreationPayload(testUser))
@@ -208,11 +209,11 @@ public class UserApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getString("activationKey");
+                .extract().jsonPath().getString("activationToken");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .queryParam("activation_key", activationKey)
+                .queryParam(USER_ACTIVATION_TOKEN, activationToken)
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_ACTIVATE)
         .then()
@@ -233,7 +234,7 @@ public class UserApiIT extends IntegrationBaseTest {
         Map<String, String> userPasswordResetPayload = new HashMap<>();
         userPasswordResetPayload.put("password", "newPassword");
 
-        String activationKey = given()
+        String activationToken = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(new UserCreationPayload(testUser))
@@ -241,26 +242,26 @@ public class UserApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER)
         .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .extract().jsonPath().getString("activationKey");
+                .extract().jsonPath().getString("activationToken");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .queryParam("activation_key", activationKey)
+                .queryParam(USER_ACTIVATION_TOKEN, activationToken)
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_ACTIVATE)
         .then()
                 .statusCode(HttpStatus.OK.value());
 
-        String resetKey = given()
+        String resetToken = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .queryParam("email", testUser.getEmail())
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_PASSWORD_RESET)
         .then()
                 .statusCode(HttpStatus.OK.value())
-                .extract().jsonPath().getString("resetKey");
+                .extract().jsonPath().getString("resetToken");
 
-        userPasswordResetPayload.put("resetKey", resetKey);
+        userPasswordResetPayload.put("resetToken", resetToken);
         given()
                 .auth().oauth2(userOAuth2AccessToken)
                 .contentType(ContentType.JSON)
@@ -305,7 +306,7 @@ public class UserApiIT extends IntegrationBaseTest {
         authorities.add(AuthoritiesConstants.ADMIN);
         authorities.add(AuthoritiesConstants.USER);
 
-        String activationKey = given()
+        String activationToken = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
                 .body(new UserCreationPayload(testUser))
@@ -317,11 +318,11 @@ public class UserApiIT extends IntegrationBaseTest {
                 .body("authorities", hasItem(not(containsString(AuthoritiesConstants.ADMIN))))
                 .root("authorities")
                 .body("size()", equalTo(1))
-                .extract().jsonPath().getString("activationKey");
+                .extract().jsonPath().getString("activationToken");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .queryParam("activation_key", activationKey)
+                .queryParam(USER_ACTIVATION_TOKEN, activationToken)
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_ACTIVATE)
         .then()

@@ -135,7 +135,7 @@ public abstract class IntegrationBaseTest {
         user.setFirstName(fairy.person().getFirstName());
         user.setLastName(fairy.person().getLastName());
         user.setPassword(passwordEncoder.encode(decodedUserPassword));
-        user.setActivationKey(SecurityUtils.generateRandomActivationKey());
+        user.setActivationToken(SecurityUtils.generateRandomActivationToken());
         user.setActivated(true);
         Set<Authority> authorities = Sets.newConcurrentHashSet();
         authorities.add(authorityService.get(AuthoritiesConstants.USER));
