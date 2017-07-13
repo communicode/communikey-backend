@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.controller;
 
+import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEYS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_HASHID;
 import static java.util.Objects.requireNonNull;
@@ -79,7 +80,7 @@ public class KeyController {
      */
     @DeleteMapping(value = KEY_HASHID)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<Void> delete(@PathVariable String keyHashid) {
+    public ResponseEntity<Void> delete(@PathVariable(name = KEY_ID) String keyHashid) {
         keyService.delete(decodeSingleValueHashid(keyHashid));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -109,7 +110,7 @@ public class KeyController {
      */
     @GetMapping(value = KEY_HASHID)
     @Secured(AuthoritiesConstants.USER)
-    public ResponseEntity get(@PathVariable String keyHashid) {
+    public ResponseEntity get(@PathVariable(name = KEY_ID) String keyHashid) {
         return keyService.get(decodeSingleValueHashid(keyHashid))
                 .map(key -> new ResponseEntity<>(key, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.FORBIDDEN));
@@ -140,7 +141,7 @@ public class KeyController {
      */
     @PutMapping(value = KEY_HASHID)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<Key> update(@PathVariable String keyHashid, @Valid @RequestBody KeyPayload payload) {
+    public ResponseEntity<Key> update(@PathVariable(name = KEY_ID) String keyHashid, @Valid @RequestBody KeyPayload payload) {
         return new ResponseEntity<>(keyService.update(hashids.decode(keyHashid)[0], payload), HttpStatus.OK);
     }
 

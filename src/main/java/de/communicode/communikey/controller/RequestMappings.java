@@ -6,6 +6,8 @@
  */
 package de.communicode.communikey.controller;
 
+import static de.communicode.communikey.controller.PathVariables.KEY_ID;
+
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
@@ -65,7 +67,7 @@ public final class RequestMappings {
     /**
      * The request parameter for a {@link Key} entity Hashid.
      */
-    public static final String KEY_HASHID = "/{keyHashid}";
+    public static final String KEY_HASHID = "/{" + KEY_ID + "}";
 
     /**
      * The endpoint for {@link User} entities.

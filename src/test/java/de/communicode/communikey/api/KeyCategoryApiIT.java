@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.api;
 
+import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.equalTo;
@@ -213,7 +214,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("keyHashid", createdKeyHashid)
+                .param(KEY_ID, createdKeyHashid)
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_KEYS)
         .then()
@@ -223,7 +224,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("keyHashid", createdKeyHashid)
+                .pathParam(KEY_ID, createdKeyHashid)
         .when()
                 .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
@@ -260,7 +261,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(userOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("keyHashid", createdKeyHashid)
+                .param(KEY_ID, createdKeyHashid)
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_KEYS)
         .then()
@@ -277,7 +278,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("keyHashid", createdKeyHashid)
+                .pathParam(KEY_ID, createdKeyHashid)
         .when()
                 .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
@@ -711,7 +712,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("keyHashid", createdKeyHashid)
+                .param(KEY_ID, createdKeyHashid)
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_KEYS)
         .then()
@@ -720,7 +721,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("keyHashid", createdKeyHashid)
+                .param(KEY_ID, createdKeyHashid)
         .when()
                 .delete(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_KEYS)
         .then()
@@ -755,7 +756,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("keyHashid", createdKeyHashid)
+                .param(KEY_ID, createdKeyHashid)
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_KEYS)
         .then()
@@ -764,7 +765,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(userOAuth2AccessToken)
                 .pathParam("keyCategoryId", createdKeyCategoryId)
-                .param("keyHashid", createdKeyHashid)
+                .param(KEY_ID, createdKeyHashid)
         .when()
                 .delete(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_KEYS)
         .then()

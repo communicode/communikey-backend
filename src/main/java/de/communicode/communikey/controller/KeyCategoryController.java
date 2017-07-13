@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.controller;
 
+import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_CHILDREN;
@@ -102,7 +103,7 @@ public class KeyCategoryController {
      */
     @GetMapping(value = KEY_CATEGORY_KEYS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> addKey(@PathVariable Long keyCategoryId, @RequestParam String keyHashid) {
+    public ResponseEntity<KeyCategory> addKey(@PathVariable Long keyCategoryId, @RequestParam(name = KEY_ID) String keyHashid) {
         return new ResponseEntity<>(keyCategoryService.addKey(keyCategoryId, decodeSingleValueHashid(keyHashid)), HttpStatus.OK);
     }
 
@@ -205,7 +206,7 @@ public class KeyCategoryController {
      */
     @DeleteMapping(value = KEY_CATEGORY_KEYS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> removeKey(@PathVariable Long keyCategoryId, @RequestParam String keyHashid) {
+    public ResponseEntity<KeyCategory> removeKey(@PathVariable Long keyCategoryId, @RequestParam(name = KEY_ID) String keyHashid) {
         return new ResponseEntity<>(keyCategoryService.removeKey(keyCategoryId, decodeSingleValueHashid(keyHashid)), HttpStatus.OK);
     }
 

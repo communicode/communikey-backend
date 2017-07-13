@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.api;
 
+import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 
@@ -84,7 +85,7 @@ public class KeyApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("keyHashid", createdKeyHashid)
+                .pathParam(KEY_ID, createdKeyHashid)
         .when()
                 .delete(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
@@ -92,7 +93,7 @@ public class KeyApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("keyHashid", createdKeyHashid)
+                .pathParam(KEY_ID, createdKeyHashid)
         .when()
                 .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
@@ -114,7 +115,7 @@ public class KeyApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
-                .pathParam("keyHashid", createdKeyHashid)
+                .pathParam(KEY_ID, createdKeyHashid)
         .when()
                 .delete(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
@@ -192,7 +193,7 @@ public class KeyApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("keyHashid", createdKeyHashid)
+                .pathParam(KEY_ID, createdKeyHashid)
         .when()
                 .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
@@ -215,7 +216,7 @@ public class KeyApiIT extends IntegrationBaseTest {
 
         given()
                 .auth().oauth2(userOAuth2AccessToken)
-                .pathParam("keyHashid", createdKeyHashid)
+                .pathParam(KEY_ID, createdKeyHashid)
         .when()
                 .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
@@ -284,7 +285,7 @@ public class KeyApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
-                .pathParam("keyHashid", createdKeyHashid)
+                .pathParam(KEY_ID, createdKeyHashid)
                 .body(keyPayload)
         .when()
                 .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
@@ -315,7 +316,7 @@ public class KeyApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(userOAuth2AccessToken)
                 .contentType(ContentType.JSON)
-                .pathParam("keyHashid", createdKeyHashid)
+                .pathParam(KEY_ID, createdKeyHashid)
                 .body(keyPayload)
         .when()
                 .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
