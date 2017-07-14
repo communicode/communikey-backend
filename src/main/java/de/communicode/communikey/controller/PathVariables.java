@@ -6,6 +6,8 @@
  */
 package de.communicode.communikey.controller;
 
+import de.communicode.communikey.domain.Key;
+
 /**
  * Provides path variables constants.
  *
@@ -19,4 +21,13 @@ public final class PathVariables {
     public static final String USER_ACTIVATION_KEY = "activation_key";
     public static final String USER_EMAIL = "email";
     public static final String USER_LOGIN = "login";
+
+    /**
+     * The Hashid of a {@link Key}.
+     *
+     * <<p>Exposed as ID through the API.
+     *
+     * @since 0.12.0
+     */
+    public static final String KEY_ID = "keyId";
 }

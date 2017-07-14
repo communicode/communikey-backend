@@ -57,6 +57,7 @@
     <rest-assured.version>3.0.2</rest-assured.version>
     <jfairy.version>0.5.6</jfairy.version>
     <springfox.swagger.version>2.6.1</springfox.swagger.version>
+    <hashids.version>1.0.2</hashids.version>
   </properties>
 
   <dependencies>
@@ -202,6 +203,11 @@
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-yaml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hashids</groupId>
+      <artifactId>hashids</artifactId>
+      <version>${hashids.version}</version>
     </dependency>
   </dependencies>
 
@@ -363,7 +369,7 @@
       <url>https://repo.maven.apache.org/maven2</url>
       <layout>default</layout>
       <snapshots>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
         <checksumPolicy>warn</checksumPolicy>
       </snapshots>
       <releases>

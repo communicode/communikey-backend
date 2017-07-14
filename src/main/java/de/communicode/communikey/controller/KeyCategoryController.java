@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.controller;
 
+import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_CHILDREN;
@@ -15,11 +16,13 @@ import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.KeyCategory;
+import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
 import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import de.communicode.communikey.service.KeyCategoryService;
+import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,10 +54,12 @@ import java.util.Set;
 public class KeyCategoryController {
 
     private final KeyCategoryService keyCategoryService;
+    private final Hashids hashids;
 
     @Autowired
-    public KeyCategoryController(KeyCategoryService keyCategoryService) {
+    public KeyCategoryController(KeyCategoryService keyCategoryService, Hashids hashids) {
         this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
+        this.hashids = requireNonNull(hashids, "hashids must not be null!");
     }
 
     /**
@@ -93,13 +98,13 @@ public class KeyCategoryController {
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_KEYS}".
      *
      * @param keyCategoryId the ID of the key category to add the key to
-     * @param keyId the ID of the key to be added
+     * @param keyHashid the Hashid of the key to be added
      * @return the updated key category entity
      */
     @GetMapping(value = KEY_CATEGORY_KEYS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> addKey(@PathVariable Long keyCategoryId, @RequestParam Long keyId) {
-        return new ResponseEntity<>(keyCategoryService.addKey(keyCategoryId, keyId), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> addKey(@PathVariable Long keyCategoryId, @RequestParam(name = KEY_ID) String keyHashid) {
+        return new ResponseEntity<>(keyCategoryService.addKey(keyCategoryId, decodeSingleValueHashid(keyHashid)), HttpStatus.OK);
     }
 
     /**
@@ -196,13 +201,13 @@ public class KeyCategoryController {
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_KEYS}".
      *
      * @param keyCategoryId the ID of the key category the key will be deleted from
-     * @param keyId the ID of the key to be deleted
+     * @param keyHashid the Hashid of the key to be deleted
      * @return the updated key category as response entity
      */
     @DeleteMapping(value = KEY_CATEGORY_KEYS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> removeKey(@PathVariable Long keyCategoryId, @RequestParam Long keyId) {
-        return new ResponseEntity<>(keyCategoryService.removeKey(keyCategoryId, keyId), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> removeKey(@PathVariable Long keyCategoryId, @RequestParam(name = KEY_ID) String keyHashid) {
+        return new ResponseEntity<>(keyCategoryService.removeKey(keyCategoryId, decodeSingleValueHashid(keyHashid)), HttpStatus.OK);
     }
 
     /**
@@ -236,5 +241,21 @@ public class KeyCategoryController {
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<KeyCategory> update(@PathVariable Long keyCategoryId, @Valid @RequestBody KeyCategoryPayload payload) {
         return new ResponseEntity<>(keyCategoryService.update(keyCategoryId, payload), HttpStatus.OK);
+    }
+
+    /**
+     * Decodes the specified Hashid.
+     *
+     * @param keyHashid the Hashid of the key to decode
+     * @return the decoded Hashid if valid
+     * @throws KeyNotFoundException if the Hashid is invalid and the key has not been found
+     * @since 0.12.0
+     */
+    private Long decodeSingleValueHashid(String keyHashid) throws KeyNotFoundException {
+        long[] decodedHashid = hashids.decode(keyHashid);
+        if (decodedHashid.length == 0) {
+            throw new KeyNotFoundException(keyHashid);
+        }
+        return decodedHashid[0];
     }
 }

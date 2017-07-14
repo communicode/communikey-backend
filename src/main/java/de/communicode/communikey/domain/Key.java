@@ -8,6 +8,8 @@ package de.communicode.communikey.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -37,7 +39,12 @@ public class Key extends AbstractEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long id;
+
+    @Column
+    @JsonProperty("id")
+    private String hashid;
 
     @NotBlank
     @Column(nullable = false)
@@ -69,6 +76,22 @@ public class Key extends AbstractEntity implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    /**
+     * @return the Hashid
+     * @since 0.12.0
+     */
+    public String getHashid() {
+        return hashid;
+    }
+
+    /**
+     * @param hashid the Hashid
+     * @since 0.12.0
+     */
+    public void setHashid(String hashid) {
+        this.hashid = hashid;
     }
 
     public String getName() {
