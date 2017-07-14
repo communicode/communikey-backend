@@ -17,9 +17,9 @@ import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
-import de.communicode.communikey.exception.ActivationKeyNotFoundException;
+import de.communicode.communikey.exception.ActivationTokenNotFoundException;
 import de.communicode.communikey.exception.AuthorityNotFoundException;
-import de.communicode.communikey.exception.ResetKeyNotFoundException;
+import de.communicode.communikey.exception.ResetTokenNotFoundException;
 import de.communicode.communikey.exception.UserConflictException;
 import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.repository.AuthorityRepository;
@@ -93,21 +93,21 @@ public class UserService {
     }
 
     /**
-     * Activates the user for the specified activation key.
+     * Activates the user for the specified activation token.
      *
-     * @param activationKey the activation key
+     * @param activationToken the activation token
      * @return the activated user
-     * @throws ActivationKeyNotFoundException if the specified activation key has not been found
+     * @throws ActivationTokenNotFoundException if the specified activation token has not been found
      */
-    public User activate(String activationKey) throws ActivationKeyNotFoundException {
-        return ofNullable(userRepository.findOneByActivationKey(activationKey))
+    public User activate(String activationToken) throws ActivationTokenNotFoundException {
+        return ofNullable(userRepository.findOneByActivationToken(activationToken))
             .map(user -> {
                 user.setActivated(true);
-                user.setActivationKey(null);
+                user.setActivationToken(null);
                 userRepository.save(user);
-                log.debug("Activated user '{}' with activation key '{}'", user.getLogin(), activationKey);
+                log.debug("Activated user '{}' with activation token '{}'", user.getLogin(), activationToken);
                 return user;
-            }).orElseThrow(() -> new ActivationKeyNotFoundException(activationKey));
+            }).orElseThrow(() -> new ActivationTokenNotFoundException(activationToken));
     }
 
     /**
@@ -162,7 +162,7 @@ public class UserService {
         user.setFirstName(payload.getFirstName());
         user.setLastName(payload.getLastName());
         user.setPassword(passwordEncoder.encode(payload.getPassword()));
-        user.setActivationKey(SecurityUtils.generateRandomActivationKey());
+        user.setActivationToken(SecurityUtils.generateRandomActivationToken());
         Set<Authority> authorities = Sets.newConcurrentHashSet();
         Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
         authorities.add(authority);
@@ -184,8 +184,8 @@ public class UserService {
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
                 user.setActivated(false);
-                user.setActivationKey(SecurityUtils.generateRandomActivationKey());
-                log.debug("Generated new activation key '{}' for user with login '{}'", user.getActivationKey(), user.getLogin());
+                user.setActivationToken(SecurityUtils.generateRandomActivationToken());
+                log.debug("Generated new activation token '{}' for user with login '{}'", user.getActivationToken(), user.getLogin());
                 deleteOauth2AccessTokens(login);
                 userRepository.save(user);
                 log.debug("Deactivated user with login '{}'", login);
@@ -207,25 +207,25 @@ public class UserService {
     }
 
     /**
-     * Generates a random generated password reset key for a user specified by the email.
+     * Generates a random generated password reset token for a user specified by the email.
      *
-     * @param email the email of the user to generate a password reset key for
-     * @return the generated reset key
+     * @param email the email of the user to generate a password reset token for
+     * @return the generated reset token
      */
-    public Map<String, String> generatePasswordResetKey(String email) {
+    public Map<String, String> generatePasswordResetToken(String email) {
         return ofNullable(userRepository.findOneByEmail(email))
             .filter(User::isActivated)
             .map(user -> {
-                if (Objects.nonNull(user.getResetKey())) {
-                    log.debug("Rejected to generate already existing password reset key '{}'", user.getResetKey());
-                    throw new UserConflictException("password reset key has already been generated");
+                if (Objects.nonNull(user.getResetToken())) {
+                    log.debug("Rejected to generate already existing password reset token '{}'", user.getResetToken());
+                    throw new UserConflictException("password reset token has already been generated");
                 }
-                user.setResetKey(SecurityUtils.generateRandomResetKey());
+                user.setResetToken(SecurityUtils.generateRandomResetToken());
                 user.setResetDate(ZonedDateTime.now());
                 userRepository.save(user);
-                log.debug("Generated reset key '{}' for user with email '{}'", user.getResetKey(), email);
+                log.debug("Generated reset token '{}' for user with email '{}'", user.getResetToken(), email);
                 return ImmutableMap.<String, String>builder().
-                    put("resetKey", user.getResetKey()).
+                    put("resetToken", user.getResetToken()).
                     build();
             }).orElseThrow(() -> new UserNotFoundException(email));
     }
@@ -281,21 +281,21 @@ public class UserService {
     }
 
     /**
-     * Resets the password of a user for the specified reset key.
+     * Resets the password of a user for the specified reset token.
      *
      * @param newPassword the new password
-     * @param resetKey the reset key of a user to reset the password of
+     * @param resetToken the reset token of a user to reset the password of
      */
-    public void resetPassword(String newPassword, String resetKey) {
-        ofNullable(userRepository.findOneByResetKey(resetKey))
+    public void resetPassword(String newPassword, String resetToken) {
+        ofNullable(userRepository.findOneByResetToken(resetToken))
             .map(user -> {
                 user.setPassword(passwordEncoder.encode(newPassword));
-                user.setResetKey(null);
+                user.setResetToken(null);
                 user.setResetDate(null);
                 userRepository.save(user);
-                log.debug("Reset password with reset key '{}' for user with login '{}'", resetKey, user.getLogin());
+                log.debug("Reset password with reset token '{}' for user with login '{}'", resetToken, user.getLogin());
                 return user;
-            }).orElseThrow(() -> new ResetKeyNotFoundException(resetKey));
+            }).orElseThrow(() -> new ResetTokenNotFoundException(resetToken));
     }
 
     /**

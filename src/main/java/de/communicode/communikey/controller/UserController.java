@@ -6,7 +6,7 @@
  */
 package de.communicode.communikey.controller;
 
-import static de.communicode.communikey.controller.PathVariables.USER_ACTIVATION_KEY;
+import static de.communicode.communikey.controller.PathVariables.USER_ACTIVATION_TOKEN;
 import static de.communicode.communikey.controller.PathVariables.USER_EMAIL;
 import static de.communicode.communikey.controller.PathVariables.USER_LOGIN;
 import static de.communicode.communikey.controller.RequestMappings.USERS;
@@ -63,22 +63,22 @@ public class UserController {
     }
 
     /**
-     * Activates the user with the specified activation key.
+     * Activates the user with the specified activation token.
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_ACTIVATE}".
      *
      * <p>Required parameter:
      * <ul>
-     *   <li>{@value PathVariables#USER_ACTIVATION_KEY}</li>
+     *   <li>{@value PathVariables#USER_ACTIVATION_TOKEN}</li>
      * </ul>
      *
-     * @param activationKey the activation key of the user to activate
+     * @param activationToken the activation token of the user to activate
      * @return the response entity
      */
     @GetMapping(value = USERS_ACTIVATE)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<User> activate(@RequestParam(value = USER_ACTIVATION_KEY) String activationKey) {
-        return new ResponseEntity<>(userService.activate(activationKey), HttpStatus.OK);
+    public ResponseEntity<User> activate(@RequestParam(value = USER_ACTIVATION_TOKEN) String activationToken) {
+        return new ResponseEntity<>(userService.activate(activationToken), HttpStatus.OK);
     }
 
     /**
@@ -171,7 +171,7 @@ public class UserController {
     }
 
     /**
-     * Gets a random generated user password reset key for the specified email.
+     * Gets a random generated user password reset token for the specified email.
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_PASSWORD_RESET}".
      *
@@ -180,12 +180,12 @@ public class UserController {
      *   <li>{@code email}</li>
      * </ul>
      *
-     * @param email the email of the user to generate a password reset key for
-     * @return the random generated reset key
+     * @param email the email of the user to generate a password reset token for
+     * @return the random generated reset token
      */
     @GetMapping(value = USERS_PASSWORD_RESET)
-    public ResponseEntity<Map<String, String>> getPasswordResetKey(@RequestParam(value = USER_EMAIL) String email) {
-        return new ResponseEntity<>(userService.generatePasswordResetKey(email), HttpStatus.OK);
+    public ResponseEntity<Map<String, String>> getPasswordResetToken(@RequestParam(value = USER_EMAIL) String email) {
+        return new ResponseEntity<>(userService.generatePasswordResetToken(email), HttpStatus.OK);
     }
 
     /**
@@ -210,11 +210,11 @@ public class UserController {
      * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_PASSWORD_RESET}".
      *
      * @param payload the payload of the user
-     * @return the random generated reset key
+     * @return the random generated reset token
      */
     @PostMapping(value = USERS_PASSWORD_RESET)
     public ResponseEntity resetPassword(@Valid @RequestBody UserPasswordResetPayload payload) {
-        userService.resetPassword(payload.getPassword(), payload.getResetKey());
+        userService.resetPassword(payload.getPassword(), payload.getResetToken());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

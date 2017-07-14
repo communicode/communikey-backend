@@ -79,20 +79,20 @@ public final class SecurityUtils {
     }
 
     /**
-     * Generates an random activation key.
+     * Generates an random activation token.
      *
-     * @return the generated activation key
+     * @return the generated activation token
      */
-    public static String generateRandomActivationKey() {
+    public static String generateRandomActivationToken() {
         return RandomStringUtils.randomNumeric(RANDOM_MIN_LENGTH);
     }
 
     /**
-     * Generates a random reset key.
+     * Generates a random reset token.
      *
-     * @return the generated reset key
+     * @return the generated reset token
      */
-    public static String generateRandomResetKey() {
+    public static String generateRandomResetToken() {
         return RandomStringUtils.randomNumeric(RANDOM_MIN_LENGTH);
     }
 }

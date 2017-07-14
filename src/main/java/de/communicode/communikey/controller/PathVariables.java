@@ -18,7 +18,7 @@ public final class PathVariables {
 
     private PathVariables() {}
 
-    public static final String USER_ACTIVATION_KEY = "activation_key";
+    public static final String USER_ACTIVATION_TOKEN = "activation_token";
     public static final String USER_EMAIL = "email";
     public static final String USER_LOGIN = "login";
 

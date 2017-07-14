@@ -79,13 +79,13 @@ public class User extends AbstractEntity implements Serializable {
     @JsonView(AuthoritiesRestView.Admin.class)
     private boolean activated = false;
 
-    @Column(name = "activation_key")
+    @Column(name = "activation_token")
     @JsonView(AuthoritiesRestView.Admin.class)
-    private String activationKey;
+    private String activationToken;
 
-    @Column(name = "reset_key")
+    @Column(name = "reset_token")
     @JsonView(AuthoritiesRestView.Admin.class)
-    private String resetKey;
+    private String resetToken;
 
     @Column(name = "reset_date")
     @JsonView(AuthoritiesRestView.Admin.class)
@@ -180,20 +180,20 @@ public class User extends AbstractEntity implements Serializable {
         this.activated = activated;
     }
 
-    public String getActivationKey() {
-        return activationKey;
+    public String getActivationToken() {
+        return activationToken;
     }
 
-    public void setActivationKey(String activationKey) {
-        this.activationKey = activationKey;
+    public void setActivationToken(String activationToken) {
+        this.activationToken = activationToken;
     }
 
-    public String getResetKey() {
-        return resetKey;
+    public String getResetToken() {
+        return resetToken;
     }
 
-    public void setResetKey(String resetKey) {
-        this.resetKey = resetKey;
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
     }
 
     public ZonedDateTime getResetDate() {
@@ -333,8 +333,8 @@ public class User extends AbstractEntity implements Serializable {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", activated=" + activated +
-                ", activationKey='" + activationKey + '\'' +
-                ", resetKey='" + resetKey + '\'' +
+                ", activationToken='" + activationToken + '\'' +
+                ", resetToken='" + resetToken + '\'' +
                 ", resetDate=" + resetDate +
                 ", authorities=" + authorities +
                 ", groups=" + groups +

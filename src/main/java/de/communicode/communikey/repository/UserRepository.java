@@ -31,20 +31,20 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Set<User> findAll();
 
     /**
-     * Finds the user entity with the specified activation key.
+     * Finds the user entity with the specified activation token.
      *
-     * @param activationKey the activation key of the user to find
+     * @param activationToken the activation token of the user to find
      * @return the user entity if found, {@code null} otherwise
      */
-    User findOneByActivationKey(String activationKey);
+    User findOneByActivationToken(String activationToken);
 
     /**
-     * Finds the user entity with the specified reset key.
+     * Finds the user entity with the specified reset token.
      *
-     * @param resetKey the reset key of the user to find
+     * @param resetToken the reset token of the user to find
      * @return the user entity if found, {@code null} otherwise
      */
-    User findOneByResetKey(String resetKey);
+    User findOneByResetToken(String resetToken);
 
     /**
      * Finds the user entity with the specified email.

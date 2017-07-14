@@ -10,7 +10,7 @@ import de.communicode.communikey.domain.User;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
- * A payload object to reset the password of a {@link User} with a specified reset key.
+ * A payload object to reset the password of a {@link User} with a specified reset token.
  *
  * @author sgreb@communicode.de
  * @since 0.2.0
@@ -21,21 +21,21 @@ public class UserPasswordResetPayload {
     private String password;
 
     @NotBlank
-    private String resetKey;
+    private String resetToken;
 
     public String getPassword() {
         return password;
     }
 
-    public String getResetKey() {
-        return resetKey;
+    public String getResetToken() {
+        return resetToken;
     }
 
     @Override
     public String toString() {
         return "UserPasswordResetPayload{" +
             "password='" + password + '\'' +
-            ", resetKey='" + resetKey + '\'' +
+            ", resetToken='" + resetToken + '\'' +
             '}';
     }
 }
