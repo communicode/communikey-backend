@@ -13,11 +13,12 @@ import org.hibernate.validator.constraints.NotBlank;
  * A payload object for a {@link Key}.
  *
  * @author sgreb@communicode.de
+ * @author dvonderbey@communicode.de
  * @since 0.2.0
  */
 public class KeyPayload {
 
-    private Long categoryId;
+    private String categoryId;
 
     @NotBlank
     private String login;
@@ -34,7 +35,7 @@ public class KeyPayload {
      * @return the category ID
      * @since 0.8.0
      */
-    public Long getCategoryId() {
+    public String getCategoryId() {
         return this.categoryId;
     }
 

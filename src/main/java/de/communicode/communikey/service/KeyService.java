@@ -17,6 +17,7 @@ import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.repository.KeyRepository;
@@ -73,7 +74,7 @@ public class KeyService {
         log.debug("Created new key with ID '{}'", persistedKey.getId());
 
         if (ofNullable(payload.getCategoryId()).isPresent()) {
-            keyCategoryService.addKey(payload.getCategoryId(), persistedKey.getId());
+            keyCategoryService.addKey(decodeSingleValueHashid(payload.getCategoryId()), persistedKey.getId());
             persistedKey = keyRepository.findOne(persistedKey.getId());
         }
 
@@ -167,5 +168,21 @@ public class KeyService {
      */
     public Key validate(Long keyId) throws KeyNotFoundException {
         return ofNullable(keyRepository.findOne(keyId)).orElseThrow(KeyNotFoundException::new);
+    }
+
+    /**
+     * Decodes the specified Hashid.
+     *
+     * @param hashid the Hashid of the key to decode
+     * @return the decoded Hashid if valid
+     * @throws KeyNotFoundException if the Hashid is invalid and the key has not been found
+     * @since 0.13.0
+     */
+    private Long decodeSingleValueHashid(String hashid) throws HashidNotValidException {
+        long[] decodedHashid = hashids.decode(hashid);
+        if (decodedHashid.length == 0) {
+            throw new HashidNotValidException();
+        }
+        return decodedHashid[0];
     }
 }

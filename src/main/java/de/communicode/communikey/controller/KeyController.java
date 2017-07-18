@@ -149,13 +149,13 @@ public class KeyController {
     /**
      * Decodes the specified Hashid.
      *
-     * @param keyHashid the Hashid of the key to decode
+     * @param hashid the Hashid of the key to decode
      * @return the decoded Hashid if valid
      * @throws KeyNotFoundException if the Hashid is invalid and the key has not been found
      * @since 0.12.0
      */
-    private Long decodeSingleValueHashid(String keyHashid) throws HashidNotValidException {
-        long[] decodedHashid = hashids.decode(keyHashid);
+    private Long decodeSingleValueHashid(String hashid) throws HashidNotValidException {
+        long[] decodedHashid = hashids.decode(hashid);
         if (decodedHashid.length == 0) {
             throw new HashidNotValidException();
         }
