@@ -26,6 +26,7 @@ import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,7 @@ import java.util.Set;
  * The REST API service to process {@link KeyCategory} entities via a {@link KeyCategoryRepository}.
  *
  * @author sgreb@communicode.de
+ * @author dvonderbey@communicode.de
  * @since 0.2.0
  */
 @Service
@@ -50,10 +52,11 @@ public class KeyCategoryService {
     private final KeyService keyService;
     private final UserGroupService userGroupService;
     private final UserGroupRepository userGroupRepository;
+    private final Hashids hashids;
 
     @Autowired
     public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService, KeyService keyService, KeyRepository keyRepository,
-                              UserRepository userRepository, UserGroupService userGroupService, UserGroupRepository userGroupRepository) {
+                              UserRepository userRepository, UserGroupService userGroupService, UserGroupRepository userGroupRepository, Hashids hashids) {
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
@@ -61,6 +64,7 @@ public class KeyCategoryService {
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.userGroupService = requireNonNull(userGroupService, "userGroupService must not be null!");
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
+        this.hashids = requireNonNull(hashids, "hashids must not be null!");
     }
 
     /**
@@ -154,8 +158,9 @@ public class KeyCategoryService {
         keyCategory.setName(name);
         keyCategory.setCreator(user);
         keyCategory = keyCategoryRepository.save(keyCategory);
+        keyCategory.setHashid(hashids.encode(keyCategory.getId()));
+        keyCategory = keyCategoryRepository.save(keyCategory);
         setResponsibleUser(keyCategory.getId(), user.getLogin());
-
 
         user.addResponsibleKeyCategory(keyCategory);
         userRepository.save(user);
@@ -297,7 +302,7 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if the key category with the specified ID has not been found
      */
     public KeyCategory validate(Long keyCategoryId) throws KeyCategoryNotFoundException {
-        return ofNullable(keyCategoryRepository.findOne(keyCategoryId)).orElseThrow(() -> new KeyCategoryNotFoundException(keyCategoryId));
+        return ofNullable(keyCategoryRepository.findOne(keyCategoryId)).orElseThrow(KeyCategoryNotFoundException::new);
     }
 
     /**

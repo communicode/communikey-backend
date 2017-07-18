@@ -6,9 +6,10 @@
  */
 package de.communicode.communikey.controller;
 
+import static de.communicode.communikey.controller.PathVariables.KEYCATEGORY_ID;
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES;
-import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES_ID;
+import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES_HASHID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_CHILDREN;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_GROUPS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_KEYS;
@@ -16,7 +17,7 @@ import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.KeyCategory;
-import de.communicode.communikey.exception.KeyNotFoundException;
+import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
@@ -67,14 +68,14 @@ public class KeyCategoryController {
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_CHILDREN}".
      *
-     * @param keyCategoryId the ID of the parent key category to add the child to
-     * @param childKeyCategoryId the ID of the child key category to be added
+     * @param keyCategoryHashid the ID of the parent key category to add the child to
+     * @param childKeyCategoryHashid the ID of the child key category to be added
      * @return the updated parent key category as response entity
      */
     @GetMapping(value = KEY_CATEGORY_CHILDREN)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> addChild(@PathVariable Long keyCategoryId, @RequestParam Long childKeyCategoryId) {
-        return new ResponseEntity<>(keyCategoryService.addChild(keyCategoryId, childKeyCategoryId), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> addChild(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam String childKeyCategoryHashid) {
+        return new ResponseEntity<>(keyCategoryService.addChild(decodeSingleValueHashid(keyCategoryHashid), decodeSingleValueHashid(childKeyCategoryHashid)), HttpStatus.OK);
     }
 
     /**
@@ -82,14 +83,14 @@ public class KeyCategoryController {
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_GROUPS}".
      *
-     * @param keyCategoryId the ID of the parent key category to add the child to
+     * @param keyCategoryHashid the ID of the parent key category to add the child to
      * @param userGroupId the ID of the user group to be added
      * @return the updated parent key category as response entity
      */
     @GetMapping(value = KEY_CATEGORY_GROUPS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> addUserGroup(@PathVariable Long keyCategoryId, @RequestParam Long userGroupId) {
-        return new ResponseEntity<>(keyCategoryService.addUserGroup(keyCategoryId, userGroupId), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> addUserGroup(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam Long userGroupId) {
+        return new ResponseEntity<>(keyCategoryService.addUserGroup(decodeSingleValueHashid(keyCategoryHashid), userGroupId), HttpStatus.OK);
     }
 
     /**
@@ -97,14 +98,14 @@ public class KeyCategoryController {
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_KEYS}".
      *
-     * @param keyCategoryId the ID of the key category to add the key to
+     * @param keyCategoryHashid the ID of the key category to add the key to
      * @param keyHashid the Hashid of the key to be added
      * @return the updated key category entity
      */
     @GetMapping(value = KEY_CATEGORY_KEYS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> addKey(@PathVariable Long keyCategoryId, @RequestParam(name = KEY_ID) String keyHashid) {
-        return new ResponseEntity<>(keyCategoryService.addKey(keyCategoryId, decodeSingleValueHashid(keyHashid)), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> addKey(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam(name = KEY_ID) String keyHashid) {
+        return new ResponseEntity<>(keyCategoryService.addKey(decodeSingleValueHashid(keyCategoryHashid), decodeSingleValueHashid(keyHashid)), HttpStatus.OK);
     }
 
     /**
@@ -126,15 +127,15 @@ public class KeyCategoryController {
      *
      * <p><strong>This is a recursive action that deletes all children key categories!</strong>
      *
-     * <p>This endpoint is mapped to {@value RequestMappings#KEYS}{@value RequestMappings#KEY_CATEGORIES_ID}.
+     * <p>This endpoint is mapped to {@value RequestMappings#KEYS}{@value RequestMappings#KEY_CATEGORIES_HASHID}.
      *
-     * @param keyCategoryId the ID of the key category to delete
+     * @param keyCategoryHashid the Hashid of the key category to delete
      * @return a empty response entity
      */
-    @DeleteMapping(value = KEY_CATEGORIES_ID)
+    @DeleteMapping(value = KEY_CATEGORIES_HASHID)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<Void> delete(@PathVariable Long keyCategoryId) {
-        keyCategoryService.delete(keyCategoryId);
+    public ResponseEntity<Void> delete(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid) {
+        keyCategoryService.delete(decodeSingleValueHashid(keyCategoryHashid));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -155,16 +156,16 @@ public class KeyCategoryController {
     /**
      * Gets the {@link KeyCategory} entity with the specified ID.
      *
-     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORIES_ID}".
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORIES_HASHID}".
      *
-     * @param keyCategoryId the ID of the key category entity to get
+     * @param keyCategoryHashid the Hashid of the key category entity to get
      * @return the key category entity
      * @throws KeyCategoryNotFoundException if the key category entity with the specified ID has not been found
      */
-    @GetMapping(value = KEY_CATEGORIES_ID)
+    @GetMapping(value = KEY_CATEGORIES_HASHID)
     @Secured(AuthoritiesConstants.USER)
-    ResponseEntity<KeyCategory> get(@PathVariable Long keyCategoryId) throws KeyCategoryNotFoundException {
-        return new ResponseEntity<>(keyCategoryService.get(keyCategoryId), HttpStatus.OK);
+    ResponseEntity<KeyCategory> get(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid) throws KeyCategoryNotFoundException {
+        return new ResponseEntity<>(keyCategoryService.get(decodeSingleValueHashid(keyCategoryHashid)), HttpStatus.OK);
     }
 
     /**
@@ -185,14 +186,14 @@ public class KeyCategoryController {
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_GROUPS}".
      *
-     * @param keyCategoryId the ID of the key category to remove the user group from
+     * @param keyCategoryHashid the hashid of the key category to remove the user group from
      * @param userGroupId the ID of the user group to be removed from the key category
      * @return the updated key category as response entity
      */
     @DeleteMapping(value = KEY_CATEGORY_GROUPS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> removeUserGroup(@PathVariable Long keyCategoryId, @RequestParam Long userGroupId) {
-        return new ResponseEntity<>(keyCategoryService.removeUserGroup(keyCategoryId, userGroupId), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> removeUserGroup(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam Long userGroupId) {
+        return new ResponseEntity<>(keyCategoryService.removeUserGroup(decodeSingleValueHashid(keyCategoryHashid), userGroupId), HttpStatus.OK);
     }
 
     /**
@@ -200,14 +201,14 @@ public class KeyCategoryController {
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_KEYS}".
      *
-     * @param keyCategoryId the ID of the key category the key will be deleted from
-     * @param keyHashid the Hashid of the key to be deleted
+     * @param keyCategoryHashid the hashid of the key category the key will be deleted from
+     * @param keyHashid the hashid of the key to be deleted
      * @return the updated key category as response entity
      */
     @DeleteMapping(value = KEY_CATEGORY_KEYS)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> removeKey(@PathVariable Long keyCategoryId, @RequestParam(name = KEY_ID) String keyHashid) {
-        return new ResponseEntity<>(keyCategoryService.removeKey(keyCategoryId, decodeSingleValueHashid(keyHashid)), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> removeKey(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam(name = KEY_ID) String keyHashid) {
+        return new ResponseEntity<>(keyCategoryService.removeKey(decodeSingleValueHashid(keyCategoryHashid), decodeSingleValueHashid(keyHashid)), HttpStatus.OK);
     }
 
     /**
@@ -215,7 +216,7 @@ public class KeyCategoryController {
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_RESPONSIBLE}".
      *
-     * @param keyCategoryId the ID of the key category to set the responsible user of
+     * @param keyCategoryHashid the hashid of the key category to set the responsible user of
      * @param userLogin the login of the user to be set as the responsible of the key category
      * @return the updated key category entity
      * @throws KeyCategoryNotFoundException if the key category with the specified ID has not been found
@@ -223,38 +224,38 @@ public class KeyCategoryController {
      */
     @PutMapping(value = KEY_CATEGORY_RESPONSIBLE)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> setResponsibleUser(@PathVariable Long keyCategoryId, @RequestParam String userLogin) {
-        return new ResponseEntity<>(keyCategoryService.setResponsibleUser(keyCategoryId, userLogin), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> setResponsibleUser(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam String userLogin) {
+        return new ResponseEntity<>(keyCategoryService.setResponsibleUser(decodeSingleValueHashid(keyCategoryHashid), userLogin), HttpStatus.OK);
     }
 
     /**
      * Updates a key category with the specified payload.
      *
-     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORIES_ID}".
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORIES_HASHID}".
      *
-     * @param keyCategoryId the ID of the key category to update
+     * @param keyCategoryHashid the hashid of the key category to update
      * @param payload the key request payload to update the key category with
      * @return the updated key category as response entity
      * @since 0.6.0
      */
-    @PutMapping(value = KEY_CATEGORIES_ID)
+    @PutMapping(value = KEY_CATEGORIES_HASHID)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> update(@PathVariable Long keyCategoryId, @Valid @RequestBody KeyCategoryPayload payload) {
-        return new ResponseEntity<>(keyCategoryService.update(keyCategoryId, payload), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> update(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @Valid @RequestBody KeyCategoryPayload payload) {
+        return new ResponseEntity<>(keyCategoryService.update(decodeSingleValueHashid(keyCategoryHashid), payload), HttpStatus.OK);
     }
 
     /**
      * Decodes the specified Hashid.
      *
-     * @param keyHashid the Hashid of the key to decode
-     * @return the decoded Hashid if valid
-     * @throws KeyNotFoundException if the Hashid is invalid and the key has not been found
+     * @param hashid the hashid to decode
+     * @return the decoded hashid if valid
+     * @throws HashidNotValidException if the Hashid is invalid
      * @since 0.12.0
      */
-    private Long decodeSingleValueHashid(String keyHashid) throws KeyNotFoundException {
-        long[] decodedHashid = hashids.decode(keyHashid);
+    private Long decodeSingleValueHashid(String hashid) throws HashidNotValidException {
+        long[] decodedHashid = hashids.decode(hashid);
         if (decodedHashid.length == 0) {
-            throw new KeyNotFoundException(keyHashid);
+            throw new HashidNotValidException();
         }
         return decodedHashid[0];
     }

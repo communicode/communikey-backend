@@ -45,4 +45,15 @@ public class KeyControllerExceptionHandler extends GlobalControllerExceptionHand
     public ResponseEntity<ErrorResponse> handleKeyNotFoundException(KeyNotFoundException exception) {
         return createErrorResponse(HttpStatus.NOT_FOUND, new Timestamp(Calendar.getInstance().getTimeInMillis()), exception.getMessage());
     }
+
+    /**
+     * Handles all exceptions of type {@link HashidNotValidException}.
+     *
+     * @param exception the exception to handle
+     * @return the error as response entity
+     */
+    @ExceptionHandler(HashidNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleHashidNotValidException(HashidNotValidException exception) {
+        return createErrorResponse(HttpStatus.NOT_FOUND, new Timestamp(Calendar.getInstance().getTimeInMillis()), exception.getMessage());
+    }
 }

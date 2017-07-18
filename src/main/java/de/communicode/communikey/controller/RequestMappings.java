@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.controller;
 
+import static de.communicode.communikey.controller.PathVariables.KEYCATEGORY_ID;
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 
 import de.communicode.communikey.domain.Authority;
@@ -18,6 +19,7 @@ import de.communicode.communikey.domain.UserGroup;
  * Provides request mapping constants.
  *
  * @author sgreb@communicode.de
+ * @author dvonderbey@communicode.de
  * @since 0.2.0
  */
 public final class RequestMappings {
@@ -38,31 +40,31 @@ public final class RequestMappings {
     public static final String KEY_CATEGORIES = API + "/categories";
 
     /**
-     * The request parameter for a {@link KeyCategory} ID.
+     * The request parameter for a {@link KeyCategory} entity Hashid.
      */
-    public static final String KEY_CATEGORIES_ID = "/{keyCategoryId}";
+    public static final String KEY_CATEGORIES_HASHID = "/{" + KEYCATEGORY_ID + "}";
 
     /**
      * The request mapping for {@link KeyCategory} children.
      */
-    public static final String KEY_CATEGORY_CHILDREN = KEY_CATEGORIES_ID + "/children";
+    public static final String KEY_CATEGORY_CHILDREN = KEY_CATEGORIES_HASHID + "/children";
 
     /**
      * The request mapping for {@link KeyCategory} user groups.
      *
      * @since 0.3.0
      */
-    public static final String KEY_CATEGORY_GROUPS = KEY_CATEGORIES_ID + "/groups";
+    public static final String KEY_CATEGORY_GROUPS = KEY_CATEGORIES_HASHID + "/groups";
 
     /**
      * The request mapping for the {@link KeyCategory} {@link Key}s.
      */
-    public static final String KEY_CATEGORY_KEYS = KEY_CATEGORIES_ID + "/keys";
+    public static final String KEY_CATEGORY_KEYS = KEY_CATEGORIES_HASHID + "/keys";
 
     /**
      * The request mapping for the responsible {@link KeyCategory} user.
      */
-    public static final String KEY_CATEGORY_RESPONSIBLE = KEY_CATEGORIES_ID + "/responsible";
+    public static final String KEY_CATEGORY_RESPONSIBLE = KEY_CATEGORIES_HASHID + "/responsible";
 
     /**
      * The request parameter for a {@link Key} entity Hashid.
