@@ -69,13 +69,13 @@ public class KeyCategoryController {
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_CHILDREN}".
      *
      * @param keyCategoryHashid the ID of the parent key category to add the child to
-     * @param childKeyCategoryHashid the ID of the child key category to be added
+     * @param childKeyCategoryId the ID of the child key category to be added
      * @return the updated parent key category as response entity
      */
     @GetMapping(value = KEY_CATEGORY_CHILDREN)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> addChild(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam String childKeyCategoryHashid) {
-        return new ResponseEntity<>(keyCategoryService.addChild(decodeSingleValueHashid(keyCategoryHashid), decodeSingleValueHashid(childKeyCategoryHashid)), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> addChild(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam String childKeyCategoryId) {
+        return new ResponseEntity<>(keyCategoryService.addChild(decodeSingleValueHashid(keyCategoryHashid), decodeSingleValueHashid(childKeyCategoryId)), HttpStatus.OK);
     }
 
     /**

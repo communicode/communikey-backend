@@ -63,7 +63,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .pathParam(KEYCATEGORY_ID, createdParentKeyCategoryHashid)
-                .param("childKeyCategoryHashid", createdChildKeyCategoryHashid)
+                .param("childKeyCategoryId", createdChildKeyCategoryHashid)
         .when()
                 .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_CHILDREN)
         .then()
