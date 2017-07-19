@@ -75,7 +75,9 @@ public class KeyCategoryController {
     @GetMapping(value = KEY_CATEGORY_CHILDREN)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<KeyCategory> addChild(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam String childKeyCategoryId) {
-        return new ResponseEntity<>(keyCategoryService.addChild(decodeSingleValueHashid(keyCategoryHashid), decodeSingleValueHashid(childKeyCategoryId)), HttpStatus.OK);
+        return new ResponseEntity<>(keyCategoryService.addChild(decodeSingleValueHashid(keyCategoryHashid),
+                                                                decodeSingleValueHashid(childKeyCategoryId)),
+                                    HttpStatus.OK);
     }
 
     /**
@@ -105,7 +107,9 @@ public class KeyCategoryController {
     @GetMapping(value = KEY_CATEGORY_KEYS)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<KeyCategory> addKey(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam(name = KEY_ID) String keyHashid) {
-        return new ResponseEntity<>(keyCategoryService.addKey(decodeSingleValueHashid(keyCategoryHashid), decodeSingleValueHashid(keyHashid)), HttpStatus.OK);
+        return new ResponseEntity<>(keyCategoryService.addKey(decodeSingleValueHashid(keyCategoryHashid),
+                                                              decodeSingleValueHashid(keyHashid)),
+                                    HttpStatus.OK);
     }
 
     /**
@@ -208,7 +212,9 @@ public class KeyCategoryController {
     @DeleteMapping(value = KEY_CATEGORY_KEYS)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<KeyCategory> removeKey(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam(name = KEY_ID) String keyHashid) {
-        return new ResponseEntity<>(keyCategoryService.removeKey(decodeSingleValueHashid(keyCategoryHashid), decodeSingleValueHashid(keyHashid)), HttpStatus.OK);
+        return new ResponseEntity<>(keyCategoryService.removeKey(decodeSingleValueHashid(keyCategoryHashid),
+                                                                 decodeSingleValueHashid(keyHashid)),
+                                    HttpStatus.OK);
     }
 
     /**

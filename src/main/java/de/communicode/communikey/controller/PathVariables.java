@@ -27,7 +27,7 @@ public final class PathVariables {
     /**
      * The Hashid of a {@link Key}.
      *
-     * <<p>Exposed as ID through the API.
+     * <p>Exposed as ID through the API.
      *
      * @since 0.12.0
      */
@@ -36,7 +36,7 @@ public final class PathVariables {
     /**
      * The Hashid of a {@link KeyCategory}.
      *
-     * <<p>Exposed as ID through the API.
+     * <p>Exposed as ID through the API.
      *
      * @since 0.13.0
      */
