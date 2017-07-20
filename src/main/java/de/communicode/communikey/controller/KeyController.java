@@ -12,6 +12,7 @@ import static de.communicode.communikey.controller.RequestMappings.KEY_HASHID;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyPayload;
@@ -148,15 +149,15 @@ public class KeyController {
     /**
      * Decodes the specified Hashid.
      *
-     * @param keyHashid the Hashid of the key to decode
+     * @param hashid the Hashid of the key to decode
      * @return the decoded Hashid if valid
      * @throws KeyNotFoundException if the Hashid is invalid and the key has not been found
      * @since 0.12.0
      */
-    private Long decodeSingleValueHashid(String keyHashid) throws KeyNotFoundException {
-        long[] decodedHashid = hashids.decode(keyHashid);
+    private Long decodeSingleValueHashid(String hashid) throws HashidNotValidException {
+        long[] decodedHashid = hashids.decode(hashid);
         if (decodedHashid.length == 0) {
-            throw new KeyNotFoundException(keyHashid);
+            throw new HashidNotValidException();
         }
         return decodedHashid[0];
     }
