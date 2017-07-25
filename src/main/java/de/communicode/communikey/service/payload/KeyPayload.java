@@ -28,6 +28,8 @@ public class KeyPayload {
 
     @NotBlank
     private String password;
+    
+    private String notes;
 
     public KeyPayload() {}
 
@@ -49,5 +51,9 @@ public class KeyPayload {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getNotes() {
+        return notes;
     }
 }

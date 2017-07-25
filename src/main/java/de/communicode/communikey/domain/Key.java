@@ -70,6 +70,10 @@ public class Key extends AbstractEntity implements Serializable {
     @Column(nullable = false)
     private String password;
 
+    @NotNull
+    @Column
+    private String notes;
+
     public Long getId() {
         return id;
     }
@@ -132,6 +136,14 @@ public class Key extends AbstractEntity implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     @Override
