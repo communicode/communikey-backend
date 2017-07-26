@@ -28,7 +28,7 @@ public class KeyPayload {
 
     @NotBlank
     private String password;
-    
+
     private String notes;
 
     public KeyPayload() {}
