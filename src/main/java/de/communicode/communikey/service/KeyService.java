@@ -68,6 +68,7 @@ public class KeyService {
         key.setName(payload.getName());
         key.setLogin(payload.getLogin());
         key.setPassword(payload.getPassword());
+        key.setNotes(payload.getNotes());
         Key persistedKey = keyRepository.save(key);
         persistedKey.setHashid(hashids.encode(persistedKey.getId()));
         persistedKey = keyRepository.save(persistedKey);
@@ -154,6 +155,7 @@ public class KeyService {
         key.setName(payload.getName());
         key.setLogin(payload.getLogin());
         key.setPassword(payload.getPassword());
+        key.setNotes(payload.getNotes());
         key = keyRepository.save(key);
         log.debug("Updated key with ID '{}'", key.getId());
         return key;

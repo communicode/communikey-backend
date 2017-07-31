@@ -251,6 +251,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         keyPayload.put("name", fairy.textProducer().word(1));
         keyPayload.put("login", fairy.person().getEmail());
         keyPayload.put("password", fairy.person().getPassword());
+        keyPayload.put("notes", fairy.textProducer().word(5));
         String createdKeyHashid = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
@@ -870,5 +871,6 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         keyPayload.put("name", fairy.textProducer().word(1));
         keyPayload.put("login", fairy.person().getEmail());
         keyPayload.put("password", fairy.person().getPassword());
+        keyPayload.put("notes", fairy.textProducer().word(5));
     }
 }

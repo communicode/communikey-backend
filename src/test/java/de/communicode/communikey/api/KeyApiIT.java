@@ -331,5 +331,6 @@ public class KeyApiIT extends IntegrationBaseTest {
         keyPayload.put("name", "key");
         keyPayload.put("login", "login");
         keyPayload.put("password", "password");
+        keyPayload.put("notes", "notes");
     }
 }

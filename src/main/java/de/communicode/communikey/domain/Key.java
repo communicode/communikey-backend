@@ -21,6 +21,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Lob;
 import javax.validation.constraints.NotNull;
 
 import java.io.Serializable;
@@ -69,6 +70,11 @@ public class Key extends AbstractEntity implements Serializable {
     @NotNull
     @Column(nullable = false)
     private String password;
+
+    @NotNull
+    @Lob
+    @Column(length = 500)
+    private String notes;
 
     public Long getId() {
         return id;
@@ -132,6 +138,14 @@ public class Key extends AbstractEntity implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     @Override

@@ -15,7 +15,7 @@ package de.communicode.communikey.exception;
 public class HashidNotValidException extends RuntimeException {
 
     /**
-     * Constructs a {@code KeyNotFoundException}.
+     * Constructs a {@code HashidNotValidException}.
      */
     public HashidNotValidException() {
         super("Hashid not valid");
