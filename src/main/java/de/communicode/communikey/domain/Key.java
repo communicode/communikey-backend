@@ -71,7 +71,6 @@ public class Key extends AbstractEntity implements Serializable {
     @Column(nullable = false)
     private String password;
 
-    @NotNull
     @Lob
     @Column(length = 500)
     private String notes;
