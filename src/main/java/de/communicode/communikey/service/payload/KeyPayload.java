@@ -9,6 +9,8 @@ package de.communicode.communikey.service.payload;
 import de.communicode.communikey.domain.Key;
 import org.hibernate.validator.constraints.NotBlank;
 
+import java.util.Set;
+
 /**
  * A payload object for a {@link Key}.
  *
@@ -26,10 +28,9 @@ public class KeyPayload {
     @NotBlank
     private String name;
 
-    @NotBlank
-    private String password;
-
     private String notes;
+
+    private Set<KeyPayloadEncryptedPasswords> encryptedPasswords;
 
     public KeyPayload() {}
 
@@ -49,11 +50,11 @@ public class KeyPayload {
         return name.trim();
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public String getNotes() {
         return notes;
+    }
+
+    public Set<KeyPayloadEncryptedPasswords> getEncryptedPasswords() {
+        return encryptedPasswords;
     }
 }

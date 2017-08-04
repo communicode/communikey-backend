@@ -6,25 +6,15 @@
  */
 package de.communicode.communikey.domain;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
+import com.google.common.collect.Sets;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GenerationType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Lob;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Represents a key.
@@ -67,9 +57,10 @@ public class Key extends AbstractEntity implements Serializable {
     @Column(nullable = false)
     private String login;
 
-    @NotNull
-    @Column(nullable = false)
-    private String password;
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "key")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    private Set<UserEncryptedPassword> userEncryptedPasswords = Sets.newConcurrentHashSet();
 
     @Lob
     @Column(length = 500)
@@ -131,12 +122,32 @@ public class Key extends AbstractEntity implements Serializable {
         this.login = login;
     }
 
-    public String getPassword() {
-        return password;
+    public Set<UserEncryptedPassword> getUserEncryptedPasswords() {
+        return Sets.newConcurrentHashSet(userEncryptedPasswords);
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setUserEncryptedPasswords(Set<UserEncryptedPassword> userEncryptedPasswords) {
+        this.userEncryptedPasswords = userEncryptedPasswords;
+    }
+
+    public boolean addUserEncryptedPassword(UserEncryptedPassword userEncryptedPassword) {
+        return userEncryptedPasswords.add(userEncryptedPassword);
+    }
+
+    public boolean addUserEncryptedPasswords(Set<UserEncryptedPassword> userEncryptedPassword) {
+        return this.userEncryptedPasswords.addAll(userEncryptedPassword);
+    }
+
+    public boolean removeUserEncryptedPassword(UserEncryptedPassword userEncryptedPassword) {
+        return userEncryptedPasswords.remove(userEncryptedPassword);
+    }
+
+    public boolean removeUserEncryptedPasswords(Set<UserEncryptedPassword> userEncryptedPassword) {
+        return this.userEncryptedPasswords.removeAll(userEncryptedPassword);
+    }
+
+    public void removeAllUserEncryptedPassword() {
+        userEncryptedPasswords.clear();
     }
 
     public String getNotes() {

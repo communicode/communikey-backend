@@ -112,6 +112,11 @@ public class User extends AbstractEntity implements Serializable {
     @JsonIdentityReference(alwaysAsId = true)
     private final Set<Key> keys = Sets.newConcurrentHashSet();
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    private final Set<UserEncryptedPassword> encryptedPasswords = Sets.newConcurrentHashSet();
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
@@ -252,6 +257,10 @@ public class User extends AbstractEntity implements Serializable {
         return Sets.newConcurrentHashSet(groups);
     }
 
+    public Set<UserEncryptedPassword> getEncryptedPasswords() {
+        return Sets.newConcurrentHashSet(encryptedPasswords);
+    }
+
     public boolean addCreatedKey(Key key) {
         return keys.add(key);
     }
@@ -338,6 +347,7 @@ public class User extends AbstractEntity implements Serializable {
                 ", resetDate=" + resetDate +
                 ", authorities=" + authorities +
                 ", groups=" + groups +
+                ", encryptedPasswords=" + encryptedPasswords +
                 ", keys=" + keys +
                 ", keyCategories=" + keyCategories +
                 ", responsibleKeyCategories=" + responsibleKeyCategories +

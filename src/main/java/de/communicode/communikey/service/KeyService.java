@@ -13,14 +13,13 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 
-import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.domain.KeyCategory;
-import de.communicode.communikey.domain.User;
-import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.domain.*;
 import de.communicode.communikey.exception.HashidNotValidException;
+import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.repository.KeyRepository;
+import de.communicode.communikey.service.payload.KeyPayloadEncryptedPasswords;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
@@ -43,13 +42,16 @@ public class KeyService {
 
     private static final Logger log = LogManager.getLogger();
     private final KeyRepository keyRepository;
+    private final UserEncryptedPasswordRepository userEncryptedPasswordRepository;
     private final KeyCategoryService keyCategoryService;
     private final UserService userService;
     private final Hashids hashids;
 
     @Autowired
-    public KeyService(KeyRepository keyRepository, @Lazy KeyCategoryService keyCategoryService, UserService userRestService, Hashids hashids) {
+    public KeyService(KeyRepository keyRepository, @Lazy KeyCategoryService keyCategoryService, UserService userRestService, Hashids hashids,
+                      UserEncryptedPasswordRepository userEncryptedPasswordRepository) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
+        this.userEncryptedPasswordRepository = requireNonNull(userEncryptedPasswordRepository, "userEncryptedPasswordRepository must not be null!");
         this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
         this.userService = requireNonNull(userRestService, "userService must not be null!");
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
@@ -67,7 +69,6 @@ public class KeyService {
         key.setCreator(user);
         key.setName(payload.getName());
         key.setLogin(payload.getLogin());
-        key.setPassword(payload.getPassword());
         key.setNotes(payload.getNotes());
         Key persistedKey = keyRepository.save(key);
         persistedKey.setHashid(hashids.encode(persistedKey.getId()));
@@ -154,8 +155,22 @@ public class KeyService {
         key.setLogin(payload.getLogin());
         key.setName(payload.getName());
         key.setLogin(payload.getLogin());
-        key.setPassword(payload.getPassword());
         key.setNotes(payload.getNotes());
+        key = keyRepository.save(key);
+        for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload.getEncryptedPasswords()) {
+            UserEncryptedPassword userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(userService.validate(encryptedPasswordsPayload.getLogin()), validate(keyId));
+            if(userEncryptedPassword != null) {
+                userEncryptedPassword.setPassword(encryptedPasswordsPayload.getEncryptedPassword());
+                userEncryptedPasswordRepository.save(userEncryptedPassword);
+            } else {
+                UserEncryptedPassword newUserEncryptedPassword = new UserEncryptedPassword();
+                newUserEncryptedPassword.setKey(key);
+                newUserEncryptedPassword.setOwner(userService.validate(encryptedPasswordsPayload.getLogin()));
+                newUserEncryptedPassword.setPassword(encryptedPasswordsPayload.getEncryptedPassword());
+                userEncryptedPasswordRepository.save(newUserEncryptedPassword);
+                key.addUserEncryptedPassword(newUserEncryptedPassword);
+            }
+        }
         key = keyRepository.save(key);
         log.debug("Updated key with ID '{}'", key.getId());
         return key;
