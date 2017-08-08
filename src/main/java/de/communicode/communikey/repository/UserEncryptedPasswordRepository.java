@@ -31,4 +31,6 @@ public interface UserEncryptedPasswordRepository extends CrudRepository<UserEncr
     Set<UserEncryptedPassword> findAll();
 
     UserEncryptedPassword findOneByOwnerAndKey(User owner, Key key);
+
+    Set<UserEncryptedPassword> findAllByOwner(User owner);
 }
