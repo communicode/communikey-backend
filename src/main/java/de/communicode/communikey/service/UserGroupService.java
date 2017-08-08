@@ -38,14 +38,16 @@ public class UserGroupService {
     private final UserRepository userRepository;
     private final KeyCategoryRepository keyCategoryRepository;
     private final UserService userService;
+    private final KeyService keyService;
 
     @Autowired
     public UserGroupService(UserGroupRepository userGroupRepository, UserService userService, UserRepository userRepository,
-            KeyCategoryRepository keyCategoryRepository) {
+            KeyCategoryRepository keyCategoryRepository, KeyService keyService) {
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
+        this.keyService = requireNonNull(keyService, "keyService must not be null!");
     }
 
     /**
@@ -98,6 +100,7 @@ public class UserGroupService {
         userGroup.getUsers().forEach(user -> {
             user.removeGroup(userGroup);
             userRepository.save(user);
+            keyService.removeObsoletePasswords(user);
             log.debug("Removed user group with name '{}' from user with login '{}'", userGroup.getName(), user.getLogin());
         });
         userGroup.getCategories().forEach(keyCategory -> {
