@@ -227,6 +227,7 @@ public class KeyCategoryService {
         if (keyCategory.removeGroup(userGroup)) {
             userGroup.removeCategory(keyCategory);
             userGroupRepository.save(userGroup);
+            userGroup.getUsers().forEach(keyService::removeObsoletePasswords);
             log.debug("Removed user group with name '{}' from key category with ID '{}'", userGroup.getName(), keyCategoryId);
             return keyCategoryRepository.save(keyCategory);
         }

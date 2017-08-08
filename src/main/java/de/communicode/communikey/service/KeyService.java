@@ -190,11 +190,13 @@ public class KeyService {
                 KeyCategory category = key.getCategory();
                 if (category != null) {
                     Set<UserGroup> usergroups = category.getGroups();
-                    usergroups.forEach(userGroup -> {
+                    if (usergroups.isEmpty()) deleteUserEncryptedPassword(key, userEncryptedPassword);
+                    else usergroups.forEach(userGroup -> {
                         if (!user.getGroups().contains(userGroup)) {
                             deleteUserEncryptedPassword(key, userEncryptedPassword);
                         }
                     });
+
                 } else if (!key.getCreator().equals(user)){
                     deleteUserEncryptedPassword(key, userEncryptedPassword);
                 }
