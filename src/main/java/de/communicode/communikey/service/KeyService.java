@@ -177,6 +177,50 @@ public class KeyService {
     }
 
     /**
+     * Removes keys of a user that are obsolete because their visibility to the user changed
+     *
+     * @param user the user user to update
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void removeObsoletePasswords(User user) {
+        userEncryptedPasswordRepository.findAllByOwner(user)
+            .forEach(userEncryptedPassword -> {
+                Key key = userEncryptedPassword.getKey();
+                KeyCategory category = key.getCategory();
+                if (category != null) {
+                    Set<UserGroup> usergroups = category.getGroups();
+                    usergroups.forEach(userGroup -> {
+                        if (!user.getGroups().contains(userGroup)) {
+                            deleteUserEncryptedPassword(key, userEncryptedPassword);
+                        }
+                    });
+                } else if (!key.getCreator().equals(user)){
+                    deleteUserEncryptedPassword(key, userEncryptedPassword);
+                }
+            });
+    }
+
+    /**
+     * Deletes an userEncryptedKey from a key and from the repository
+     *
+     * @param key the key of the userEncryptedPassword
+     * @param userEncryptedPassword the userEncryptedPassword to delete
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    private void deleteUserEncryptedPassword(Key key, UserEncryptedPassword userEncryptedPassword) {
+        User owner = userEncryptedPassword.getOwner();
+        key.removeUserEncryptedPassword(userEncryptedPassword);
+        userEncryptedPasswordRepository.delete(userEncryptedPassword);
+        keyRepository.save(key);
+        log.debug("Removed encryptedPassword '{}’ of key '{}' of user {}.",
+            userEncryptedPassword.getId(),
+            key.getId(),
+            owner.getId());
+    }
+
+    /**
      * Validates a key with the specified ID.
      *
      * @param keyId the ID of the key to validate
