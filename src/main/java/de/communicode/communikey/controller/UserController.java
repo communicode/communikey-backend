@@ -9,13 +9,7 @@ package de.communicode.communikey.controller;
 import static de.communicode.communikey.controller.PathVariables.USER_ACTIVATION_TOKEN;
 import static de.communicode.communikey.controller.PathVariables.USER_EMAIL;
 import static de.communicode.communikey.controller.PathVariables.USER_LOGIN;
-import static de.communicode.communikey.controller.RequestMappings.USERS;
-import static de.communicode.communikey.controller.RequestMappings.USERS_ACTIVATE;
-import static de.communicode.communikey.controller.RequestMappings.USERS_DEACTIVATE;
-import static de.communicode.communikey.controller.RequestMappings.USERS_LOGIN;
-import static de.communicode.communikey.controller.RequestMappings.USERS_REGISTER;
-import static de.communicode.communikey.controller.RequestMappings.USERS_PASSWORD_RESET;
-import static de.communicode.communikey.controller.RequestMappings.USER_AUTHORITIES;
+import static de.communicode.communikey.controller.RequestMappings.*;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.User;
@@ -24,6 +18,7 @@ import de.communicode.communikey.service.UserService;
 import de.communicode.communikey.service.payload.UserCreationPayload;
 import de.communicode.communikey.service.payload.UserPasswordResetPayload;
 import de.communicode.communikey.service.payload.UserPayload;
+import de.communicode.communikey.service.payload.UserPublicKeyResetPayload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -189,6 +184,24 @@ public class UserController {
     }
 
     /**
+     * Gets a random generated user publicKey reset token for the specified email.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_PASSWORD_RESET}".
+     *
+     * <p>Required parameter:
+     * <ul>
+     *   <li>{@code email}</li>
+     * </ul>
+     *
+     * @param email the email of the user to generate a publicKey reset token for
+     * @return the random generated reset token
+     */
+    @GetMapping(value = USERS_PUBLICKEY_RESET)
+    public ResponseEntity<Map<String, String>> getPublicKeyResetToken(@RequestParam(value = USER_EMAIL) String email) {
+        return new ResponseEntity<>(userService.generatePublicKeyResetToken(email), HttpStatus.OK);
+    }
+
+    /**
      * Removes a authority from a user with the specified login.
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USER_AUTHORITIES}".
@@ -217,6 +230,23 @@ public class UserController {
         userService.resetPassword(payload.getPassword(), payload.getResetToken());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+
+    /**
+     * Resets the publicKey of a user.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#USERS}{@value RequestMappings#USERS_PASSWORD_RESET}".
+     *
+     * @param payload the payload of the user
+     * @return the random generated reset token
+     */
+    @PostMapping(value = USERS_PUBLICKEY_RESET)
+    public ResponseEntity resetPublicKey(@Valid @RequestBody UserPublicKeyResetPayload payload) {
+        userService.resetPublicKey(payload.getPublicKey(), payload.getResetToken());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
 
     /**
      * Updates a user with the specified payload.

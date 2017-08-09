@@ -91,6 +91,17 @@ public class User extends AbstractEntity implements Serializable {
     @JsonView(AuthoritiesRestView.Admin.class)
     private ZonedDateTime resetDate = null;
 
+    @Column(name = "public_key")
+    private String publicKey;
+
+    @Column(name = "publickey_reset_token")
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private String publicKeyResetToken;
+
+    @Column(name = "publickey_reset_date")
+    @JsonView(AuthoritiesRestView.Admin.class)
+    private ZonedDateTime publicKeyResetDate = null;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "users_authorities",
@@ -196,12 +207,36 @@ public class User extends AbstractEntity implements Serializable {
         this.resetToken = resetToken;
     }
 
+    public String getPublicKeyResetToken() {
+        return publicKeyResetToken;
+    }
+
+    public void setPublicKeyResetToken(String publicKeyResetToken) {
+        this.publicKeyResetToken = publicKeyResetToken;
+    }
+
+    public ZonedDateTime getPublicKeyResetDate() {
+        return publicKeyResetDate;
+    }
+
+    public void setPublicKeyResetDate(ZonedDateTime publicKeyResetDate) {
+        this.publicKeyResetDate = publicKeyResetDate;
+    }
+
     public ZonedDateTime getResetDate() {
         return resetDate;
     }
 
     public void setResetDate(ZonedDateTime resetDate) {
         this.resetDate = resetDate;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 
     public boolean addAuthority(Authority authority) {

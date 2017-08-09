@@ -47,6 +47,14 @@ public interface UserRepository extends CrudRepository<User, Long> {
     User findOneByResetToken(String resetToken);
 
     /**
+     * Finds the user entity with the specified publicKeyResetToken.
+     *
+     * @param publicKeyResetToken the publicKeyResetToken of the user to find
+     * @return the user entity if found, {@code null} otherwise
+     */
+    User findOneByPublicKeyResetToken(String publicKeyResetToken);
+
+    /**
      * Finds the user entity with the specified email.
      *
      * @param email the email of the user to find

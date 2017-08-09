@@ -231,6 +231,30 @@ public class UserService {
     }
 
     /**
+     * Generates a random generated publicKey reset token for a user specified by the email.
+     *
+     * @param email the email of the user to generate a publicKey reset token for
+     * @return the generated reset token
+     */
+    public Map<String, String> generatePublicKeyResetToken(String email) {
+        return ofNullable(userRepository.findOneByEmail(email))
+            .filter(User::isActivated)
+            .map(user -> {
+                if (Objects.nonNull(user.getPublicKeyResetToken())) {
+                    log.debug("Rejected to generate already existing publicKey reset token '{}'", user.getPublicKeyResetToken());
+                    throw new UserConflictException("publicKey reset token has already been generated");
+                }
+                user.setPublicKeyResetToken(SecurityUtils.generateRandomResetToken());
+                user.setPublicKeyResetDate(ZonedDateTime.now());
+                userRepository.save(user);
+                log.debug("Generated publicKeyResetToken '{}' for user with email '{}'", user.getPublicKeyResetToken(), email);
+                return ImmutableMap.<String, String>builder().
+                    put("publicKeyResetToken", user.getPublicKeyResetToken()).
+                    build();
+            }).orElseThrow(() -> new UserNotFoundException(email));
+    }
+
+    /**
      * Gets all users.
      *
      * @return a collection of all user
@@ -296,6 +320,24 @@ public class UserService {
                 log.debug("Reset password with reset token '{}' for user with login '{}'", resetToken, user.getLogin());
                 return user;
             }).orElseThrow(() -> new ResetTokenNotFoundException(resetToken));
+    }
+
+    /**
+     * Resets the publicKey of a user for the specified publicKeyReset token.
+     *
+     * @param publicKey the new password
+     * @param publicKeyResetToken the reset token of a user to reset the password of
+     */
+    public void resetPublicKey(String publicKey, String publicKeyResetToken) {
+        ofNullable(userRepository.findOneByPublicKeyResetToken(publicKeyResetToken))
+            .map(user -> {
+                user.setPublicKey(publicKey);
+                user.setPublicKeyResetToken(null);
+                user.setPublicKeyResetDate(null);
+                userRepository.save(user);
+                log.debug("Reset publicKeyResetToken with reset token '{}' for user with login '{}'", publicKeyResetToken, user.getLogin());
+                return user;
+            }).orElseThrow(() -> new ResetTokenNotFoundException(publicKeyResetToken));
     }
 
     /**
