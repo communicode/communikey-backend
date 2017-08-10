@@ -165,6 +165,7 @@ public class ApiController {
             .put("lastName", isNull(user.getLastName()) ? "" : user.getLastName())
             .put("privileged", SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN))
             .put("authorities", user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toList()))
+            .put("publicKey", isNull(user.getPublicKey()) ? "" : user.getPublicKey())
             .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
