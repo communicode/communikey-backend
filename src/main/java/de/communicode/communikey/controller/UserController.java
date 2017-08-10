@@ -197,6 +197,7 @@ public class UserController {
      * @return the random generated reset token
      */
     @GetMapping(value = USERS_PUBLICKEY_RESET)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Map<String, String>> getPublicKeyResetToken(@RequestParam(value = USER_EMAIL) String email) {
         return new ResponseEntity<>(userService.generatePublicKeyResetToken(email), HttpStatus.OK);
     }
