@@ -163,6 +163,7 @@ public class UserService {
         user.setLastName(payload.getLastName());
         user.setPassword(passwordEncoder.encode(payload.getPassword()));
         user.setActivationToken(SecurityUtils.generateRandomActivationToken());
+        user.setPublicKeyResetToken(SecurityUtils.generateRandomResetToken());
         Set<Authority> authorities = Sets.newConcurrentHashSet();
         Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
         authorities.add(authority);
