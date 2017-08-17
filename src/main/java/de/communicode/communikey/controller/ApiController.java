@@ -167,6 +167,7 @@ public class ApiController {
             .put("authorities", user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toList()))
             .put("publicKey", isNull(user.getPublicKey()) ? "" : user.getPublicKey())
             .put("publiKeyResetToken", isNull(user.getPublicKeyResetToken()) ? "" : user.getPublicKeyResetToken())
+            .put("passwordResetToken", isNull(user.getResetToken()) ? "" : user.getResetToken())
             .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
