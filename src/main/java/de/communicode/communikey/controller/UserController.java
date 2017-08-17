@@ -179,6 +179,7 @@ public class UserController {
      * @return the random generated reset token
      */
     @GetMapping(value = USERS_PASSWORD_RESET)
+    @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Map<String, String>> getPasswordResetToken(@RequestParam(value = USER_EMAIL) String email) {
         return new ResponseEntity<>(userService.generatePasswordResetToken(email), HttpStatus.OK);
     }
