@@ -23,6 +23,13 @@ public class UserPublicKeyResetPayload {
     @NotBlank
     private String resetToken;
 
+    public UserPublicKeyResetPayload() {}
+
+    public UserPublicKeyResetPayload(String publicKey, String resetToken) {
+        this.publicKey = publicKey;
+        this.resetToken = resetToken;
+    }
+
     public String getPublicKey() {
         return publicKey;
     }
