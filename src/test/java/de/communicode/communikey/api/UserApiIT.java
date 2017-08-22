@@ -19,6 +19,7 @@ import de.communicode.communikey.domain.User;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.UserCreationPayload;
 import de.communicode.communikey.service.payload.UserPayload;
+import de.communicode.communikey.service.payload.UserPublicKeyResetPayload;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.Test;
@@ -199,7 +200,7 @@ public class UserApiIT extends IntegrationBaseTest {
     }
 
     @Test
-    public void testGetPasswordResetTokenAsUser() {
+    public void testGetPasswordResetTokenOfUserAsRoot() {
         initializeTestUser(true);
         String activationToken = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -220,7 +221,7 @@ public class UserApiIT extends IntegrationBaseTest {
                 .statusCode(HttpStatus.OK.value());
 
         given()
-                .auth().oauth2(userOAuth2AccessToken)
+                .auth().oauth2(adminUserOAuth2AccessToken)
                 .queryParam("email", testUser.getEmail())
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_PASSWORD_RESET)
@@ -270,6 +271,62 @@ public class UserApiIT extends IntegrationBaseTest {
                 .post(RequestMappings.USERS + RequestMappings.USERS_PASSWORD_RESET)
         .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void testPostPublicKeyResetTokenOfUserAsRoot() {
+        initializeTestUser(true);
+        String activationToken = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(new UserCreationPayload(testUser))
+        .when()
+                .post(RequestMappings.USERS + RequestMappings.USERS_REGISTER)
+        .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract().jsonPath().getString("activationToken");
+
+        String publicKeyResetToken = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .pathParam("login", testUser.getLogin())
+        .when()
+                .get(RequestMappings.USERS + RequestMappings.USERS_LOGIN)
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract().jsonPath().getString("publicKeyResetToken");
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .queryParam(USER_ACTIVATION_TOKEN, activationToken)
+        .when()
+                .get(RequestMappings.USERS + RequestMappings.USERS_ACTIVATE)
+        .then()
+                .statusCode(HttpStatus.OK.value());
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .queryParam(USER_ACTIVATION_TOKEN, activationToken)
+                .contentType(ContentType.JSON)
+                .body(new UserPublicKeyResetPayload(fairy.textProducer().word(50), publicKeyResetToken))
+        .when()
+                .post(RequestMappings.USERS + RequestMappings.USERS_PUBLICKEY_RESET)
+        .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void testGetPublicKeyResetTokenOfUserAsRoot() {
+        initializeTestUser(true);
+        testPostPublicKeyResetTokenOfUserAsRoot();
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .queryParam("email", testUser.getEmail())
+        .when()
+                .get(RequestMappings.USERS + RequestMappings.USERS_PUBLICKEY_RESET)
+        .then()
+                .statusCode(HttpStatus.OK.value());
     }
 
     @Test
