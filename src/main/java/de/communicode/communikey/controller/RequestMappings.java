@@ -72,6 +72,11 @@ public final class RequestMappings {
     public static final String KEY_HASHID = "/{" + KEY_ID + "}";
 
     /**
+     * The request parameter for a {@link Key} entity userEncryptedPassword.
+     */
+    public static final String KEY_ENCRYPTED_PASSWORD = KEY_HASHID + "/password";
+
+    /**
      * The endpoint for {@link User} entities.
      */
     public static final String USERS = API + "/users";

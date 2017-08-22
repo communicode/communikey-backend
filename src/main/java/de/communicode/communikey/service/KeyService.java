@@ -16,6 +16,7 @@ import static java.util.stream.Collectors.toSet;
 import de.communicode.communikey.domain.*;
 import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
+import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.repository.KeyRepository;
@@ -25,6 +26,10 @@ import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -140,6 +145,18 @@ public class KeyService {
             .flatMap(userGroup -> userGroup.getCategories().stream())
             .flatMap(keyCategory -> keyCategory.getKeys().stream())
             .collect(toSet());
+    }
+
+    /**
+     * Gets a userEncryptedPassword for the specified hashid
+     **
+     * @return a userEncryptedPassword
+     */
+    public UserEncryptedPassword getUserEncryptedPassword(Long hashid) {
+        String login = SecurityUtils.getCurrentUserLogin();
+        User user = userService.validate(login);
+        Key key = validate(hashid);
+        return userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key);
     }
 
     /**
