@@ -57,6 +57,7 @@ public class Key extends AbstractEntity implements Serializable {
     @Column(nullable = false)
     private String login;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "key")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)

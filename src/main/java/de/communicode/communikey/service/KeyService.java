@@ -74,14 +74,30 @@ public class KeyService {
         persistedKey.setHashid(hashids.encode(persistedKey.getId()));
         persistedKey = keyRepository.save(persistedKey);
         log.debug("Created new key with ID '{}'", persistedKey.getId());
-
+        createUserEncryptedPasswords(key, payload.getEncryptedPasswords());
         if (ofNullable(payload.getCategoryId()).isPresent()) {
             keyCategoryService.addKey(decodeSingleValueHashid(payload.getCategoryId()), persistedKey.getId());
             persistedKey = keyRepository.findOne(persistedKey.getId());
         }
-
         userService.addKey(userLogin, persistedKey);
         return persistedKey;
+    }
+
+    /**
+     * Creates new userEncryptedPassword from an array of KeyPayloadEncryptedPasswords.
+     *
+     * @param payload the array of userEncryptedPasswords from a key payload
+     */
+    private void createUserEncryptedPasswords(Key key, Set<KeyPayloadEncryptedPasswords> payload) {
+        for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload) {
+            UserEncryptedPassword newUserEncryptedPassword = new UserEncryptedPassword();
+            newUserEncryptedPassword.setKey(key);
+            newUserEncryptedPassword.setOwner(userService.validate(encryptedPasswordsPayload.getLogin()));
+            newUserEncryptedPassword.setPassword(encryptedPasswordsPayload.getEncryptedPassword());
+            userEncryptedPasswordRepository.save(newUserEncryptedPassword);
+            key.addUserEncryptedPassword(newUserEncryptedPassword);
+        }
+        keyRepository.save(key);
     }
 
     /**
@@ -91,7 +107,9 @@ public class KeyService {
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
     public void delete(Long keyId) throws KeyNotFoundException {
-        keyRepository.delete(validate(keyId));
+        Key key = validate(keyId);
+        userEncryptedPasswordRepository.deleteByKey(key);
+        keyRepository.delete(key);
         log.debug("Deleted key with ID '{}'", keyId);
     }
 
@@ -100,6 +118,7 @@ public class KeyService {
      */
     public void deleteAll() {
         keyRepository.deleteAll();
+        userEncryptedPasswordRepository.deleteAll();
         log.debug("Deleted all keys");
     }
 
@@ -163,12 +182,7 @@ public class KeyService {
                 userEncryptedPassword.setPassword(encryptedPasswordsPayload.getEncryptedPassword());
                 userEncryptedPasswordRepository.save(userEncryptedPassword);
             } else {
-                UserEncryptedPassword newUserEncryptedPassword = new UserEncryptedPassword();
-                newUserEncryptedPassword.setKey(key);
-                newUserEncryptedPassword.setOwner(userService.validate(encryptedPasswordsPayload.getLogin()));
-                newUserEncryptedPassword.setPassword(encryptedPasswordsPayload.getEncryptedPassword());
-                userEncryptedPasswordRepository.save(newUserEncryptedPassword);
-                key.addUserEncryptedPassword(newUserEncryptedPassword);
+                createUserEncryptedPasswords(key, payload.getEncryptedPasswords());
             }
         }
         key = keyRepository.save(key);

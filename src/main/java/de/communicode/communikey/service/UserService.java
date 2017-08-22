@@ -61,6 +61,7 @@ public class UserService {
     private final KeyCategoryRepository keyCategoryRepository;
     private final UserGroupRepository userGroupRepository;
     private final UserRepository userRepository;
+    private final KeyService keyService;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
     private final JdbcTokenStore jdbcTokenStore;
@@ -74,6 +75,7 @@ public class UserService {
             KeyCategoryRepository keyCategoryRepository,
             UserGroupRepository userGroupRepository,
             UserRepository userRepository,
+            @Lazy KeyService keyService,
             AuthorityRepository authorityRepository,
             PasswordEncoder passwordEncoder,
             JdbcTokenStore jdbcTokenStore,
@@ -84,6 +86,7 @@ public class UserService {
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
+        this.keyService = requireNonNull(keyService, "keyService must not be null!");
         this.authorityRepository = requireNonNull(authorityRepository, "authorityRepository must not be null!");
         this.passwordEncoder = requireNonNull(passwordEncoder, "passwordEncoder must not be null!");
         this.jdbcTokenStore = requireNonNull(jdbcTokenStore, "jdbcTokenStore must not be null!");
@@ -203,6 +206,7 @@ public class UserService {
     public void delete(String login) throws UserNotFoundException {
         deleteOauth2AccessTokens(login);
         User user = dissolveReferences(validate(login));
+        keyService.removeObsoletePasswords(user);
         userRepository.delete(user);
         log.debug("Deleted user with login '{}'", login);
     }
