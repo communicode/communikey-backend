@@ -9,7 +9,14 @@ package de.communicode.communikey.controller;
 import static de.communicode.communikey.controller.PathVariables.USER_ACTIVATION_TOKEN;
 import static de.communicode.communikey.controller.PathVariables.USER_EMAIL;
 import static de.communicode.communikey.controller.PathVariables.USER_LOGIN;
-import static de.communicode.communikey.controller.RequestMappings.*;
+import static de.communicode.communikey.controller.RequestMappings.USERS;
+import static de.communicode.communikey.controller.RequestMappings.USERS_ACTIVATE;
+import static de.communicode.communikey.controller.RequestMappings.USERS_DEACTIVATE;
+import static de.communicode.communikey.controller.RequestMappings.USERS_LOGIN;
+import static de.communicode.communikey.controller.RequestMappings.USERS_REGISTER;
+import static de.communicode.communikey.controller.RequestMappings.USERS_PASSWORD_RESET;
+import static de.communicode.communikey.controller.RequestMappings.USER_AUTHORITIES;
+import static de.communicode.communikey.controller.RequestMappings.USERS_PUBLICKEY_RESET;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.User;
