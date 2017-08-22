@@ -9,6 +9,7 @@ package de.communicode.communikey.service.payload;
 import de.communicode.communikey.domain.Key;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
@@ -30,6 +31,7 @@ public class KeyPayload {
 
     private String notes;
 
+    @NotNull
     private Set<KeyPayloadEncryptedPasswords> encryptedPasswords;
 
     public KeyPayload() {}

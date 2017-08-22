@@ -10,6 +10,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 import com.google.common.collect.Sets;
+import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.exception.UserGroupConflictException;
 import de.communicode.communikey.exception.UserGroupNotFoundException;
@@ -165,14 +166,17 @@ public class UserGroupService {
      * @throws UserGroupNotFoundException if the user group with the specified ID has not been found
      */
     public UserGroup removeUser(Long userGroupId, String login) {
-        return ofNullable(userGroupRepository.findOne(userGroupId))
+        User user = userService.validate(login);
+        UserGroup returnGroup = ofNullable(userGroupRepository.findOne(userGroupId))
             .map(userGroup -> {
-                if (userGroup.removeUser(userService.validate(login))) {
+                if (userGroup.removeUser(user)) {
                     userGroupRepository.save(userGroup);
                     log.debug("Removed user with login '{}' from user group '{}'", login, userGroup.getName());
                 }
                 return userGroup;
             }).orElseThrow(() -> new UserGroupNotFoundException(userGroupId));
+        keyService.removeObsoletePasswords(user);
+        return returnGroup;
     }
 
     /**
