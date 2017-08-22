@@ -18,7 +18,9 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Integration tests for the {@link Key} REST API.
@@ -28,7 +30,7 @@ import java.util.Map;
  */
 public class KeyApiIT extends IntegrationBaseTest {
 
-    private Map<String, String> keyPayload = new HashMap<>();
+    private Map<String, Object> keyPayload = new HashMap<>();
 
     @Test
     public void testCreateKeyAsAdminWithValidPayload() {
@@ -330,7 +332,12 @@ public class KeyApiIT extends IntegrationBaseTest {
     private void initializeTestKeyPayload() {
         keyPayload.put("name", "key");
         keyPayload.put("login", "login");
-        keyPayload.put("password", "password");
         keyPayload.put("notes", "notes");
+        Map<String, String> encryptedPassword = new HashMap<>();
+        encryptedPassword.put("login", "root");
+        encryptedPassword.put("encryptedPassword", "user encrypted password content");
+        Set<Map> encryptedPasswords = new HashSet<>();
+        encryptedPasswords.add(encryptedPassword);
+        keyPayload.put("encryptedPasswords", encryptedPasswords);
     }
 }
