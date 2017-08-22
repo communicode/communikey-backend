@@ -11,6 +11,7 @@ import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserEncryptedPassword;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -34,5 +35,6 @@ public interface UserEncryptedPasswordRepository extends CrudRepository<UserEncr
 
     Set<UserEncryptedPassword> findAllByOwner(User owner);
 
+    @Transactional
     void deleteByKey(Key key);
 }

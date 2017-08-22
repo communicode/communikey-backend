@@ -117,8 +117,8 @@ public class KeyService {
      * Deletes all keys.
      */
     public void deleteAll() {
-        keyRepository.deleteAll();
         userEncryptedPasswordRepository.deleteAll();
+        keyRepository.deleteAll();
         log.debug("Deleted all keys");
     }
 
