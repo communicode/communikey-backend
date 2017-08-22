@@ -12,9 +12,8 @@ import org.hibernate.validator.constraints.NotBlank;
 /**
  * A payload object to reset the password of a {@link User} with a specified reset token.
  *
- * @author dvonderbey@communicode.de
- * @author lleifermann@communicode.de
- * @since 0.15.0
+ * @author sgreb@communicode.de
+ * @since 0.2.0
  */
 public class UserPasswordResetPayload {
 
