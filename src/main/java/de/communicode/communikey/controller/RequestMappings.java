@@ -127,6 +127,11 @@ public final class RequestMappings {
     public static final String USERS_PASSWORD_RESET = "/reset_password";
 
     /**
+     * The endpoint to reset a {@link User} publicKey.
+     */
+    public static final String USERS_PUBLICKEY_RESET = "/reset_publickey";
+
+    /**
      * The endpoint for {@link Authority} entities.
      *
      * @since 0.3.0
