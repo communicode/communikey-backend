@@ -199,7 +199,7 @@ public class UserApiIT extends IntegrationBaseTest {
     }
 
     @Test
-    public void testGetPasswordResetTokenAsUser() {
+    public void testGetPasswordResetTokenOfUserAsRoot() {
         initializeTestUser(true);
         String activationToken = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -220,7 +220,7 @@ public class UserApiIT extends IntegrationBaseTest {
                 .statusCode(HttpStatus.OK.value());
 
         given()
-                .auth().oauth2(userOAuth2AccessToken)
+                .auth().oauth2(adminUserOAuth2AccessToken)
                 .queryParam("email", testUser.getEmail())
         .when()
                 .get(RequestMappings.USERS + RequestMappings.USERS_PASSWORD_RESET)
