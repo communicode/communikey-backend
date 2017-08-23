@@ -9,6 +9,7 @@ package de.communicode.communikey.controller;
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEYS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_HASHID;
+import static de.communicode.communikey.controller.RequestMappings.KEY_SUBSCRIBERS;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Key;
@@ -115,6 +116,22 @@ public class KeyController {
         return keyService.get(decodeSingleValueHashid(keyHashid))
                 .map(key -> new ResponseEntity<>(key, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.FORBIDDEN));
+    }
+
+    /**
+     * Gets the subscribers of a key with the specified Hashid.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEY_SUBSCRIBERS}".
+     *
+     * @param keyHashid the Hashid of the key entity to get
+     * @return the key as response entity
+     */
+    @GetMapping(value = KEY_SUBSCRIBERS)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity getSubscribers(@PathVariable(name = KEY_ID) String keyHashid) {
+        return keyService.getSubscribers(decodeSingleValueHashid(keyHashid))
+            .map(key -> new ResponseEntity<>(key, HttpStatus.OK))
+            .orElseGet(() -> new ResponseEntity<>(HttpStatus.FORBIDDEN));
     }
 
     /**

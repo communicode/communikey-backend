@@ -72,6 +72,11 @@ public final class RequestMappings {
     public static final String KEY_HASHID = "/{" + KEY_ID + "}";
 
     /**
+     * The request parameter for the subscribers of a {@link Key} entity Hashid.
+     */
+    public static final String KEY_SUBSCRIBERS = KEY_HASHID + "/subscribers";
+
+    /**
      * The endpoint for {@link User} entities.
      */
     public static final String USERS = API + "/users";
