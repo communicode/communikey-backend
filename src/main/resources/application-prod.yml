@@ -3,8 +3,8 @@ spring:
     active: prod
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://localhost:3306/communikey?useUnicode=true&characterEncoding=utf8&createDatabaseIfNotExist=true&autoReconnect=true
     hikari:
+      jdbc-url: jdbc:mysql://localhost:3306/communikey?useUnicode=true&characterEncoding=utf8&createDatabaseIfNotExist=true&autoReconnect=true
       data-source-properties:
         cachePrepStmts: true
         prepStmtCacheSize: 250
