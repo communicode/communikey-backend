@@ -13,6 +13,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import de.communicode.communikey.IntegrationBaseTest;
 import de.communicode.communikey.controller.RequestMappings;
 import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.domain.KeyCategory;
 import io.restassured.http.ContentType;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,9 @@ import java.util.Set;
 public class KeyApiIT extends IntegrationBaseTest {
 
     private Map<String, Object> keyPayload = new HashMap<>();
+    private Key key = new Key();
+    private UserGroup userGroup = new UserGroup();
+    private KeyCategory keyCategory = new KeyCategory();
 
     @Test
     public void testCreateKeyAsAdminWithValidPayload() {
@@ -324,6 +329,63 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
                 .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void testSubscriberListOfKeyWithOneSubscriber() {
+        initializeSubscriberTestData();
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .pathParam(KEY_ID, key.getHashid())
+        .when()
+                .get(RequestMappings.KEYS + RequestMappings.KEY_SUBSCRIBERS)
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("size()", equalTo(1))
+                .body("[0].publicKey", equalTo(user.getPublicKey()))
+                .body("[0].user", equalTo(user.getLogin()));
+    }
+
+    private void initializeSubscriberTestData() {
+        initializeTestKey();
+        key.setCreator(user);
+        keyRepository.save(key);
+        key.setHashid(hashIds.encode(key.getId()));
+        keyRepository.save(key);
+        initializeTestUserGroup();
+        userGroup.addUser(user);
+        userGroupRepository.save(userGroup);
+        initializeTestKeyCategory();
+        keyCategory.addKey(key);
+        keyCategory.addGroup(userGroup);
+        keyCategory.setCreator(user);
+        keyCategoryRepository.save(keyCategory);
+        key.setCategory(keyCategory);
+        keyRepository.save(key);
+    }
+
+    /**
+     * Initializes the test key.
+     */
+    private void initializeTestKey() {
+        key.setName(fairy.textProducer().word(1));
+        key.setLogin(fairy.textProducer().word(1));
+        key.setNotes(fairy.textProducer().word(5));
+    }
+
+    /**
+     * Initializes the test userGroup.
+     */
+    private void initializeTestUserGroup() {
+        userGroup.setName(fairy.textProducer().word(1));
+    }
+
+    /**
+     * Initializes the test category.
+     */
+    private void initializeTestKeyCategory() {
+        keyCategory.setName(fairy.textProducer().word(1));
     }
 
     /**

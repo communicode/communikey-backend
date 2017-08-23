@@ -13,14 +13,18 @@ import com.google.common.collect.Sets;
 import de.communicode.communikey.config.CommunikeyProperties;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.User;
+import de.communicode.communikey.repository.KeyCategoryRepository;
+import de.communicode.communikey.repository.UserGroupRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.AuthorityService;
 import de.communicode.communikey.service.KeyCategoryService;
 import de.communicode.communikey.service.KeyService;
+import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.service.UserGroupService;
 import de.communicode.communikey.service.UserService;
+import org.hashids.Hashids;
 import io.codearte.jfairy.Fairy;
 import io.restassured.http.ContentType;
 import org.junit.After;
@@ -59,9 +63,15 @@ public abstract class IntegrationBaseTest {
     @Autowired
     protected KeyCategoryService keyCategoryService;
     @Autowired
+    protected KeyCategoryRepository keyCategoryRepository;
+    @Autowired
     protected KeyService keyService;
     @Autowired
+    protected KeyRepository keyRepository;
+    @Autowired
     protected UserGroupService userGroupService;
+    @Autowired
+    protected UserGroupRepository userGroupRepository;
     @Autowired
     protected PasswordEncoder passwordEncoder;
     @Autowired
@@ -70,6 +80,8 @@ public abstract class IntegrationBaseTest {
     protected CommunikeyProperties communikeyProperties;
     @Autowired
     protected TestRestTemplate testRestTemplate;
+    @Autowired
+    protected Hashids hashIds;
 
     protected Fairy fairy;
 
@@ -77,6 +89,10 @@ public abstract class IntegrationBaseTest {
     protected String decodedUserPassword = "password";
     protected String userLogin = "user";
     protected String userEmail = userLogin + "@communicode.de";
+    protected String userPublicKey = "-----BEGIN PUBLIC KEY-----" +
+                                     "VGhpcyBpcyBhIGJhc2U2NCBlbm" +
+                                     "NyeXB0ZWQgcHVibGljIGtleQ==" +
+                                     "-----END PUBLIC KEY-----";
 
     protected String userOAuth2AccessToken;
     protected String adminUserOAuth2AccessToken;
@@ -136,6 +152,8 @@ public abstract class IntegrationBaseTest {
         user.setLastName(fairy.person().getLastName());
         user.setPassword(passwordEncoder.encode(decodedUserPassword));
         user.setActivationToken(SecurityUtils.generateRandomActivationToken());
+        user.setPublicKey(userPublicKey);
+        user.setPublicKeyResetToken(null);
         user.setActivated(true);
         Set<Authority> authorities = Sets.newConcurrentHashSet();
         authorities.add(authorityService.get(AuthoritiesConstants.USER));
