@@ -9,6 +9,7 @@ package de.communicode.communikey.api;
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 
 import de.communicode.communikey.IntegrationBaseTest;
 import de.communicode.communikey.controller.RequestMappings;
@@ -332,7 +333,7 @@ public class KeyApiIT extends IntegrationBaseTest {
     }
 
     @Test
-    public void testSubscriberListOfKeyWithOneSubscriber() {
+    public void testSubscriberListOfKeyWithTwoSubscribers() {
         initializeSubscriberTestData();
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -342,9 +343,9 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .get(RequestMappings.KEYS + RequestMappings.KEY_SUBSCRIBERS)
         .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("size()", equalTo(1))
-                .body("[0].publicKey", equalTo(user.getPublicKey()))
-                .body("[0].user", equalTo(user.getLogin()));
+                .body("size()", equalTo(2))
+                .body("publicKey", hasItems(user.getPublicKey()))
+                .body("user", hasItems(user.getLogin()));
     }
 
     private void initializeSubscriberTestData() {

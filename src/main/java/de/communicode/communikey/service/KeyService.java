@@ -20,9 +20,12 @@ import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
+import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyPayload;
+import de.communicode.communikey.service.AuthorityService;
 import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.repository.KeyRepository;
+import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.service.payload.KeyPayloadEncryptedPasswords;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,15 +56,21 @@ public class KeyService {
     private final KeyCategoryService keyCategoryService;
     private final UserService userService;
     private final Hashids hashids;
+    private final UserRepository userRepository;
+    private final AuthorityService authorityService;
 
     @Autowired
-    public KeyService(KeyRepository keyRepository, @Lazy KeyCategoryService keyCategoryService, UserService userRestService, Hashids hashids,
-                      UserEncryptedPasswordRepository userEncryptedPasswordRepository) {
+    public KeyService(KeyRepository keyRepository, @Lazy KeyCategoryService keyCategoryService,
+                      UserService userRestService, Hashids hashids, UserEncryptedPasswordRepository
+                      userEncryptedPasswordRepository, UserRepository userRepository,
+                      AuthorityService authorityService) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.userEncryptedPasswordRepository = requireNonNull(userEncryptedPasswordRepository, "userEncryptedPasswordRepository must not be null!");
         this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
         this.userService = requireNonNull(userRestService, "userService must not be null!");
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
+        this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
+        this.authorityService = requireNonNull(authorityService, "authorityService must not be null!");
     }
 
     /**
@@ -243,12 +252,12 @@ public class KeyService {
                             .forEach((User user) -> {
                                 Map<String, String> publicKey = new HashMap<>();
                                 if (user.getPublicKey() != null) {
-                                    publicKey.put("user", user.getLogin());
-                                    publicKey.put("publicKey", user.getPublicKey());
-                                    publicKeys.add(publicKey);
+                                    publicKeys.add(user.getSubscriberInfo());
                                 }
                             }));
                 }
+                userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
+                    .forEach(user -> publicKeys.add(user.getSubscriberInfo()));
                 return publicKeys;
             });
     }

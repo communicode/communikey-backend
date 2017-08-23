@@ -34,6 +34,9 @@ import javax.validation.constraints.Pattern;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -368,6 +371,15 @@ public class User extends AbstractEntity implements Serializable {
 
     public Set<KeyCategory> getResponsibleKeyCategories() {
         return Sets.newConcurrentHashSet(responsibleKeyCategories);
+    }
+
+    public Map<String, String> getSubscriberInfo() {
+        Map<String, String> subscriberInfo = new HashMap<>();
+        if(getPublicKey() != null) {
+            subscriberInfo.put("user", getLogin());
+            subscriberInfo.put("publicKey", getPublicKey());
+        }
+        return subscriberInfo;
     }
 
     @Override
