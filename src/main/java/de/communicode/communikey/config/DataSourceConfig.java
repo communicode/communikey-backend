@@ -60,6 +60,7 @@ public class DataSourceConfig {
         hikariConfig.setJdbcUrl(datasourceUrl);
         hikariConfig.setUsername(databaseUsername);
         hikariConfig.setPassword(databasePassword);
+        hikariConfig.setMaximumPoolSize(10);
         return new HikariDataSource(hikariConfig);
     }
 
