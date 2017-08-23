@@ -226,6 +226,8 @@ public class KeyService {
 
     /**
      * Returns a list of public keys and the names of the subscribers for a specific key
+     * Goes through the category of the key to find all groups and their members that
+     * are able to "see" the key. Also adds all admins to the list.
      *
      * @param keyId the keyId of the key of which the subscribers are wanted
      * @author dvonderbey@communicode.de
@@ -235,14 +237,18 @@ public class KeyService {
         return get(keyId)
             .map((Key key) -> {
                 Set<Map<String, String>> publicKeys = new HashSet<>();
-                key.getCategory().getGroups()
-                    .forEach((UserGroup userGroup) -> userGroup.getUsers()
-                        .forEach((User user) -> {
-                            Map<String, String> publicKey = new HashMap<>();
-                            publicKey.put("user", user.getLogin());
-                            publicKey.put("publicKey", user.getPublicKey());
-                            publicKeys.add(publicKey);
-                        }));
+                if(key.getCategory() != null) {
+                    key.getCategory().getGroups()
+                        .forEach((UserGroup userGroup) -> userGroup.getUsers()
+                            .forEach((User user) -> {
+                                Map<String, String> publicKey = new HashMap<>();
+                                if (user.getPublicKey() != null) {
+                                    publicKey.put("user", user.getLogin());
+                                    publicKey.put("publicKey", user.getPublicKey());
+                                    publicKeys.add(publicKey);
+                                }
+                            }));
+                }
                 return publicKeys;
             });
     }
