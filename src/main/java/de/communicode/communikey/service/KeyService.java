@@ -225,28 +225,26 @@ public class KeyService {
     }
 
     /**
-     * Returns a list of public keys of subscribers for a specific key
+     * Returns a list of public keys and the names of the subscribers for a specific key
      *
-     * @param keyId the keyId to search the subscribers for
+     * @param keyId the keyId of the key of which the subscribers are wanted
      * @author dvonderbey@communicode.de
      * @since 0.15.0
      */
     public Optional<Set<Map<String, String>>> getSubscribers(Long keyId) {
         return get(keyId)
-            .map(key -> {
+            .map((Key key) -> {
                 Set<Map<String, String>> publicKeys = new HashSet<>();
-                if (key.getCategory() != null) {
-                    Set<UserGroup> userGroups = key.getCategory().getGroups();
-                    userGroups.forEach(userGroup -> userGroup.getUsers().forEach(user -> {
-                        Map<String, String> publicKey = new HashMap<>();
-                        publicKey.put("user", user.getLogin());
-                        publicKey.put("publicKey", user.getPublicKey());
-                        publicKeys.add(publicKey);
-                    }));
-                }
-                return Optional.of(publicKeys);
-            })
-            .orElseGet(Optional::empty);
+                key.getCategory().getGroups()
+                    .forEach((UserGroup userGroup) -> userGroup.getUsers()
+                        .forEach((User user) -> {
+                            Map<String, String> publicKey = new HashMap<>();
+                            publicKey.put("user", user.getLogin());
+                            publicKey.put("publicKey", user.getPublicKey());
+                            publicKeys.add(publicKey);
+                        }));
+                return publicKeys;
+            });
     }
 
     /**

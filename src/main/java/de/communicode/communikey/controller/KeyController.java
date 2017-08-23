@@ -130,7 +130,7 @@ public class KeyController {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity getSubscribers(@PathVariable(name = KEY_ID) String keyHashid) {
         return keyService.getSubscribers(decodeSingleValueHashid(keyHashid))
-            .map(key -> new ResponseEntity<>(key, HttpStatus.OK))
+            .map(subscribers -> new ResponseEntity<>(subscribers, HttpStatus.OK))
             .orElseGet(() -> new ResponseEntity<>(HttpStatus.FORBIDDEN));
     }
 
