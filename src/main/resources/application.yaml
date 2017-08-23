@@ -21,6 +21,10 @@ communikey:
       login: root
       email: cckey_root@communicode.de
       password: password
+      public-key: >
+                -----BEGIN PUBLIC KEY-----
+                CHAAAAAAAANGE MEEEEEEEEEEE
+                -----END PUBLIC KEY-----
 
 server:
   port: 8080
