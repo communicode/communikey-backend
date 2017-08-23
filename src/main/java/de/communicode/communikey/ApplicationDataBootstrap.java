@@ -75,7 +75,7 @@ public class ApplicationDataBootstrap {
             this.rootUser.setLastName(communikeyProperties.getSecurity().getRoot().getLastName());
             this.rootUser.setPassword(passwordEncoder.encode(communikeyProperties.getSecurity().getRoot().getPassword()));
             this.rootUser.setActivationToken(SecurityUtils.generateRandomActivationToken());
-            this.rootUser.setPublicKeyResetToken(SecurityUtils.generateRandomResetToken());
+            this.rootUser.setPublicKey(communikeyProperties.getSecurity().getRoot().getPublicKey());
             this.rootUser.setActivated(true);
             final Set<Authority> authorities = Stream.of(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
                     .map(authorityRepository::findOne)
