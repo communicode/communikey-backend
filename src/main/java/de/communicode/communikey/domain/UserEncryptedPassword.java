@@ -43,6 +43,7 @@ public class UserEncryptedPassword extends AbstractEntity implements Serializabl
 
     @NotNull
     @NotBlank
+    @Lob
     @Column(nullable = false)
     private String password;
 
