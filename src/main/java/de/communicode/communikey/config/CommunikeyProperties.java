@@ -106,8 +106,7 @@ public final class CommunikeyProperties {
             private String lastName = "root";
 
             private String publicKey = "-----BEGIN PUBLIC KEY-----" +
-                                       "VGhpcyBpcyBhIGJhc2U2NCBlbm" +
-                                       "NyeXB0ZWQgcHVibGljIGtleQ==" +
+                                       "THIS IS JUST AN EXAMPLE !!" +
                                        "-----END PUBLIC KEY-----";
 
             public String getLogin() {
