@@ -288,7 +288,6 @@ public class KeyApiIT extends IntegrationBaseTest {
 
         keyPayload.replace("name", "newName");
         keyPayload.replace("login", "newLogin");
-        keyPayload.replace("password", "newPassword");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -300,8 +299,7 @@ public class KeyApiIT extends IntegrationBaseTest {
         .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("name", equalTo(keyPayload.get("name")))
-                .body("login", equalTo(keyPayload.get("login")))
-                .body("password", equalTo(keyPayload.get("password")));
+                .body("login", equalTo(keyPayload.get("login")));
     }
 
     @Test
@@ -346,6 +344,33 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .body("size()", equalTo(2))
                 .body("publicKey", hasItems(user.getPublicKey()))
                 .body("user", hasItems(user.getLogin()));
+    }
+
+    @Test
+    public void testPostEncryptedPasswordsForSubscribers() {
+        initializeSubscriberTestData();
+        Set<Map<String, String>> encryptedPasswordsPayload = new HashSet<>();
+        Map<String, String> encryptedPassword1Payload = new HashMap<>();
+        encryptedPassword1Payload.put("login", "root");
+        encryptedPassword1Payload.put("encryptedPassword", "VGhpcyBpcyBhIGJhc2U2NCBlbmNyeXB0ZWQgcGFzc3dvcmQgc3RyaW5n");
+        Map<String, String> encryptedPassword2Payload = new HashMap<>();
+        encryptedPassword2Payload.put("login", "user");
+        encryptedPassword2Payload.put("encryptedPassword", "VGhpcyBpcyBhIGJhc2U2NCBlbmNyeXB0ZWQgcGFzc3dvcmQgc3RyaW5n");
+        Map<String, Object> newPayload = new HashMap<>();
+        encryptedPasswordsPayload.add(encryptedPassword1Payload);
+        encryptedPasswordsPayload.add(encryptedPassword2Payload);
+        newPayload.put("name", "nametest");
+        newPayload.put("login", "logintest");
+        newPayload.put("encryptedPasswords", encryptedPasswordsPayload);
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .pathParam(KEY_ID, key.getHashid())
+                .body(newPayload)
+        .when()
+                .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+        .then()
+                .statusCode(HttpStatus.OK.value());
     }
 
     private void initializeSubscriberTestData() {
@@ -399,7 +424,7 @@ public class KeyApiIT extends IntegrationBaseTest {
         Map<String, String> encryptedPassword = new HashMap<>();
         encryptedPassword.put("login", "root");
         encryptedPassword.put("encryptedPassword", "user encrypted password content");
-        Set<Map> encryptedPasswords = new HashSet<>();
+        Set<Map<String, String>> encryptedPasswords = new HashSet<>();
         encryptedPasswords.add(encryptedPassword);
         keyPayload.put("encryptedPasswords", encryptedPasswords);
     }

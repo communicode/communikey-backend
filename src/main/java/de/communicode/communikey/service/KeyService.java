@@ -21,6 +21,7 @@ import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
+import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.service.AuthorityService;
 import de.communicode.communikey.exception.KeyNotFoundException;
@@ -32,6 +33,10 @@ import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
@@ -90,7 +95,9 @@ public class KeyService {
         persistedKey.setHashid(hashids.encode(persistedKey.getId()));
         persistedKey = keyRepository.save(persistedKey);
         log.debug("Created new key with ID '{}'", persistedKey.getId());
-        createUserEncryptedPasswords(key, payload.getEncryptedPasswords());
+        for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload.getEncryptedPasswords()) {
+            createUserEncryptedPasswords(key, encryptedPasswordsPayload);
+        }
         if (ofNullable(payload.getCategoryId()).isPresent()) {
             keyCategoryService.addKey(decodeSingleValueHashid(payload.getCategoryId()), persistedKey.getId());
             persistedKey = keyRepository.findOne(persistedKey.getId());
@@ -104,15 +111,13 @@ public class KeyService {
      *
      * @param payload the array of userEncryptedPasswords from a key payload
      */
-    private void createUserEncryptedPasswords(Key key, Set<KeyPayloadEncryptedPasswords> payload) {
-        for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload) {
-            UserEncryptedPassword newUserEncryptedPassword = new UserEncryptedPassword();
-            newUserEncryptedPassword.setKey(key);
-            newUserEncryptedPassword.setOwner(userService.validate(encryptedPasswordsPayload.getLogin()));
-            newUserEncryptedPassword.setPassword(encryptedPasswordsPayload.getEncryptedPassword());
-            userEncryptedPasswordRepository.save(newUserEncryptedPassword);
-            key.addUserEncryptedPassword(newUserEncryptedPassword);
-        }
+    private void createUserEncryptedPasswords(Key key, KeyPayloadEncryptedPasswords payload) {
+        UserEncryptedPassword newUserEncryptedPassword = new UserEncryptedPassword();
+        newUserEncryptedPassword.setKey(key);
+        newUserEncryptedPassword.setOwner(userService.validate(payload.getLogin()));
+        newUserEncryptedPassword.setPassword(payload.getEncryptedPassword());
+        userEncryptedPasswordRepository.save(newUserEncryptedPassword);
+        key.addUserEncryptedPassword(newUserEncryptedPassword);
         keyRepository.save(key);
     }
 
@@ -178,6 +183,18 @@ public class KeyService {
     }
 
     /**
+     * Gets a userEncryptedPassword for the specified hashid
+     **
+     * @return a userEncryptedPassword
+     */
+    public UserEncryptedPassword getUserEncryptedPassword(Long hashid) {
+        String login = SecurityUtils.getCurrentUserLogin();
+        User user = userService.validate(login);
+        Key key = validate(hashid);
+        return userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key);
+    }
+
+    /**
      * Updates a key with the specified payload.
      *
      * @param keyId the ID of the key to update
@@ -193,14 +210,20 @@ public class KeyService {
         key.setNotes(payload.getNotes());
         key = keyRepository.save(key);
         for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload.getEncryptedPasswords()) {
-            UserEncryptedPassword userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(userService.validate(encryptedPasswordsPayload.getLogin()), validate(keyId));
+            UserEncryptedPassword userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(
+                userService.validate(encryptedPasswordsPayload.getLogin()), validate(keyId));
+            log.debug("Payload for user: " + encryptedPasswordsPayload.getLogin());
+            log.debug("Searching for owner and key, result: " + userEncryptedPassword);
             if(userEncryptedPassword != null) {
+                log.debug("Updating password");
                 userEncryptedPassword.setPassword(encryptedPasswordsPayload.getEncryptedPassword());
                 userEncryptedPasswordRepository.save(userEncryptedPassword);
             } else {
-                createUserEncryptedPasswords(key, payload.getEncryptedPasswords());
+                log.debug("Creating password");
+                createUserEncryptedPasswords(key, encryptedPasswordsPayload);
             }
         }
+        log.debug("Saving password");
         key = keyRepository.save(key);
         log.debug("Updated key with ID '{}'", key.getId());
         return key;
@@ -222,7 +245,7 @@ public class KeyService {
                     Set<UserGroup> userGroups = category.getGroups();
                     if (userGroups.isEmpty()) deleteUserEncryptedPassword(key, userEncryptedPassword);
                     else userGroups.forEach(userGroup -> {
-                        if (!user.getGroups().contains(userGroups)) {
+                        if (!user.getGroups().contains(userGroup)) {
                             deleteUserEncryptedPassword(key, userEncryptedPassword);
                         }
                     });
@@ -250,14 +273,18 @@ public class KeyService {
                     key.getCategory().getGroups()
                         .forEach((UserGroup userGroup) -> userGroup.getUsers()
                             .forEach((User user) -> {
-                                Map<String, String> publicKey = new HashMap<>();
                                 if (user.getPublicKey() != null) {
                                     publicKeys.add(user.getSubscriberInfo());
                                 }
                             }));
                 }
                 userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
-                    .forEach(user -> publicKeys.add(user.getSubscriberInfo()));
+                    .forEach(user -> {
+                        Map<String, String> subscriberInfo = user.getSubscriberInfo();
+                        if(!publicKeys.contains(subscriberInfo)) {
+                            publicKeys.add(subscriberInfo);
+                        }
+                    });
                 return publicKeys;
             });
     }
@@ -273,8 +300,8 @@ public class KeyService {
     private void deleteUserEncryptedPassword(Key key, UserEncryptedPassword userEncryptedPassword) {
         User owner = userEncryptedPassword.getOwner();
         key.removeUserEncryptedPassword(userEncryptedPassword);
-        userEncryptedPasswordRepository.delete(userEncryptedPassword);
         keyRepository.save(key);
+        userEncryptedPasswordRepository.delete(userEncryptedPassword);
         log.debug("Removed encryptedPassword '{}’ of key '{}' of user {}.",
             userEncryptedPassword.getId(),
             key.getId(),

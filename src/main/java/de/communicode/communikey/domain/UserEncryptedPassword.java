@@ -83,8 +83,8 @@ public class UserEncryptedPassword extends AbstractEntity implements Serializabl
     public String toString() {
         return "UserEncryptedPassword{" +
             "id=" + id +
-            ", key=" + key +
-            ", owner=" + owner +
+            ", key=" + key.getId() +
+            ", owner=" + owner.getId() +
             '}';
     }
 }
