@@ -119,6 +119,7 @@ public class KeyService {
         userEncryptedPasswordRepository.save(newUserEncryptedPassword);
         key.addUserEncryptedPassword(newUserEncryptedPassword);
         keyRepository.save(key);
+        log.debug("Created userencryptedPassword for key {} and user {}", key.getId(), payload.getLogin());
     }
 
     /**
@@ -212,20 +213,14 @@ public class KeyService {
         for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload.getEncryptedPasswords()) {
             UserEncryptedPassword userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(
                 userService.validate(encryptedPasswordsPayload.getLogin()), validate(keyId));
-            log.debug("Payload for user: " + encryptedPasswordsPayload.getLogin());
-            log.debug("Searching for owner and key, result: " + userEncryptedPassword);
             if(userEncryptedPassword != null) {
-                log.debug("Updating password");
                 userEncryptedPassword.setPassword(encryptedPasswordsPayload.getEncryptedPassword());
                 userEncryptedPasswordRepository.save(userEncryptedPassword);
             } else {
-                log.debug("Creating password");
                 createUserEncryptedPasswords(key, encryptedPasswordsPayload);
             }
         }
-        log.debug("Saving password");
         key = keyRepository.save(key);
-        log.debug("Updated key with ID '{}'", key.getId());
         return key;
     }
 
