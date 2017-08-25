@@ -6,6 +6,9 @@
  */
 package de.communicode.communikey.config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.hibernate.HikariConfigurationUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -38,13 +41,13 @@ public class DataSourceConfig {
     @Value("classpath:schema.sql")
     private Resource schemaScript;
 
-    @Value("${spring.datasource.url}")
+    @Value("${spring.datasource.hikari.jdbc-url}")
     private String datasourceUrl;
 
-    @Value("${spring.datasource.username}")
+    @Value("${spring.datasource.hikari.username}")
     private String databaseUsername;
 
-    @Value("${spring.datasource.password}")
+    @Value("${spring.datasource.hikari.password}")
     private String databasePassword;
     /**
      * Configures the JDBC driver manager data source.
@@ -52,12 +55,13 @@ public class DataSourceConfig {
      * @return the configured JDBC driver manager data source
      */
     @Bean
-    public DataSource dataSource() {
-        return DataSourceBuilder.create()
-            .url(datasourceUrl)
-            .username(databaseUsername)
-            .password(databasePassword)
-            .build();
+    public HikariDataSource dataSource() {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(datasourceUrl);
+        hikariConfig.setUsername(databaseUsername);
+        hikariConfig.setPassword(databasePassword);
+        hikariConfig.setMaximumPoolSize(10);
+        return new HikariDataSource(hikariConfig);
     }
 
     /**
@@ -67,7 +71,7 @@ public class DataSourceConfig {
      * @return the data source initializer bean
      */
     @Bean
-    DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
+    DataSourceInitializer dataSourceInitializer(HikariDataSource dataSource) {
         DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
         initializer.setDatabasePopulator(databasePopulator());
@@ -82,7 +86,7 @@ public class DataSourceConfig {
      *   <li>OAuth2</li>
      * </ul>
      *
-     * @return the database populartor object
+     * @return the database populator object
      */
     private DatabasePopulator databasePopulator() {
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
