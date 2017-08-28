@@ -349,7 +349,7 @@ public class KeyApiIT extends IntegrationBaseTest {
     @Test
     public void testPostEncryptedPasswordsForSubscribers() {
         initializeSubscriberTestData();
-        Set<Map<String, String>> encryptedPasswordsPayload = new HashSet<>();
+        Set<Map> encryptedPasswordsPayload = new HashSet<>();
         Map<String, String> encryptedPassword1Payload = new HashMap<>();
         encryptedPassword1Payload.put("login", "root");
         encryptedPassword1Payload.put("encryptedPassword", "VGhpcyBpcyBhIGJhc2U2NCBlbmNyeXB0ZWQgcGFzc3dvcmQgc3RyaW5n");
@@ -359,8 +359,8 @@ public class KeyApiIT extends IntegrationBaseTest {
         Map<String, Object> newPayload = new HashMap<>();
         encryptedPasswordsPayload.add(encryptedPassword1Payload);
         encryptedPasswordsPayload.add(encryptedPassword2Payload);
-        newPayload.put("name", "nametest");
-        newPayload.put("login", "logintest");
+        newPayload.put("name", "newname");
+        newPayload.put("login", "newlogin");
         newPayload.put("encryptedPasswords", encryptedPasswordsPayload);
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
