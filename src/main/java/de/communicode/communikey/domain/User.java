@@ -373,13 +373,42 @@ public class User extends AbstractEntity implements Serializable {
         return Sets.newConcurrentHashSet(responsibleKeyCategories);
     }
 
-    public Map<String, String> getSubscriberInfo() {
-        Map<String, String> subscriberInfo = new HashMap<>();
-        if(getPublicKey() != null) {
-            subscriberInfo.put("user", getLogin());
-            subscriberInfo.put("publicKey", getPublicKey());
+    public SubscriberInfo getSubscriberInfo() {
+        return new SubscriberInfo(login, publicKey);
+    }
+
+    public static class SubscriberInfo {
+        private String user;
+        private String publicKey;
+
+        SubscriberInfo(String user, String publicKey) {
+            this.user = user;
+            this.publicKey = publicKey;
         }
-        return subscriberInfo;
+
+        public String getUser() {
+            return user;
+        }
+
+        public void setUser(String user) {
+            this.user = user;
+        }
+
+        public String getPublicKey() {
+            return publicKey;
+        }
+
+        public void setPublicKey(String publicKey) {
+            this.publicKey = publicKey;
+        }
+
+        @Override
+        public String toString() {
+            return "SubscriberInfo{" +
+                   "user=" + this.user + '\'' +
+                   ", publicKey=" + this.publicKey +
+                   "}";
+        }
     }
 
     @Override
@@ -400,6 +429,6 @@ public class User extends AbstractEntity implements Serializable {
                 ", keys=" + keys +
                 ", keyCategories=" + keyCategories +
                 ", responsibleKeyCategories=" + responsibleKeyCategories +
-                '}';
+                "}";
     }
 }

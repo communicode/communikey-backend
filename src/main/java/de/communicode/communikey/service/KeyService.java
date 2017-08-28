@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 
+import com.google.common.eventbus.Subscribe;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserEncryptedPassword;
@@ -260,10 +261,10 @@ public class KeyService {
      * @author dvonderbey@communicode.de
      * @since 0.15.0
      */
-    public Optional<Set<Map<String, String>>> getSubscribers(Long keyId) {
+    public Optional<Set<User.SubscriberInfo>> getSubscribers(Long keyId) {
         return get(keyId)
             .map((Key key) -> {
-                Set<Map<String, String>> publicKeys = new HashSet<>();
+                Set<User.SubscriberInfo> publicKeys = new HashSet<>();
                 if(key.getCategory() != null) {
                     key.getCategory().getGroups()
                         .forEach((UserGroup userGroup) -> userGroup.getUsers()
@@ -275,7 +276,7 @@ public class KeyService {
                 }
                 userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
                     .forEach(user -> {
-                        Map<String, String> subscriberInfo = user.getSubscriberInfo();
+                        User.SubscriberInfo subscriberInfo = user.getSubscriberInfo();
                         if(!publicKeys.contains(subscriberInfo)) {
                             publicKeys.add(subscriberInfo);
                         }
