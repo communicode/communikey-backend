@@ -11,14 +11,11 @@ import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLog
 import static de.communicode.communikey.security.SecurityUtils.isCurrentUserInRole;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toSet;
 
 import com.google.common.eventbus.Subscribe;
-import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.domain.User;
-import de.communicode.communikey.domain.UserEncryptedPassword;
-import de.communicode.communikey.domain.UserGroup;
-import de.communicode.communikey.domain.KeyCategory;
+import de.communicode.communikey.domain.*;
 import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
@@ -46,6 +43,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * The REST API service to process {@link Key} entities via a {@link KeyRepository}.
@@ -274,13 +272,12 @@ public class KeyService {
                                 }
                             }));
                 }
-                userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
-                    .forEach(user -> {
-                        User.SubscriberInfo subscriberInfo = user.getSubscriberInfo();
-                        if(!publicKeys.contains(subscriberInfo)) {
-                            publicKeys.add(subscriberInfo);
-                        }
-                    });
+                Authority adminAuthority = authorityService.get(AuthoritiesConstants.ADMIN);
+                Set<User.SubscriberInfo> publicKeys2 = userRepository.findAllByAuthorities(adminAuthority)
+                    .stream()
+                    .map(User::getSubscriberInfo)
+                    .collect(toSet());
+                publicKeys.addAll(publicKeys2);
                 return publicKeys;
             });
     }

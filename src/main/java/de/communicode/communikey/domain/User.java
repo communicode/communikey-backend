@@ -403,6 +403,23 @@ public class User extends AbstractEntity implements Serializable {
         }
 
         @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + user.hashCode();
+            result = prime * result + publicKey.hashCode();
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof SubscriberInfo))
+                return false;
+            SubscriberInfo n = (SubscriberInfo) o;
+            return n.user.equals(user) && n.publicKey.equals(publicKey);
+        }
+
+        @Override
         public String toString() {
             return "SubscriberInfo{" +
                    "user=" + this.user + '\'' +
@@ -425,7 +442,6 @@ public class User extends AbstractEntity implements Serializable {
                 ", resetDate=" + resetDate +
                 ", authorities=" + authorities +
                 ", groups=" + groups +
-//                ", encryptedPasswords=" + encryptedPasswords +
                 ", keys=" + keys +
                 ", keyCategories=" + keyCategories +
                 ", responsibleKeyCategories=" + responsibleKeyCategories +
