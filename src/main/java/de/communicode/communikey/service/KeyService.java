@@ -273,11 +273,10 @@ public class KeyService {
                             }));
                 }
                 Authority adminAuthority = authorityService.get(AuthoritiesConstants.ADMIN);
-                Set<User.SubscriberInfo> publicKeys2 = userRepository.findAllByAuthorities(adminAuthority)
+                publicKeys.addAll(userRepository.findAllByAuthorities(adminAuthority)
                     .stream()
                     .map(User::getSubscriberInfo)
-                    .collect(toSet());
-                publicKeys.addAll(publicKeys2);
+                    .collect(toSet()));
                 return publicKeys;
             });
     }
