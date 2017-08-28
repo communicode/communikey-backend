@@ -347,7 +347,7 @@ public class KeyApiIT extends IntegrationBaseTest {
     }
 
     @Test
-    public void testPostEncryptedPasswordsForSubscribers() {
+    public void testPutEncryptedPasswordsForSubscribers() {
         initializeSubscriberTestData();
         Set<Map> encryptedPasswordsPayload = new HashSet<>();
         Map<String, String> encryptedPassword1Payload = new HashMap<>();
