@@ -38,12 +38,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The REST API service to process {@link Key} entities via a {@link KeyRepository}.
@@ -260,18 +257,19 @@ public class KeyService {
      * @since 0.15.0
      */
     public Optional<Set<User.SubscriberInfo>> getSubscribers(Long keyId) {
+        Set<User.SubscriberInfo> publicKeys = new HashSet<>();
+        publicKeys.addAll(get(keyId)
+            .map(Key::getCategory)
+            .map(KeyCategory::getGroups)
+            .map(Collection::stream)
+            .orElse(Stream.empty())
+            .flatMap(userGroup -> userGroup.getUsers().stream())
+            .filter(user -> user.getPublicKey() != null)
+            .map(User::getSubscriberInfo)
+            .collect(toSet()));
+        
         return get(keyId)
             .map((Key key) -> {
-                Set<User.SubscriberInfo> publicKeys = new HashSet<>();
-                if(key.getCategory() != null) {
-                    key.getCategory().getGroups()
-                        .forEach((UserGroup userGroup) -> userGroup.getUsers()
-                            .forEach((User user) -> {
-                                if (user.getPublicKey() != null) {
-                                    publicKeys.add(user.getSubscriberInfo());
-                                }
-                            }));
-                }
                 Authority adminAuthority = authorityService.get(AuthoritiesConstants.ADMIN);
                 publicKeys.addAll(userRepository.findAllByAuthorities(adminAuthority)
                     .stream()
