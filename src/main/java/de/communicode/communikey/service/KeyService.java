@@ -258,7 +258,7 @@ public class KeyService {
      * @since 0.15.0
      */
     public Optional<Set<User.SubscriberInfo>> getSubscribers(Long keyId) {
-        Stream<User.SubscriberInfo> subscriberStream =  get(keyId)
+        Stream<User.SubscriberInfo> subscriberStream = get(keyId)
             .map(Key::getCategory)
             .map(KeyCategory::getGroups)
             .map(Collection::stream)
@@ -267,7 +267,7 @@ public class KeyService {
             .filter(user -> user.getPublicKey() != null)
             .map(User::getSubscriberInfo);
 
-        Stream<User.SubscriberInfo>  adminStream = userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
+        Stream<User.SubscriberInfo> adminStream = userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
             .stream()
             .map(User::getSubscriberInfo);
 
