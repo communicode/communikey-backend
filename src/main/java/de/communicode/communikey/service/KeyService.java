@@ -11,6 +11,7 @@ import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLog
 import static de.communicode.communikey.security.SecurityUtils.isCurrentUserInRole;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toSet;
 
@@ -257,26 +258,21 @@ public class KeyService {
      * @since 0.15.0
      */
     public Optional<Set<User.SubscriberInfo>> getSubscribers(Long keyId) {
-        Set<User.SubscriberInfo> publicKeys = new HashSet<>();
-        publicKeys.addAll(get(keyId)
+        Stream<User.SubscriberInfo> subscriberStream =  get(keyId)
             .map(Key::getCategory)
             .map(KeyCategory::getGroups)
             .map(Collection::stream)
             .orElse(Stream.empty())
             .flatMap(userGroup -> userGroup.getUsers().stream())
             .filter(user -> user.getPublicKey() != null)
-            .map(User::getSubscriberInfo)
-            .collect(toSet()));
-        
-        return get(keyId)
-            .map((Key key) -> {
-                Authority adminAuthority = authorityService.get(AuthoritiesConstants.ADMIN);
-                publicKeys.addAll(userRepository.findAllByAuthorities(adminAuthority)
-                    .stream()
-                    .map(User::getSubscriberInfo)
-                    .collect(toSet()));
-                return publicKeys;
-            });
+            .map(User::getSubscriberInfo);
+
+        Stream<User.SubscriberInfo>  adminStream = userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
+            .stream()
+            .map(User::getSubscriberInfo);
+
+        return Stream.concat(subscriberStream, adminStream)
+            .collect(collectingAndThen(toSet(), Optional::of));
     }
 
     /**
