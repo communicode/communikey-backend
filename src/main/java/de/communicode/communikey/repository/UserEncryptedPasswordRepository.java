@@ -36,5 +36,8 @@ public interface UserEncryptedPasswordRepository extends CrudRepository<UserEncr
     Set<UserEncryptedPassword> findAllByOwner(User owner);
 
     @Transactional
+    void removeAllByOwner(User owner);
+
+    @Transactional
     void deleteByKey(Key key);
 }

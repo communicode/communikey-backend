@@ -252,6 +252,11 @@ public class KeyService {
             });
     }
 
+    public void removeAllUserEncryptedPasswordsForUser(User user) {
+        userEncryptedPasswordRepository.removeAllByOwner(user);
+        log.debug("Removed all encrypted passwords for user '{}'", user.getLogin());
+    }
+
     /**
      * Returns a list of public keys and the names of the subscribers for a specific key
      * Goes through the category of the key to find all groups and their members that
