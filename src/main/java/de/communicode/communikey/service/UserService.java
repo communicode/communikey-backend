@@ -248,6 +248,7 @@ public class UserService {
                     log.debug("Rejected to generate already existing publicKey reset token '{}'", user.getPublicKeyResetToken());
                     throw new UserConflictException("publicKey reset token has already been generated");
                 }
+                user.setPublicKey(null);
                 user.setPublicKeyResetToken(SecurityUtils.generateRandomResetToken());
                 user.setPublicKeyResetDate(ZonedDateTime.now());
                 userRepository.save(user);
