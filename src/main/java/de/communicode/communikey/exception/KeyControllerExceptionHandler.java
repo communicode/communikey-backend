@@ -47,6 +47,17 @@ public class KeyControllerExceptionHandler extends GlobalControllerExceptionHand
     }
 
     /**
+     * Handles all exceptions of type {@link UserEncryptedPasswordNotFoundException}.
+     *
+     * @param exception the exception to handle
+     * @return the error as response entity
+     */
+    @ExceptionHandler(UserEncryptedPasswordNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleKeyNotFoundException(UserEncryptedPasswordNotFoundException exception) {
+        return createErrorResponse(HttpStatus.NOT_FOUND, new Timestamp(Calendar.getInstance().getTimeInMillis()), exception.getMessage());
+    }
+
+    /**
      * Handles all exceptions of type {@link HashidNotValidException}.
      *
      * @param exception the exception to handle

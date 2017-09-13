@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.toSet;
 import com.google.common.eventbus.Subscribe;
 import de.communicode.communikey.domain.*;
 import de.communicode.communikey.exception.HashidNotValidException;
+import de.communicode.communikey.exception.UserEncryptedPasswordNotFoundException;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
@@ -182,14 +183,17 @@ public class KeyService {
 
     /**
      * Gets a userEncryptedPassword for the specified hashid
-     **
+     *
      * @return a userEncryptedPassword
      */
-    public UserEncryptedPassword getUserEncryptedPassword(Long hashid) {
+    public Optional<UserEncryptedPassword> getUserEncryptedPassword(Long hashid) throws KeyNotFoundException, UserEncryptedPasswordNotFoundException {
         String login = SecurityUtils.getCurrentUserLogin();
         User user = userService.validate(login);
         Key key = validate(hashid);
-        return userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key);
+        UserEncryptedPassword userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key);
+        ofNullable(userEncryptedPassword)
+            .orElseThrow(UserEncryptedPasswordNotFoundException::new);
+        return Optional.of(userEncryptedPassword);
     }
 
     /**
