@@ -103,7 +103,7 @@ public class KeyService {
     }
 
     /**
-     * Creates new userEncryptedPassword from an array of KeyPayloadEncryptedPasswords.
+     * Creates new userEncryptedPassword from KeyPayloadEncryptedPasswords.
      *
      * @param payload the array of userEncryptedPasswords from a key payload
      */
@@ -283,7 +283,7 @@ public class KeyService {
     }
 
     /**
-     * Deletes an userEncryptedKey from a key and from the repository
+     * Deletes an userEncryptedPassword from a key and from the repository
      *
      * @param key the key of the userEncryptedPassword
      * @param userEncryptedPassword the userEncryptedPassword to delete
