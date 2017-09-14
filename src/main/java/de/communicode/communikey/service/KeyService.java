@@ -12,18 +12,19 @@ import static de.communicode.communikey.security.SecurityUtils.isCurrentUserInRo
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toSet;
 
-import com.google.common.eventbus.Subscribe;
-import de.communicode.communikey.domain.*;
+import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.KeyCategory;
+import de.communicode.communikey.domain.User;
+import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.domain.UserEncryptedPassword;
 import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.exception.UserEncryptedPasswordNotFoundException;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyPayload;
-import de.communicode.communikey.service.AuthorityService;
 import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserRepository;
@@ -33,15 +34,12 @@ import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**

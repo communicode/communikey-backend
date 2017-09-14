@@ -7,9 +7,8 @@
 package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
-import static de.communicode.communikey.controller.RequestMappings.*;
-import static de.communicode.communikey.controller.RequestParameter.API_AUTHORIZE;
 import static de.communicode.communikey.controller.RequestMappings.KEYS;
+import static de.communicode.communikey.controller.RequestMappings.KEY_ENCRYPTED_PASSWORD;
 import static de.communicode.communikey.controller.RequestMappings.KEY_HASHID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_SUBSCRIBERS;
 import static java.util.Objects.requireNonNull;
@@ -21,7 +20,6 @@ import de.communicode.communikey.exception.UserEncryptedPasswordNotFoundExceptio
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.service.KeyService;
-import de.communicode.communikey.service.payload.UserCredentialPayload;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
