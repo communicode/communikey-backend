@@ -34,6 +34,9 @@ import javax.validation.constraints.Pattern;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -124,6 +127,11 @@ public class User extends AbstractEntity implements Serializable {
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     private final Set<Key> keys = Sets.newConcurrentHashSet();
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    private final Set<UserEncryptedPassword> encryptedPasswords = Sets.newConcurrentHashSet();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
@@ -289,6 +297,10 @@ public class User extends AbstractEntity implements Serializable {
         return Sets.newConcurrentHashSet(groups);
     }
 
+    public Set<UserEncryptedPassword> getEncryptedPasswords() {
+        return Sets.newConcurrentHashSet(encryptedPasswords);
+    }
+
     public boolean addCreatedKey(Key key) {
         return keys.add(key);
     }
@@ -361,6 +373,61 @@ public class User extends AbstractEntity implements Serializable {
         return Sets.newConcurrentHashSet(responsibleKeyCategories);
     }
 
+    public SubscriberInfo getSubscriberInfo() {
+        return new SubscriberInfo(login, publicKey);
+    }
+
+    public static class SubscriberInfo {
+        private String user;
+        private String publicKey;
+
+        SubscriberInfo(String user, String publicKey) {
+            this.user = user;
+            this.publicKey = publicKey;
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public void setUser(String user) {
+            this.user = user;
+        }
+
+        public String getPublicKey() {
+            return publicKey;
+        }
+
+        public void setPublicKey(String publicKey) {
+            this.publicKey = publicKey;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + user.hashCode();
+            result = prime * result + publicKey.hashCode();
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof SubscriberInfo))
+                return false;
+            SubscriberInfo n = (SubscriberInfo) o;
+            return n.user.equals(user) && n.publicKey.equals(publicKey);
+        }
+
+        @Override
+        public String toString() {
+            return "SubscriberInfo{" +
+                   "user=" + this.user + '\'' +
+                   ", publicKey=" + this.publicKey +
+                   "}";
+        }
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -378,6 +445,6 @@ public class User extends AbstractEntity implements Serializable {
                 ", keys=" + keys +
                 ", keyCategories=" + keyCategories +
                 ", responsibleKeyCategories=" + responsibleKeyCategories +
-                '}';
+                "}";
     }
 }

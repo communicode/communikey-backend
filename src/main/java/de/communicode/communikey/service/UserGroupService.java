@@ -10,6 +10,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 import com.google.common.collect.Sets;
+import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.exception.UserGroupConflictException;
 import de.communicode.communikey.exception.UserGroupNotFoundException;
@@ -38,14 +39,16 @@ public class UserGroupService {
     private final UserRepository userRepository;
     private final KeyCategoryRepository keyCategoryRepository;
     private final UserService userService;
+    private final KeyService keyService;
 
     @Autowired
     public UserGroupService(UserGroupRepository userGroupRepository, UserService userService, UserRepository userRepository,
-            KeyCategoryRepository keyCategoryRepository) {
+            KeyCategoryRepository keyCategoryRepository, KeyService keyService) {
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
+        this.keyService = requireNonNull(keyService, "keyService must not be null!");
     }
 
     /**
@@ -98,6 +101,7 @@ public class UserGroupService {
         userGroup.getUsers().forEach(user -> {
             user.removeGroup(userGroup);
             userRepository.save(user);
+            keyService.removeObsoletePasswords(user);
             log.debug("Removed user group with name '{}' from user with login '{}'", userGroup.getName(), user.getLogin());
         });
         userGroup.getCategories().forEach(keyCategory -> {
@@ -162,14 +166,17 @@ public class UserGroupService {
      * @throws UserGroupNotFoundException if the user group with the specified ID has not been found
      */
     public UserGroup removeUser(Long userGroupId, String login) {
-        return ofNullable(userGroupRepository.findOne(userGroupId))
+        User user = userService.validate(login);
+        UserGroup returnGroup = ofNullable(userGroupRepository.findOne(userGroupId))
             .map(userGroup -> {
-                if (userGroup.removeUser(userService.validate(login))) {
+                if (userGroup.removeUser(user)) {
                     userGroupRepository.save(userGroup);
                     log.debug("Removed user with login '{}' from user group '{}'", login, userGroup.getName());
                 }
                 return userGroup;
             }).orElseThrow(() -> new UserGroupNotFoundException(userGroupId));
+        keyService.removeObsoletePasswords(user);
+        return returnGroup;
     }
 
     /**

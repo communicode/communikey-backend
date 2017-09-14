@@ -9,16 +9,21 @@ package de.communicode.communikey.api;
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
 
 import de.communicode.communikey.IntegrationBaseTest;
 import de.communicode.communikey.controller.RequestMappings;
 import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.domain.KeyCategory;
 import io.restassured.http.ContentType;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Integration tests for the {@link Key} REST API.
@@ -28,7 +33,10 @@ import java.util.Map;
  */
 public class KeyApiIT extends IntegrationBaseTest {
 
-    private Map<String, String> keyPayload = new HashMap<>();
+    private Map<String, Object> keyPayload = new HashMap<>();
+    private Key key = new Key();
+    private UserGroup userGroup = new UserGroup();
+    private KeyCategory keyCategory = new KeyCategory();
 
     @Test
     public void testCreateKeyAsAdminWithValidPayload() {
@@ -280,7 +288,6 @@ public class KeyApiIT extends IntegrationBaseTest {
 
         keyPayload.replace("name", "newName");
         keyPayload.replace("login", "newLogin");
-        keyPayload.replace("password", "newPassword");
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -292,8 +299,7 @@ public class KeyApiIT extends IntegrationBaseTest {
         .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("name", equalTo(keyPayload.get("name")))
-                .body("login", equalTo(keyPayload.get("login")))
-                .body("password", equalTo(keyPayload.get("password")));
+                .body("login", equalTo(keyPayload.get("login")));
     }
 
     @Test
@@ -324,13 +330,102 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
+    @Test
+    public void testSubscriberListOfKeyWithTwoSubscribers() {
+        initializeSubscriberTestData();
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .pathParam(KEY_ID, key.getHashid())
+        .when()
+                .get(RequestMappings.KEYS + RequestMappings.KEY_SUBSCRIBERS)
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("size()", equalTo(2))
+                .body("publicKey", hasItems(user.getPublicKey()))
+                .body("user", hasItems(user.getLogin()));
+    }
+
+    @Test
+    public void testPutEncryptedPasswordsForSubscribers() {
+        initializeSubscriberTestData();
+        Set<Map> encryptedPasswordsPayload = new HashSet<>();
+        Map<String, String> encryptedPassword1Payload = new HashMap<>();
+        encryptedPassword1Payload.put("login", "root");
+        encryptedPassword1Payload.put("encryptedPassword", "VGhpcyBpcyBhIGJhc2U2NCBlbmNyeXB0ZWQgcGFzc3dvcmQgc3RyaW5n");
+        Map<String, String> encryptedPassword2Payload = new HashMap<>();
+        encryptedPassword2Payload.put("login", "user");
+        encryptedPassword2Payload.put("encryptedPassword", "VGhpcyBpcyBhIGJhc2U2NCBlbmNyeXB0ZWQgcGFzc3dvcmQgc3RyaW5n");
+        Map<String, Object> newPayload = new HashMap<>();
+        encryptedPasswordsPayload.add(encryptedPassword1Payload);
+        encryptedPasswordsPayload.add(encryptedPassword2Payload);
+        newPayload.put("name", "newname");
+        newPayload.put("login", "newlogin");
+        newPayload.put("encryptedPasswords", encryptedPasswordsPayload);
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .pathParam(KEY_ID, key.getHashid())
+                .body(newPayload)
+        .when()
+                .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+        .then()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    private void initializeSubscriberTestData() {
+        initializeTestKey();
+        key.setCreator(user);
+        keyRepository.save(key);
+        key.setHashid(hashIds.encode(key.getId()));
+        keyRepository.save(key);
+        initializeTestUserGroup();
+        userGroup.addUser(user);
+        userGroupRepository.save(userGroup);
+        initializeTestKeyCategory();
+        keyCategory.addKey(key);
+        keyCategory.addGroup(userGroup);
+        keyCategory.setCreator(user);
+        keyCategoryRepository.save(keyCategory);
+        key.setCategory(keyCategory);
+        keyRepository.save(key);
+    }
+
+    /**
+     * Initializes the test key.
+     */
+    private void initializeTestKey() {
+        key.setName(fairy.textProducer().word(1));
+        key.setLogin(fairy.textProducer().word(1));
+        key.setNotes(fairy.textProducer().word(5));
+    }
+
+    /**
+     * Initializes the test userGroup.
+     */
+    private void initializeTestUserGroup() {
+        userGroup.setName(fairy.textProducer().word(1));
+    }
+
+    /**
+     * Initializes the test category.
+     */
+    private void initializeTestKeyCategory() {
+        keyCategory.setName(fairy.textProducer().word(1));
+    }
+
     /**
      * Initializes the test key payload.
      */
     private void initializeTestKeyPayload() {
         keyPayload.put("name", "key");
         keyPayload.put("login", "login");
-        keyPayload.put("password", "password");
         keyPayload.put("notes", "notes");
+        Map<String, String> encryptedPassword = new HashMap<>();
+        encryptedPassword.put("login", "root");
+        encryptedPassword.put("encryptedPassword", "user encrypted password content");
+        Set<Map<String, String>> encryptedPasswords = new HashSet<>();
+        encryptedPasswords.add(encryptedPassword);
+        keyPayload.put("encryptedPasswords", encryptedPasswords);
     }
 }

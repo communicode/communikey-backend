@@ -8,12 +8,15 @@ package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEYS;
+import static de.communicode.communikey.controller.RequestMappings.KEY_ENCRYPTED_PASSWORD;
 import static de.communicode.communikey.controller.RequestMappings.KEY_HASHID;
+import static de.communicode.communikey.controller.RequestMappings.KEY_SUBSCRIBERS;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.exception.KeyNotFoundException;
+import de.communicode.communikey.exception.UserEncryptedPasswordNotFoundException;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.service.KeyService;
@@ -115,6 +118,40 @@ public class KeyController {
         return keyService.get(decodeSingleValueHashid(keyHashid))
                 .map(key -> new ResponseEntity<>(key, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.FORBIDDEN));
+    }
+
+    /**
+     * Gets the subscribers of a key with the specified Hashid.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEY_SUBSCRIBERS}".
+     *
+     * @param keyHashid the Hashid of the key entity to get
+     * @return the key as response entity
+     */
+    @GetMapping(value = KEY_SUBSCRIBERS)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity getSubscribers(@PathVariable(name = KEY_ID) String keyHashid) {
+        return keyService.getSubscribers(decodeSingleValueHashid(keyHashid))
+            .map(subscribers -> new ResponseEntity<>(subscribers, HttpStatus.OK))
+            .orElseGet(() -> new ResponseEntity<>(HttpStatus.FORBIDDEN));
+    }
+
+    /**
+     * Gets the userEncryptedPassword for the specified Hashid
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEY_ENCRYPTED_PASSWORD}".
+     *
+     * @param keyHashid the Hashid of the key entity to get
+     * @return the userEncryptedPassword of the requesting user for the specified key as response entity
+     * @throws KeyNotFoundException if the Hashid is invalid and the key has not been found
+     * @throws UserEncryptedPasswordNotFoundException if the Hashid is invalid and the key has not been found
+     */
+    @GetMapping(value = KEY_ENCRYPTED_PASSWORD)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity getEncryptedPassword(@PathVariable(name = KEY_ID) String keyHashid) {
+        return keyService.getUserEncryptedPassword(decodeSingleValueHashid(keyHashid))
+            .map(userEncryptedPassword -> new ResponseEntity<>(userEncryptedPassword, HttpStatus.OK))
+            .orElseGet(() -> new ResponseEntity<>(HttpStatus.FORBIDDEN));
     }
 
     /**

@@ -23,7 +23,9 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Integration tests for the {@link KeyCategory} REST API.
@@ -36,7 +38,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
 
     private Map<String, String> keyCategoryPayload = new HashMap<>();
     private Map<String, String> userGroupPayload = new HashMap<>();
-    private Map<String, String> keyPayload = new HashMap<>();
+    private Map<String, Object> keyPayload = new HashMap<>();
 
     @Test
     public void testAddChildAsAdmin() {
@@ -237,6 +239,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
     @Test
     public void testAddKeyAsUser() {
         initializeTestKeyCategoryPayload();
+        initializeTestKeyPayload();
 
         String createdKeyCategoryHashid = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
@@ -247,11 +250,6 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .then()
                 .extract().jsonPath().getString("id");
 
-        Map<String, String> keyPayload = new HashMap<>();
-        keyPayload.put("name", fairy.textProducer().word(1));
-        keyPayload.put("login", fairy.person().getEmail());
-        keyPayload.put("password", fairy.person().getPassword());
-        keyPayload.put("notes", fairy.textProducer().word(5));
         String createdKeyHashid = given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
                 .contentType(ContentType.JSON)
@@ -870,7 +868,12 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
     private void initializeTestKeyPayload() {
         keyPayload.put("name", fairy.textProducer().word(1));
         keyPayload.put("login", fairy.person().getEmail());
-        keyPayload.put("password", fairy.person().getPassword());
         keyPayload.put("notes", fairy.textProducer().word(5));
+        Map<String, String> encryptedPassword = new HashMap<>();
+        encryptedPassword.put("login", "root");
+        encryptedPassword.put("encryptedPassword", "user encrypted password content");
+        Set<Map> encryptedPasswords = new HashSet<>();
+        encryptedPasswords.add(encryptedPassword);
+        keyPayload.put("encryptedPasswords", encryptedPasswords);
     }
 }

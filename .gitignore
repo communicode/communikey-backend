@@ -8,6 +8,7 @@
 # +---------------+
 # https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 out/
+.idea
 .idea/*
 !.idea/runConfigurations
 !.idea/compiler.xml

@@ -105,6 +105,10 @@ public final class CommunikeyProperties {
 
             private String lastName = "root";
 
+            private String publicKey = "-----BEGIN PUBLIC KEY-----" +
+                                       "THIS IS JUST AN EXAMPLE !!" +
+                                       "-----END PUBLIC KEY-----";
+
             public String getLogin() {
                 return this.login;
             }
@@ -143,6 +147,14 @@ public final class CommunikeyProperties {
 
             public void setLastName(String lastName) {
                 this.lastName = lastName;
+            }
+
+            public String getPublicKey() {
+                return this.publicKey;
+            }
+
+            public void setPublicKey(String publicKey) {
+                this.publicKey = publicKey;
             }
 
             @Override
