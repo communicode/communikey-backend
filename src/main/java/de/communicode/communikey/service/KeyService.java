@@ -82,6 +82,7 @@ public class KeyService {
      */
     public Key create(KeyPayload payload) {
         Key key = new Key();
+        if (!checkKeyCreationPrivilege(payload)) throw new KeyNotAccessibleByUserException();
         String userLogin = getCurrentUserLogin();
         User user = userService.validate(userLogin);
         key.setCreator(user);

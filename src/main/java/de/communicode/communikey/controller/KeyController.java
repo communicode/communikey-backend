@@ -70,12 +70,9 @@ public class KeyController {
     @PostMapping
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> create(@Valid @RequestBody KeyPayload payload) {
-        if (keyService.checkKeyCreationPrivilege(payload)) {
-            return new ResponseEntity<>(keyService.create(payload), HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(keyService.create(payload), HttpStatus.CREATED);
     }
-
+    
     /**
      * Deletes the key with the specified Hashid.
      *
