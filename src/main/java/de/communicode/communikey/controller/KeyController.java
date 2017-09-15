@@ -70,7 +70,10 @@ public class KeyController {
     @PostMapping
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> create(@Valid @RequestBody KeyPayload payload) {
-        return new ResponseEntity<>(keyService.create(payload), HttpStatus.CREATED);
+        if (keyService.checkKeyCreationPrivilege(payload)) {
+            return new ResponseEntity<>(keyService.create(payload), HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     /**

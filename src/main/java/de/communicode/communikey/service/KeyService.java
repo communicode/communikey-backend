@@ -20,6 +20,7 @@ import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.domain.UserEncryptedPassword;
 import de.communicode.communikey.exception.HashidNotValidException;
+import de.communicode.communikey.exception.KeyNotAccessibleByUserException;
 import de.communicode.communikey.exception.UserEncryptedPasswordNotFoundException;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
@@ -204,6 +205,9 @@ public class KeyService {
      */
     public Key update(Long keyId, KeyPayload payload) {
         Key key = validate(keyId);
+        for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload.getEncryptedPasswords()) {
+            if (!checkKeyCategoryAccess(key, encryptedPasswordsPayload)) throw new KeyNotAccessibleByUserException();
+        }
         key.setLogin(payload.getLogin());
         key.setName(payload.getName());
         key.setLogin(payload.getLogin());
@@ -248,6 +252,52 @@ public class KeyService {
                     deleteUserEncryptedPassword(key, userEncryptedPassword);
                 }
             });
+    }
+
+    /**
+     * Checks if the given login in a payload object contradicts the current login.
+     * Prevents users from adding a encryptedPassword in the encryptedPasswords set for
+     * other users they know the login of, since this is considered a malicious action.
+     *
+     * @param payload the payload to inspect
+     * @author lleifermann@communicode.de
+     * @return boolean
+     * @since 0.15.0
+     */
+
+    public boolean checkKeyCreationPrivilege(KeyPayload payload) {
+        for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload.getEncryptedPasswords()) {
+            String encryptedPasswordLogin = encryptedPasswordsPayload.getLogin();
+            if (encryptedPasswordLogin.equals(getCurrentUserLogin())){
+                return true;
+            }
+        }
+        log.debug("User '{}' tried to add encryptedPassword for different login", getCurrentUserLogin());
+        return false;
+    }
+
+    /**
+     * Checks if, given a key and a KeyPayloadEncryptedPasswords, a encrypted password for
+     * the owner exists in the Set.
+     * Returns true, if the user who intents to PUT a new encrypted Password in the Set has indeed
+     * access to it. Otherwise returns false
+     *
+     * @param key the key
+     * @param payload the payload to inspect
+     * @author lleifermann@communicode.de
+     * @return boolean
+     * @since 0.15.0
+     */
+
+    public boolean checkKeyCategoryAccess(Key key, KeyPayloadEncryptedPasswords payload) {
+        KeyCategory keyCategory = key.getCategory();
+        User user = userService.validate(payload.getLogin());
+        if(user.getAuthorities().contains(authorityService.get(AuthoritiesConstants.ADMIN)))
+            return true;
+        for (UserGroup userGroup:keyCategory.getGroups()) {
+            if(user.getGroups().contains(userGroup)) return true;
+        }
+        return false;
     }
 
     public void removeAllUserEncryptedPasswordsForUser(User user) {
