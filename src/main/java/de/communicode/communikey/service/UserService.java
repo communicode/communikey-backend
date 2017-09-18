@@ -17,6 +17,7 @@ import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.domain.UserEncryptedPassword;
 import de.communicode.communikey.exception.ActivationTokenNotFoundException;
 import de.communicode.communikey.exception.AuthorityNotFoundException;
 import de.communicode.communikey.exception.ResetTokenNotFoundException;
@@ -149,6 +150,21 @@ public class UserService {
     public User addKey(String userLogin, Key key) {
         User user = validate(userLogin);
         user.addCreatedKey(key);
+        return userRepository.save(user);
+    }
+
+    /**
+     * Adds the encrypted password to the user with the specified login.
+     *
+     * @param userLogin the login of the user the key will be added to
+     * @param userEncryptedPassword the userEncryptedPassword to be added
+     * @return the updated user
+     * @throws UserNotFoundException if the user with the specified login has not been found
+     * @since 0.15.0
+     */
+    public User addUserEncryptedPassword(String userLogin, UserEncryptedPassword userEncryptedPassword) {
+        User user = validate(userLogin);
+        user.addUserEncryptedPassword(userEncryptedPassword);
         return userRepository.save(user);
     }
 
