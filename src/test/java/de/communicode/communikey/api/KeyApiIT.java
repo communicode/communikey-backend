@@ -11,6 +11,8 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import de.communicode.communikey.IntegrationBaseTest;
 import de.communicode.communikey.controller.RequestMappings;
 import de.communicode.communikey.domain.Key;
@@ -376,22 +378,20 @@ public class KeyApiIT extends IntegrationBaseTest {
     @Test
     public void testEncryptedPasswordDeletionAfterLosingAccessToUserGroup() {
         initializeSubscriberTestData();
-        Set<Map> encryptedPasswordsPayload = new HashSet<>();
-
-        Map<String, String> encryptedPassword1Payload = new HashMap<>();
-        encryptedPassword1Payload.put("login", "root");
-        encryptedPassword1Payload.put("encryptedPassword", "VGhpcyBpcyBhIGJhc2U2NCBlbmNyeXB0ZWQgcGFzc3dvcmQgc3RyaW5n");
-
-        Map<String, String> encryptedPassword2Payload = new HashMap<>();
-        encryptedPassword2Payload.put("login", "user");
-        encryptedPassword2Payload.put("encryptedPassword", "VGhpcyBpcyBhIGJhc2U2NCBlbmNyeXB0ZWQgcGFzc3dvcmQgc3RyaW5n");
-
-        Map<String, Object> newPayload = new HashMap<>();
-        encryptedPasswordsPayload.add(encryptedPassword1Payload);
-        encryptedPasswordsPayload.add(encryptedPassword2Payload);
-        newPayload.put("name", "newname");
-        newPayload.put("login", "newlogin");
-        newPayload.put("encryptedPasswords", encryptedPasswordsPayload);
+        ImmutableMap<String, Object> newPayload = ImmutableMap.<String, Object>builder()
+            .put("name", "newname")
+            .put("login", "newlogin")
+            .put("encryptedPasswords", ImmutableSet.<Map>builder()
+                .add(ImmutableMap.<String, String>builder()
+                    .put("login", "root")
+                    .put("encryptedPassword", "VGhpcyBpcyBhIGJhc2U2NCBlbmNyeXB0ZWQgcGFzc3dvcmQgc3RyaW5n")
+                    .build())
+                .add(ImmutableMap.<String, String>builder()
+                    .put("login", "user")
+                    .put("encryptedPassword", "VGhpcyBpcyBhIGJhc2U2NCBlbmNyeXB0ZWQgcGFzc3dvcmQgc3RyaW5n")
+                    .build())
+                .build())
+            .build();
 
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
