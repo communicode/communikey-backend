@@ -171,6 +171,8 @@ public class UserGroupService {
             .map(userGroup -> {
                 if (userGroup.removeUser(user)) {
                     userGroupRepository.save(userGroup);
+                    user.removeGroup(userGroup);
+                    userRepository.save(user);
                     log.debug("Removed user with login '{}' from user group '{}'", login, userGroup.getName());
                 }
                 return userGroup;

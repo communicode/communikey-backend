@@ -373,6 +373,63 @@ public class KeyApiIT extends IntegrationBaseTest {
                 .statusCode(HttpStatus.OK.value());
     }
 
+    @Test
+    public void testEncryptedPasswordDeletionAfterLosingAccessToUserGroup() {
+        initializeSubscriberTestData();
+        Set<Map> encryptedPasswordsPayload = new HashSet<>();
+        Map<String, String> encryptedPassword1Payload = new HashMap<>();
+        encryptedPassword1Payload.put("login", "root");
+        encryptedPassword1Payload.put("encryptedPassword", "VGhpcyBpcyBhIGJhc2U2NCBlbmNyeXB0ZWQgcGFzc3dvcmQgc3RyaW5n");
+        Map<String, String> encryptedPassword2Payload = new HashMap<>();
+        encryptedPassword2Payload.put("login", "user");
+        encryptedPassword2Payload.put("encryptedPassword", "VGhpcyBpcyBhIGJhc2U2NCBlbmNyeXB0ZWQgcGFzc3dvcmQgc3RyaW5n");
+        Map<String, Object> newPayload = new HashMap<>();
+        encryptedPasswordsPayload.add(encryptedPassword1Payload);
+        encryptedPasswordsPayload.add(encryptedPassword2Payload);
+        newPayload.put("name", "newname");
+        newPayload.put("login", "newlogin");
+        newPayload.put("encryptedPasswords", encryptedPasswordsPayload);
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .pathParam(KEY_ID, key.getHashid())
+                .body(newPayload)
+        .when()
+                .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+        .then()
+                .statusCode(HttpStatus.OK.value());
+
+        given()
+                .auth().oauth2(userOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .pathParam(KEY_ID, key.getHashid())
+        .when()
+                .get(RequestMappings.KEYS + RequestMappings.KEY_ENCRYPTED_PASSWORD)
+        .then()
+                .statusCode(HttpStatus.OK.value());
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .pathParam("userGroupId", userGroup.getId())
+                .param("login", user.getLogin())
+        .when()
+                .delete(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_USERS)
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .root("users")
+                .body("size()", equalTo(0));
+
+        given()
+                .auth().oauth2(userOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .pathParam(KEY_ID, key.getHashid())
+        .when()
+                .get(RequestMappings.KEYS + RequestMappings.KEY_ENCRYPTED_PASSWORD)
+        .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+
+    }
+
     private void initializeSubscriberTestData() {
         initializeTestKey();
         key.setCreator(user);
