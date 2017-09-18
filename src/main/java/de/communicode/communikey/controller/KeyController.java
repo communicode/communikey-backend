@@ -72,7 +72,7 @@ public class KeyController {
     public ResponseEntity<Key> create(@Valid @RequestBody KeyPayload payload) {
         return new ResponseEntity<>(keyService.create(payload), HttpStatus.CREATED);
     }
-    
+
     /**
      * Deletes the key with the specified Hashid.
      *

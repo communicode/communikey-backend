@@ -257,6 +257,8 @@ public class KeyService {
 
     /**
      * Checks if the given login in a payload object contradicts the current login.
+     * Only allows the creator himself to own an userEncryptedPassword on key
+     * creation.
      * Prevents users from adding a encryptedPassword in the encryptedPasswords set for
      * other users they know the login of, since this is considered a malicious action.
      *
@@ -273,13 +275,12 @@ public class KeyService {
                 return true;
             }
         }
-        log.debug("User '{}' tried to add encryptedPassword for different login", getCurrentUserLogin());
+        log.info("User '{}' tried to add an encryptedPassword for a different login", getCurrentUserLogin());
         return false;
     }
 
     /**
-     * Checks if, given a key and a KeyPayloadEncryptedPasswords, a encrypted password for
-     * the owner exists in the Set.
+     * Checks if the intended owner of the userEncryptedPassword has access to the key itself.
      * Returns true, if the user who intents to PUT a new encrypted Password in the Set has indeed
      * access to it. Otherwise returns false
      *
@@ -298,6 +299,7 @@ public class KeyService {
         for (UserGroup userGroup:keyCategory.getGroups()) {
             if(user.getGroups().contains(userGroup)) return true;
         }
+        log.info("User '{}' tried to add an encryptedPassword for user {} without access to the key.", getCurrentUserLogin(), user.getLogin());
         return false;
     }
 
