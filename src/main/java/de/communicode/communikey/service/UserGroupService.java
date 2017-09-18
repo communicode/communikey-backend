@@ -23,6 +23,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -169,12 +171,11 @@ public class UserGroupService {
         User user = userService.validate(login);
         UserGroup returnGroup = ofNullable(userGroupRepository.findOne(userGroupId))
             .map(userGroup -> {
-                if (userGroup.removeUser(user)) {
-                    userGroupRepository.save(userGroup);
-                    user.removeGroup(userGroup);
-                    userRepository.save(user);
-                    log.debug("Removed user with login '{}' from user group '{}'", login, userGroup.getName());
-                }
+                userGroup.removeUser(user);
+                userGroupRepository.save(userGroup);
+                user.removeGroup(userGroup);
+                userRepository.save(user);
+                log.debug("Removed user with login '{}' from user group '{}'", login, userGroup.getName());
                 return userGroup;
             }).orElseThrow(() -> new UserGroupNotFoundException(userGroupId));
         keyService.removeObsoletePasswords(user);
