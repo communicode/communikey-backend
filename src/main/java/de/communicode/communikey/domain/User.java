@@ -373,6 +373,7 @@ public class User extends AbstractEntity implements Serializable {
         return Sets.newConcurrentHashSet(responsibleKeyCategories);
     }
 
+    @JsonIgnore
     public SubscriberInfo getSubscriberInfo() {
         return new SubscriberInfo(login, publicKey);
     }
