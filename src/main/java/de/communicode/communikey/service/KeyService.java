@@ -293,11 +293,11 @@ public class KeyService {
      */
     private void deleteUserEncryptedPassword(Key key, UserEncryptedPassword userEncryptedPassword) {
         User owner = userEncryptedPassword.getOwner();
+        owner.removeUserEncryptedPassword(userEncryptedPassword);
+        userRepository.save(owner);
         key.removeUserEncryptedPassword(userEncryptedPassword);
         keyRepository.save(key);
         userEncryptedPasswordRepository.delete(userEncryptedPassword);
-        owner.removeUserEncryptedPassword(userEncryptedPassword);
-        userRepository.save(owner);
         log.debug("Removed encryptedPassword '{}’ of key '{}' of user {}.",
             userEncryptedPassword.getId(),
             key.getId(),
