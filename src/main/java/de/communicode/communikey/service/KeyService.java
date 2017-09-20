@@ -115,6 +115,7 @@ public class KeyService {
         userEncryptedPasswordRepository.save(newUserEncryptedPassword);
         key.addUserEncryptedPassword(newUserEncryptedPassword);
         keyRepository.save(key);
+        userService.addUserEncryptedPassword(payload.getLogin(), newUserEncryptedPassword);
         log.debug("Created userencryptedPassword for key {} and user {}", key.getId(), payload.getLogin());
     }
 
@@ -292,6 +293,8 @@ public class KeyService {
      */
     private void deleteUserEncryptedPassword(Key key, UserEncryptedPassword userEncryptedPassword) {
         User owner = userEncryptedPassword.getOwner();
+        owner.removeUserEncryptedPassword(userEncryptedPassword);
+        userRepository.save(owner);
         key.removeUserEncryptedPassword(userEncryptedPassword);
         keyRepository.save(key);
         userEncryptedPasswordRepository.delete(userEncryptedPassword);
