@@ -35,6 +35,13 @@ public interface UserEncryptedPasswordRepository extends CrudRepository<UserEncr
 
     Set<UserEncryptedPassword> findAllByOwner(User owner);
 
+    /**
+     * Finds all UserEncryptedPassword entities of the repository with the specified key.
+     *
+     * @return a collection of found UserEncryptedPassword entities
+     */
+    Set<UserEncryptedPassword> findAllByKey(Key key);
+
     @Transactional
     void removeAllByOwner(User owner);
 

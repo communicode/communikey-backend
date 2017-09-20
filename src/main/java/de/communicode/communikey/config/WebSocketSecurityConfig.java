@@ -33,7 +33,7 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
                               SimpMessageType.UNSUBSCRIBE,
                               SimpMessageType.DISCONNECT).permitAll()
             .simpDestMatchers("/topic/**", "/queue/**", "/app/**").authenticated()
-            .simpSubscribeDestMatchers("/topic/**", "/queue/**", "/app/**").authenticated()
+            .simpSubscribeDestMatchers("/topic/**", "/queue/**", "/app/**", "/user/**").authenticated()
             .simpTypeMatchers(SimpMessageType.MESSAGE, SimpMessageType.SUBSCRIBE).denyAll()
             .anyMessage().denyAll();
     }

@@ -95,4 +95,14 @@ public final class SecurityUtils {
     public static String generateRandomResetToken() {
         return RandomStringUtils.randomNumeric(RANDOM_MIN_LENGTH);
     }
+
+    /**
+     * Generates a random encryption job token.
+     *
+     * @return the generated token
+     * @since 0.15.0
+     */
+    public static String generateRandomJobToken() {
+        return RandomStringUtils.randomAlphanumeric(RANDOM_MIN_LENGTH);
+    }
 }

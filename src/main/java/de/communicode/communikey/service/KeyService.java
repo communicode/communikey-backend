@@ -21,6 +21,7 @@ import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.domain.UserEncryptedPassword;
 import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.exception.UserEncryptedPasswordNotFoundException;
+import de.communicode.communikey.repository.EncryptionJobRepository;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
@@ -34,8 +35,10 @@ import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
@@ -59,12 +62,15 @@ public class KeyService {
     private final Hashids hashids;
     private final UserRepository userRepository;
     private final AuthorityService authorityService;
+    private final EncryptionJobService encryptionJobService;
+    private final EncryptionJobRepository encryptionJobRepository;
 
     @Autowired
     public KeyService(KeyRepository keyRepository, @Lazy KeyCategoryService keyCategoryService,
                       UserService userRestService, Hashids hashids, UserEncryptedPasswordRepository
                       userEncryptedPasswordRepository, UserRepository userRepository,
-                      AuthorityService authorityService) {
+                      AuthorityService authorityService, @Lazy EncryptionJobService encryptionJobService,
+                      EncryptionJobRepository encryptionJobRepository) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.userEncryptedPasswordRepository = requireNonNull(userEncryptedPasswordRepository, "userEncryptedPasswordRepository must not be null!");
         this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
@@ -72,6 +78,8 @@ public class KeyService {
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.authorityService = requireNonNull(authorityService, "authorityService must not be null!");
+        this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
+        this.encryptionJobRepository = requireNonNull(encryptionJobRepository, "encryptionJobRepository must not be null!");
     }
 
     /**
@@ -128,6 +136,7 @@ public class KeyService {
     public void delete(Long keyId) throws KeyNotFoundException {
         Key key = validate(keyId);
         userEncryptedPasswordRepository.deleteByKey(key);
+        encryptionJobRepository.deleteByKey(key);
         keyRepository.delete(key);
         log.debug("Deleted key with ID '{}'", keyId);
     }
@@ -209,7 +218,17 @@ public class KeyService {
         key.setName(payload.getName());
         key.setLogin(payload.getLogin());
         key.setNotes(payload.getNotes());
+        key.getUserEncryptedPasswords().stream()
+            .forEach(userEncryptedPassword -> {
+                userEncryptedPassword.getOwner().removeUserEncryptedPassword(userEncryptedPassword);
+                userRepository.save(userEncryptedPassword.getOwner());
+                log.debug("Removed userEncryptedPassword with id '{}' for user '{}'",
+                            userEncryptedPassword.getId(),
+                            userEncryptedPassword.getOwner().getId());
+                });
+        key.removeAllUserEncryptedPasswords();
         key = keyRepository.save(key);
+        userEncryptedPasswordRepository.deleteByKey(key);
         for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload.getEncryptedPasswords()) {
             UserEncryptedPassword userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(
                 userService.validate(encryptedPasswordsPayload.getLogin()), validate(keyId));
@@ -221,6 +240,7 @@ public class KeyService {
             }
         }
         key = keyRepository.save(key);
+        encryptionJobService.createForKey(key);
         return key;
     }
 
@@ -266,21 +286,32 @@ public class KeyService {
      * @since 0.15.0
      */
     public Optional<Set<User.SubscriberInfo>> getSubscribers(Long keyId) {
-        Stream<User.SubscriberInfo> subscriberStream = get(keyId)
+        return getAccessors(validate(keyId)).stream()
+            .map(User::getSubscriberInfo)
+            .collect(collectingAndThen(toSet(), Optional::of));
+    }
+
+    /**
+     * Returns a set of Users that should have access to a key and are viable to get an encrypted password.
+     *
+     * @param key the key of which the accessors are wanted
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public Set<User> getAccessors(Key key) {
+        Stream<User> subscriberStream = Optional.of(key)
             .map(Key::getCategory)
             .map(KeyCategory::getGroups)
             .map(Collection::stream)
             .orElse(Stream.empty())
             .flatMap(userGroup -> userGroup.getUsers().stream())
-            .filter(user -> user.getPublicKey() != null)
-            .map(User::getSubscriberInfo);
+            .filter(user -> user.getPublicKey() != null);
 
-        Stream<User.SubscriberInfo> adminStream = userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
-            .stream()
-            .map(User::getSubscriberInfo);
+        Stream<User> adminStream = userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
+            .stream();
 
         return Stream.concat(subscriberStream, adminStream)
-            .collect(collectingAndThen(toSet(), Optional::of));
+            .collect(toSet());
     }
 
     /**
@@ -302,6 +333,20 @@ public class KeyService {
             userEncryptedPassword.getId(),
             key.getId(),
             owner.getId());
+    }
+
+    /**
+     * Returns a list of users that own a UserEncryptedPassword of the specified key.
+     *
+     * @param key the key the user should have an userEncryptedPassword of
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public Set<User.SubscriberInfo> getQualifiedEncoders(Key key) {
+        return userEncryptedPasswordRepository.findAllByKey(key).stream()
+            .map(UserEncryptedPassword::getOwner)
+            .map(User::getSubscriberInfo)
+            .collect(toSet());
     }
 
     /**

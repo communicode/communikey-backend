@@ -161,7 +161,7 @@ public class Key extends AbstractEntity implements Serializable {
         return this.userEncryptedPasswords.removeAll(userEncryptedPassword);
     }
 
-    public void removeAllUserEncryptedPassword() {
+    public void removeAllUserEncryptedPasswords() {
         userEncryptedPasswords.clear();
     }
 
