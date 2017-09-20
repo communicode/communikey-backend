@@ -298,7 +298,27 @@ public class User extends AbstractEntity implements Serializable {
     }
 
     public Set<UserEncryptedPassword> getEncryptedPasswords() {
-        return Sets.newConcurrentHashSet(encryptedPasswords);
+        return Sets.newConcurrentHashSet(this.encryptedPasswords);
+    }
+
+    public boolean addUserEncryptedPassword(UserEncryptedPassword userEncryptedPassword) {
+        return this.encryptedPasswords.add(userEncryptedPassword);
+    }
+
+    public boolean addUserEncryptedPasswords(Set<UserEncryptedPassword> userEncryptedPasswords) {
+        return this.encryptedPasswords.addAll(userEncryptedPasswords);
+    }
+
+    public boolean removeUserEncryptedPassword(UserEncryptedPassword userEncryptedPassword) {
+        return this.encryptedPasswords.remove(userEncryptedPassword);
+    }
+
+    public boolean removeUserEncryptedPasswords(Set<UserEncryptedPassword> userEncryptedPasswords) {
+        return this.encryptedPasswords.removeAll(userEncryptedPasswords);
+    }
+
+    public void removeAllUserEncryptedPasswords() {
+        this.encryptedPasswords.clear();
     }
 
     public boolean addCreatedKey(Key key) {
