@@ -8,6 +8,7 @@ package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.controller.PathVariables.KEYCATEGORY_ID;
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
+import static de.communicode.communikey.controller.PathVariables.JOB_TOKEN;
 
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.Key;
@@ -154,6 +155,37 @@ public final class RequestMappings {
      * @since 0.3.0
      */
     public static final String AUTHORITIES_NAME = "/{authorityName}";
+
+    /**
+     * The messaging queue endpoint.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE = "/queue";
+
+    /**
+     * The user messaging reply endpoint.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE_REPLY = QUEUE + "/reply";
+
+    /**
+     * The user messaging reply endpoint.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE_JOB_ABORT = QUEUE + "/encryption/jobs/aborts";
+
+    /**
+     * The endpoint for {@link Key} entities.
+     */
+    public static final String JOBS = "/jobs";
+
+    /**
+     * The request parameter for a {@link Key} entity Hashid.
+     */
+    public static final String FULFILL = "/{" + JOB_TOKEN + "}";
 
     private RequestMappings() {}
 }

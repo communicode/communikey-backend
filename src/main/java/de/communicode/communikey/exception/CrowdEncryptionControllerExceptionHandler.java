@@ -7,13 +7,10 @@
 package de.communicode.communikey.exception;
 
 import de.communicode.communikey.controller.CrowdEncryptionController;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import de.communicode.communikey.service.payload.EncryptionJobStatusPayload;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.sql.Timestamp;
-import java.util.Calendar;
 
 /**
  * The exception handler for the {@link CrowdEncryptionController} that returns a error as response entity.
@@ -30,8 +27,9 @@ public class CrowdEncryptionControllerExceptionHandler extends GlobalControllerE
      * @param exception the exception to handle
      * @return the error as response entity
      */
-    @ExceptionHandler(EncryptionJobNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleKeyConflictException(EncryptionJobNotFoundException exception) {
-        return createErrorResponse(HttpStatus.NOT_FOUND, new Timestamp(Calendar.getInstance().getTimeInMillis()), exception.getMessage());
+    @MessageExceptionHandler(EncryptionJobNotFoundException.class)
+    @SendToUser(value="/queue/errors")
+    public EncryptionJobStatusPayload handleKeyConflictException(EncryptionJobNotFoundException exception) {
+        return new EncryptionJobStatusPayload("Error: " + exception);
     }
 }

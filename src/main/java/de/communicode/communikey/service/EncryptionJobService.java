@@ -15,14 +15,16 @@ import de.communicode.communikey.repository.EncryptionJobRepository;
 import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
 import de.communicode.communikey.repository.UserRepository;
-import de.communicode.communikey.security.SecurityUtils;
+import de.communicode.communikey.service.payload.EncryptionJobAbortPayload;
 import de.communicode.communikey.service.payload.EncryptionJobPayload;
+import de.communicode.communikey.service.payload.EncryptionJobStatusPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_JOB_ABORT;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -72,7 +74,7 @@ public class EncryptionJobService {
     }
 
     /**
-     * Adds a key category as a child of a parent key category.
+     * Creates encryption jobs for a key.
      *
      * @param key the key that should be encrypted
      */
@@ -97,7 +99,7 @@ public class EncryptionJobService {
     private void advertise(EncryptionJob encryptionJob) {
         keyService.getQualifiedEncoders(encryptionJob.getKey())
             .forEach(subscriberInfo -> {
-                messagingTemplate.convertAndSendToUser(subscriberInfo.getUser(), "/queue/encryptionJobs", encryptionJob);
+                messagingTemplate.convertAndSendToUser(subscriberInfo.getUser(), "/queue/encryption/jobs", encryptionJob);
                 log.debug("Sent out advertisement for EncryptionJob '{}' and user '{}'.", encryptionJob.getId(), subscriberInfo.getUser());
             });
         log.debug("Sent out advertisements for EncryptionJob '{}'.", encryptionJob.getId());
@@ -119,26 +121,33 @@ public class EncryptionJobService {
      *
      * @param encryptionJobPayload the encryptionJobPayload that should fulfill an encryptionJob
      */
-    public void fulfill(EncryptionJobPayload encryptionJobPayload) {
-        EncryptionJob encryptionJob = validate(encryptionJobPayload.getToken());
+    public EncryptionJobStatusPayload fulfill(String jobToken, EncryptionJobPayload encryptionJobPayload) {
+        EncryptionJob encryptionJob = validate(jobToken);
         Key key = encryptionJob.getKey();
         User user = encryptionJob.getUser();
 
-        UserEncryptedPassword userEncryptedPassword = new UserEncryptedPassword();
-        userEncryptedPassword.setOwner(user);
-        userEncryptedPassword.setKey(key);
-        userEncryptedPassword.setPassword(encryptionJobPayload.getEncryptedPassword());
-        userEncryptedPasswordRepository.save(userEncryptedPassword);
-        user.addUserEncryptedPassword(userEncryptedPassword);
-        userRepository.save(user);
-        key.addUserEncryptedPassword(userEncryptedPassword);
-        keyRepository.save(key);
+        UserEncryptedPassword userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key);
 
-        encryptionJobRepository.deleteByToken(encryptionJobPayload.getToken());
+        if(userEncryptedPassword != null) {
+            log.debug("Websocket- Updating old userEncryptedPassword");
+            userEncryptedPassword.setPassword(encryptionJobPayload.getEncryptedPassword());
+            userEncryptedPasswordRepository.save(userEncryptedPassword);
+        } else {
+            log.debug("Websocket- Creating new userEncryptedPassword");
+            UserEncryptedPassword newUserEncryptedPassword = new UserEncryptedPassword();
+            newUserEncryptedPassword.setOwner(user);
+            newUserEncryptedPassword.setKey(key);
+            newUserEncryptedPassword.setPassword(encryptionJobPayload.getEncryptedPassword());
+            userEncryptedPasswordRepository.save(newUserEncryptedPassword);
+            user.addUserEncryptedPassword(newUserEncryptedPassword);
+            userRepository.save(user);
+            key.addUserEncryptedPassword(newUserEncryptedPassword);
+            keyRepository.save(key);
+        }
+        encryptionJobRepository.deleteByToken(jobToken);
 
-        messagingTemplate.convertAndSendToUser(SecurityUtils.getCurrentUserLogin(), "/queue/reply", "Encryption succeeded!");
-        messagingTemplate.convertAndSend("/queue/encryptionJobAborts", "Abort job with token ASDASQ12A!");
-
+        messagingTemplate.convertAndSend(QUEUE_JOB_ABORT, new EncryptionJobAbortPayload(jobToken));
         log.debug("Fulfilled encryptionJob with ID '{}' for user '{}' and key '{}'.", encryptionJob.getId(), user.getId(), key.getId());
+        return new EncryptionJobStatusPayload("Success");
     }
 }

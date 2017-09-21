@@ -233,9 +233,11 @@ public class KeyService {
             UserEncryptedPassword userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(
                 userService.validate(encryptedPasswordsPayload.getLogin()), validate(keyId));
             if(userEncryptedPassword != null) {
+                log.debug("HTTP- Updating old userEncryptedPassword");
                 userEncryptedPassword.setPassword(encryptedPasswordsPayload.getEncryptedPassword());
                 userEncryptedPasswordRepository.save(userEncryptedPassword);
             } else {
+                log.debug("HTTP- Creating new userEncryptedPassword");
                 createUserEncryptedPasswords(key, encryptedPasswordsPayload);
             }
         }

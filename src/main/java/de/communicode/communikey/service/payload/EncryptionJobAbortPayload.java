@@ -10,23 +10,27 @@ import de.communicode.communikey.domain.EncryptionJob;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
- * A payload object for a {@link EncryptionJob} fulfillment.
+ * A payload object for a {@link EncryptionJob} abort.
  *
  * @author dvonderbey@communicode.de
  * @since 0.15.0
  */
-public class EncryptionJobPayload {
+public class EncryptionJobAbortPayload {
 
     @NotBlank
-    private String encryptedPassword;
+    private String token;
 
-    public EncryptionJobPayload() {}
+    public EncryptionJobAbortPayload() {}
 
-    public String getEncryptedPassword() {
-        return encryptedPassword;
+    public EncryptionJobAbortPayload(String token) {
+        this.token = token;
     }
 
-    public void setEncryptedPassword(String encryptedPassword) {
-        this.encryptedPassword = encryptedPassword;
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
