@@ -10,10 +10,7 @@ import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLog
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
-import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.domain.KeyCategory;
-import de.communicode.communikey.domain.User;
-import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.domain.*;
 import de.communicode.communikey.exception.KeyCategoryConflictException;
 import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import de.communicode.communikey.exception.KeyNotFoundException;
@@ -53,10 +50,13 @@ public class KeyCategoryService {
     private final UserGroupService userGroupService;
     private final UserGroupRepository userGroupRepository;
     private final Hashids hashids;
+    private final EncryptionJobService encryptionJobService;
 
     @Autowired
-    public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService, KeyService keyService, KeyRepository keyRepository,
-                              UserRepository userRepository, UserGroupService userGroupService, UserGroupRepository userGroupRepository, Hashids hashids) {
+    public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService,
+                              KeyService keyService, KeyRepository keyRepository, UserRepository userRepository,
+                              UserGroupService userGroupService, UserGroupRepository userGroupRepository,
+                              Hashids hashids, EncryptionJobService encryptionJobService) {
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
@@ -65,6 +65,7 @@ public class KeyCategoryService {
         this.userGroupService = requireNonNull(userGroupService, "userGroupService must not be null!");
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
+        this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
     }
 
     /**
@@ -114,8 +115,10 @@ public class KeyCategoryService {
         if (keyCategory.addGroup(userGroup)) {
             userGroup.addCategory(keyCategory);
             userGroupRepository.save(userGroup);
+            keyCategoryRepository.save(keyCategory);
+            encryptionJobService.createForCategoryForUsergroup(keyCategory, userGroup);
             log.debug("Added user group '{}' to key category with ID '{}'", userGroup.getName(), keyCategoryId);
-            return keyCategoryRepository.save(keyCategory);
+            return (keyCategory);
         }
          return keyCategory;
     }
@@ -136,6 +139,7 @@ public class KeyCategoryService {
         key = keyRepository.save(key);
         keyCategory.addKey(key);
         keyCategory = keyCategoryRepository.save(keyCategory);
+        encryptionJobService.createForKeyInCategory(key, keyCategory);
         log.debug("Added key with ID '{}' to key category with ID '{}'", keyId, keyCategoryId);
         return keyCategory;
     }

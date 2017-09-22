@@ -42,15 +42,17 @@ public class UserGroupService {
     private final KeyCategoryRepository keyCategoryRepository;
     private final UserService userService;
     private final KeyService keyService;
+    private final EncryptionJobService encryptionJobService;
 
     @Autowired
     public UserGroupService(UserGroupRepository userGroupRepository, UserService userService, UserRepository userRepository,
-            KeyCategoryRepository keyCategoryRepository, KeyService keyService) {
+            KeyCategoryRepository keyCategoryRepository, KeyService keyService, EncryptionJobService encryptionJobService) {
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
+        this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
     }
 
     /**
@@ -63,11 +65,13 @@ public class UserGroupService {
      * @throws UserGroupNotFoundException if the user group with the specified ID has not been found
      */
     public UserGroup addUser(Long userGroupId, String login) {
+        User user = userService.validate(login);
         return ofNullable(userGroupRepository.findOne(userGroupId))
             .map(userGroup -> {
-                if (userGroup.addUser(userService.validate(login))) {
+                if (userGroup.addUser(user)) {
                     userGroupRepository.save(userGroup);
                     log.debug("Added user with login '{}' to user group '{}'", login, userGroup.getName());
+                    encryptionJobService.createForUsergroupForUser(userGroup, user);
                     return userGroup;
                 }
                 return userGroup;

@@ -49,6 +49,7 @@ public class EncryptionJob extends AbstractEntity implements Serializable {
     private User user;
 
     @Column
+    @Lob
     private String publicKey;
 
     public EncryptionJob() {}

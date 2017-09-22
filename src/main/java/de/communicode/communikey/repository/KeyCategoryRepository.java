@@ -7,6 +7,7 @@
 package de.communicode.communikey.repository;
 
 import de.communicode.communikey.domain.KeyCategory;
+import de.communicode.communikey.domain.UserGroup;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -35,4 +36,12 @@ public interface KeyCategoryRepository extends CrudRepository<KeyCategory, Long>
      * @return a collection of found key category entities
      */
     Set<KeyCategory> findAllByParentIsNull();
+
+    /**
+     * Finds all key category entities which are in the specified usergroup.
+     *
+     * @param userGroup the usergroup the key categories should contain
+     * @return a collection of found key category entities
+     */
+    Set<KeyCategory> findAllByGroupsContains(UserGroup userGroup);
 }

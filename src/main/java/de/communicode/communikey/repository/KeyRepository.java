@@ -7,6 +7,7 @@
 package de.communicode.communikey.repository;
 
 import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.KeyCategory;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -27,4 +28,12 @@ public interface KeyRepository extends CrudRepository<Key, Long> {
      */
     @Override
     Set<Key> findAll();
+
+    /**
+     * Finds all key entities that are in the specified key category.
+     *
+     * @param keyCategory the key category the keys should be in
+     * @return a collection of found key entities
+     */
+    Set<Key> findAllByCategory(KeyCategory keyCategory);
 }

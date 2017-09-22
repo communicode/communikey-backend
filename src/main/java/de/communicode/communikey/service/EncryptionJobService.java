@@ -6,15 +6,9 @@
  */
 package de.communicode.communikey.service;
 
-import de.communicode.communikey.domain.EncryptionJob;
-import de.communicode.communikey.domain.Key;
-import de.communicode.communikey.domain.User;
-import de.communicode.communikey.domain.UserEncryptedPassword;
+import de.communicode.communikey.domain.*;
 import de.communicode.communikey.exception.EncryptionJobNotFoundException;
-import de.communicode.communikey.repository.EncryptionJobRepository;
-import de.communicode.communikey.repository.KeyRepository;
-import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
-import de.communicode.communikey.repository.UserRepository;
+import de.communicode.communikey.repository.*;
 import de.communicode.communikey.service.payload.EncryptionJobAbortPayload;
 import de.communicode.communikey.service.payload.EncryptionJobPayload;
 import de.communicode.communikey.service.payload.EncryptionJobStatusPayload;
@@ -44,18 +38,24 @@ public class EncryptionJobService {
     private final UserEncryptedPasswordRepository userEncryptedPasswordRepository;
     private final UserRepository userRepository;
     private final KeyRepository keyRepository;
+    private final UserGroupRepository userGroupRepository;
+    private final KeyCategoryRepository keyCategoryRepository;
 
     @Autowired
     public EncryptionJobService(EncryptionJobRepository encryptionJobRepository, KeyService keyService,
                                 SimpMessagingTemplate messagingTemplate,
                                 UserEncryptedPasswordRepository userEncryptedPasswordRepository,
-                                UserRepository userRepository, KeyRepository keyRepository) {
+                                UserRepository userRepository, KeyRepository keyRepository,
+                                UserGroupRepository userGroupRepository,
+                                KeyCategoryRepository keyCategoryRepository) {
         this.encryptionJobRepository = requireNonNull(encryptionJobRepository, "encryptionJobRepository must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
         this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
         this.userEncryptedPasswordRepository = requireNonNull(userEncryptedPasswordRepository, "userEncryptedPasswordRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
+        this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
+        this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
     }
 
     /**
@@ -83,12 +83,49 @@ public class EncryptionJobService {
             .stream()
             .filter(user -> userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key) != null)
             .filter(user -> encryptionJobRepository.findByUserAndKey(user, key) == null)
-            .forEach(user -> {
-                EncryptionJob encryptionJob = new EncryptionJob(key, user);
-                encryptionJobRepository.save(encryptionJob);
-                advertise(encryptionJob);
-            });
+            .forEach(user -> this.create(key, user));
         log.debug("Created all EncryptionJobs for key '{}'.", key.getId());
+    }
+
+    /**
+     * Creates encryption jobs for the keys of a user in a specific user group.
+     *
+     * @param userGroup the usergroup of the keys
+     * @param user the user for whom the jobs should be created
+     */
+    public void createForUsergroupForUser(UserGroup userGroup, User user) {
+        keyCategoryRepository.findAllByGroupsContains(userGroup).stream()
+            .flatMap(keyCategory -> keyRepository.findAllByCategory(keyCategory).stream())
+            .forEach(key -> create(key, user));
+        log.debug("Created all EncryptionJobs for the keys of user '{}' in usergroup '{}'.", user.getId(), userGroup.getId());
+    }
+
+    /**
+     * Creates encryption jobs for the keys of a user in a specific user group.
+     *
+     * @param keyCategory the category of the keys
+     * @param userGroup the userGroup of the users for whom the jobs should be created
+     */
+    public void createForCategoryForUsergroup(KeyCategory keyCategory, UserGroup userGroup) {
+        keyRepository.findAllByCategory(keyCategory)
+            .forEach(key -> {
+                userRepository.findAllByGroupsContains(userGroup)
+                    .forEach(user -> create(key, user));
+            });
+        log.debug("Created all EncryptionJobs for the keys in category '{}' for users in usergroup '{}'.", keyCategory.getId(), userGroup.getId());
+    }
+
+    /**
+     * Creates encryption jobs for a key for users that have access to a specific category.
+     *
+     * @param key the key
+     * @param keyCategory the category of the usergroups of the users for whom the jobs should be created
+     */
+    public void createForKeyInCategory(Key key, KeyCategory keyCategory) {
+        keyCategory.getGroups().stream()
+            .flatMap(userGroup -> userGroup.getUsers().stream())
+            .forEach(user -> create(key, user));
+        log.debug("Created all EncryptionJobs for the key '{}' for users with access to category '{}'.", key.getId(), keyCategory.getId());
     }
 
     /**
