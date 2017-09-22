@@ -25,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -51,12 +52,14 @@ public class KeyCategoryService {
     private final UserGroupRepository userGroupRepository;
     private final Hashids hashids;
     private final EncryptionJobService encryptionJobService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService,
                               KeyService keyService, KeyRepository keyRepository, UserRepository userRepository,
                               UserGroupService userGroupService, UserGroupRepository userGroupRepository,
-                              Hashids hashids, EncryptionJobService encryptionJobService) {
+                              Hashids hashids, EncryptionJobService encryptionJobService,
+                              SimpMessagingTemplate messagingTemplate) {
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
@@ -66,6 +69,7 @@ public class KeyCategoryService {
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
         this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
+        this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
     }
 
     /**
@@ -141,6 +145,10 @@ public class KeyCategoryService {
         keyCategory = keyCategoryRepository.save(keyCategory);
         encryptionJobService.createForKeyInCategory(key, keyCategory);
         log.debug("Added key with ID '{}' to key category with ID '{}'", keyId, keyCategoryId);
+
+        final Key savedKey = keyRepository.findOne(key.getId());
+        keyService.getAccessors(savedKey)
+            .forEach(user -> messagingTemplate.convertAndSendToUser(user.getLogin(), "/queue/updates/keys", savedKey));
         return keyCategory;
     }
 

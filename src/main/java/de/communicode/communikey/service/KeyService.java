@@ -64,13 +64,15 @@ public class KeyService {
     private final AuthorityService authorityService;
     private final EncryptionJobService encryptionJobService;
     private final EncryptionJobRepository encryptionJobRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     public KeyService(KeyRepository keyRepository, @Lazy KeyCategoryService keyCategoryService,
                       UserService userRestService, Hashids hashids, UserEncryptedPasswordRepository
                       userEncryptedPasswordRepository, UserRepository userRepository,
                       AuthorityService authorityService, @Lazy EncryptionJobService encryptionJobService,
-                      EncryptionJobRepository encryptionJobRepository) {
+                      EncryptionJobRepository encryptionJobRepository,
+                      SimpMessagingTemplate messagingTemplate) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.userEncryptedPasswordRepository = requireNonNull(userEncryptedPasswordRepository, "userEncryptedPasswordRepository must not be null!");
         this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
@@ -80,6 +82,7 @@ public class KeyService {
         this.authorityService = requireNonNull(authorityService, "authorityService must not be null!");
         this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
         this.encryptionJobRepository = requireNonNull(encryptionJobRepository, "encryptionJobRepository must not be null!");
+        this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
     }
 
     /**
@@ -241,8 +244,12 @@ public class KeyService {
                 createUserEncryptedPasswords(key, encryptedPasswordsPayload);
             }
         }
-        key = keyRepository.save(key);
-        encryptionJobService.createForKey(key);
+        final Key savedKey = keyRepository.save(key);
+        encryptionJobService.createForKey(savedKey);
+
+        getAccessors(key)
+            .forEach(user -> messagingTemplate.convertAndSendToUser(user.getLogin(), "/queue/updates/keys", savedKey));
+
         return key;
     }
 
@@ -289,6 +296,7 @@ public class KeyService {
      */
     public Optional<Set<User.SubscriberInfo>> getSubscribers(Long keyId) {
         return getAccessors(validate(keyId)).stream()
+            .filter(user -> user.getPublicKey() != null)
             .map(User::getSubscriberInfo)
             .collect(collectingAndThen(toSet(), Optional::of));
     }
@@ -306,8 +314,7 @@ public class KeyService {
             .map(KeyCategory::getGroups)
             .map(Collection::stream)
             .orElse(Stream.empty())
-            .flatMap(userGroup -> userGroup.getUsers().stream())
-            .filter(user -> user.getPublicKey() != null);
+            .flatMap(userGroup -> userGroup.getUsers().stream());
 
         Stream<User> adminStream = userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
             .stream();
