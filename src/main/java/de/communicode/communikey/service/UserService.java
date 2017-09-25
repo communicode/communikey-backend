@@ -141,6 +141,7 @@ public class UserService {
 
         if (user.addAuthority(authority)) {
             log.debug("Added authority with name '{}' to user with login '{}'", authority.getName(), login);
+            encryptionJobService.createForUser(user);
             deleteOauth2AccessTokens(login);
             return userRepository.save(user);
         }
@@ -333,6 +334,7 @@ public class UserService {
 
         if (user.removeAuthority(authority)) {
             log.debug("Removed authority with name '{}' from user with login '{}'", authority.getName(), login);
+            keyService.removeObsoletePasswords(user);
             deleteOauth2AccessTokens(login);
             return userRepository.save(user);
         }
