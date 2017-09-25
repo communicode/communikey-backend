@@ -69,7 +69,9 @@ public class EncryptionJobService {
      */
     public Optional<EncryptionJob> create(Key key, User user) {
         if (encryptionJobRepository.findByUserAndKey(user, key) == null &&
-            userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key) == null) {
+            userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key) == null &&
+            user.getPublicKey() != null) {
+
             EncryptionJob encryptionJob = new EncryptionJob(key, user);
             encryptionJobRepository.save(encryptionJob);
             advertise(encryptionJob);
@@ -113,8 +115,7 @@ public class EncryptionJobService {
     public void createForCategoryForUsergroup(KeyCategory keyCategory, UserGroup userGroup) {
         keyRepository.findAllByCategory(keyCategory)
             .forEach(key -> {
-                userRepository.findAllByGroupsContains(userGroup)
-                    .forEach(user -> create(key, user));
+                userRepository.findAllByGroupsContains(userGroup).forEach(user -> create(key, user));
             });
         log.debug("Created all EncryptionJobs for the keys in category '{}' for users in usergroup '{}'.", keyCategory.getId(), userGroup.getId());
     }
