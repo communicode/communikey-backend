@@ -417,27 +417,6 @@ public class KeyCategoryService {
     }
 
     /**
-     * Returns a set of Users that should have access to a key category.
-     *
-     * @param keyCategory the category of which the accessors are wanted
-     * @author dvonderbey@communicode.de
-     * @since 0.15.0
-     */
-    public Set<User> getAccessors(KeyCategory keyCategory) {
-        Stream<User> subscriberStream = Optional.of(keyCategory)
-            .map(KeyCategory::getGroups)
-            .map(Collection::stream)
-            .orElse(Stream.empty())
-            .flatMap(userGroup -> userGroup.getUsers().stream());
-
-        Stream<User> adminStream = userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
-            .stream();
-
-        return Stream.concat(subscriberStream, adminStream)
-            .collect(toSet());
-    }
-
-    /**
      * Sends out websocket messages to users for live updates.
      *
      * @param keyCategory the category that was updated
@@ -445,8 +424,6 @@ public class KeyCategoryService {
      * @since 0.15.0
      */
     public void sendUpdates(KeyCategory keyCategory) {
-        for (User accessor:getAccessors(keyCategory)) {
-            messagingTemplate.convertAndSendToUser(accessor.getLogin(), "/queue/updates/categories", keyCategory);
-        }
+        messagingTemplate.convertAndSend("/queue/updates/categories", keyCategory);
     }
 }
