@@ -302,7 +302,7 @@ public class KeyService {
     }
 
     /**
-     * Returns a set of Users that should have access to a key and are viable to get an encrypted password.
+     * Returns a set of Users that should have access to a key.
      *
      * @param key the key of which the accessors are wanted
      * @author dvonderbey@communicode.de

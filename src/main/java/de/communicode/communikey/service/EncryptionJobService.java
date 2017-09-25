@@ -9,6 +9,8 @@ package de.communicode.communikey.service;
 import de.communicode.communikey.domain.*;
 import de.communicode.communikey.exception.EncryptionJobNotFoundException;
 import de.communicode.communikey.repository.*;
+import de.communicode.communikey.security.AuthoritiesConstants;
+import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.EncryptionJobAbortPayload;
 import de.communicode.communikey.service.payload.EncryptionJobPayload;
 import de.communicode.communikey.service.payload.EncryptionJobStatusPayload;
@@ -18,7 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static de.communicode.communikey.controller.RequestMappings.QUEUE_JOB_ABORT;
+import static de.communicode.communikey.security.AuthoritiesConstants.ADMIN;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -38,7 +43,6 @@ public class EncryptionJobService {
     private final UserEncryptedPasswordRepository userEncryptedPasswordRepository;
     private final UserRepository userRepository;
     private final KeyRepository keyRepository;
-    private final UserGroupRepository userGroupRepository;
     private final KeyCategoryRepository keyCategoryRepository;
 
     @Autowired
@@ -46,7 +50,6 @@ public class EncryptionJobService {
                                 SimpMessagingTemplate messagingTemplate,
                                 UserEncryptedPasswordRepository userEncryptedPasswordRepository,
                                 UserRepository userRepository, KeyRepository keyRepository,
-                                UserGroupRepository userGroupRepository,
                                 KeyCategoryRepository keyCategoryRepository) {
         this.encryptionJobRepository = requireNonNull(encryptionJobRepository, "encryptionJobRepository must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
@@ -54,7 +57,6 @@ public class EncryptionJobService {
         this.userEncryptedPasswordRepository = requireNonNull(userEncryptedPasswordRepository, "userEncryptedPasswordRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
-        this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
     }
 
@@ -65,12 +67,16 @@ public class EncryptionJobService {
      * @param user the user for whom the key should be encrypted
      * @return the created encryption job
      */
-    public EncryptionJob create(Key key, User user) {
-        EncryptionJob encryptionJob = new EncryptionJob(key, user);
-        encryptionJobRepository.save(encryptionJob);
-        advertise(encryptionJob);
-        log.debug("Created EncryptionJob for key '{}' and user '{}'.", key.getId(), user.getId());
-        return encryptionJob;
+    public Optional<EncryptionJob> create(Key key, User user) {
+        if (encryptionJobRepository.findByUserAndKey(user, key) == null &&
+            userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key) == null) {
+            EncryptionJob encryptionJob = new EncryptionJob(key, user);
+            encryptionJobRepository.save(encryptionJob);
+            advertise(encryptionJob);
+            log.debug("Created EncryptionJob for key '{}' and user '{}'.", key.getId(), user.getId());
+            return Optional.of(encryptionJob);
+        }
+        return Optional.empty();
     }
 
     /**
@@ -79,10 +85,8 @@ public class EncryptionJobService {
      * @param key the key that should be encrypted
      */
     public void createForKey(Key key) {
-        keyService.getAccessors(key)
-            .stream()
-            .filter(user -> userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key) != null)
-            .filter(user -> encryptionJobRepository.findByUserAndKey(user, key) == null)
+        keyService.getAccessors(key).stream()
+            .filter(user -> user.getPublicKey() != null)
             .forEach(user -> this.create(key, user));
         log.debug("Created all EncryptionJobs for key '{}'.", key.getId());
     }
@@ -126,6 +130,21 @@ public class EncryptionJobService {
             .flatMap(userGroup -> userGroup.getUsers().stream())
             .forEach(user -> create(key, user));
         log.debug("Created all EncryptionJobs for the key '{}' for users with access to category '{}'.", key.getId(), keyCategory.getId());
+    }
+
+    /**
+     * Creates encryption jobs for the keys of a user.
+     *
+     * @param user the user
+     */
+    public void createForUser(User user) {
+        if (user.getAuthorities().stream().anyMatch(authority -> authority.getName().equals(AuthoritiesConstants.ADMIN)))
+        {
+            keyRepository.findAll().forEach(key -> create(key, user));
+        } else {
+            user.getGroups().forEach(userGroup -> createForUsergroupForUser(userGroup, user));
+        }
+        log.debug("Created all EncryptionJobs for the user '{}'.", user.getLogin());
     }
 
     /**

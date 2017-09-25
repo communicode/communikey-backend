@@ -70,6 +70,7 @@ public class UserService {
     private final JdbcTokenStore jdbcTokenStore;
     private final AuthorityService authorityService;
     private final UserService userService;
+    private final EncryptionJobService encryptionJobService;
     private final CommunikeyProperties communikeyProperties;
 
     @Autowired
@@ -85,7 +86,8 @@ public class UserService {
             JdbcTokenStore jdbcTokenStore,
             AuthorityService authorityService,
             @Lazy UserService userService,
-            CommunikeyProperties communikeyProperties) {
+            CommunikeyProperties communikeyProperties,
+            @Lazy EncryptionJobService encryptionJobService) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
@@ -97,6 +99,7 @@ public class UserService {
         this.jdbcTokenStore = requireNonNull(jdbcTokenStore, "jdbcTokenStore must not be null!");
         this.authorityService = requireNonNull(authorityService, "authorityService must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
+        this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
         this.communikeyProperties = requireNonNull(communikeyProperties, "communikeyProperties must not be null!");
     }
 
@@ -362,6 +365,7 @@ public class UserService {
                 user.setPublicKeyResetDate(null);
                 userRepository.save(user);
                 keyService.removeAllUserEncryptedPasswordsForUser(user);
+                encryptionJobService.createForUser(user);
                 log.debug("Reset publicKeyResetToken with reset token '{}' for user with login '{}'", publicKeyResetToken, user.getLogin());
                 return user;
             }).orElseThrow(() -> new ResetTokenNotFoundException(publicKeyResetToken));
