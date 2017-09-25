@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.service;
 
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_CATEGORIES;
 import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLogin;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
@@ -150,9 +151,7 @@ public class KeyCategoryService {
         encryptionJobService.createForKeyInCategory(key, keyCategory);
         log.debug("Added key with ID '{}' to key category with ID '{}'", keyId, keyCategoryId);
 
-        final Key savedKey = keyRepository.findOne(key.getId());
-        keyService.getAccessors(savedKey)
-            .forEach(user -> messagingTemplate.convertAndSendToUser(user.getLogin(), "/queue/updates/keys", savedKey));
+        keyService.sendUpdates(key);
         return keyCategory;
     }
 
@@ -424,6 +423,7 @@ public class KeyCategoryService {
      * @since 0.15.0
      */
     public void sendUpdates(KeyCategory keyCategory) {
-        messagingTemplate.convertAndSend("/queue/updates/categories", keyCategory);
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_CATEGORIES, keyCategory);
+        log.debug("Sent out updates for key category '{}'.", keyCategory.getId());
     }
 }

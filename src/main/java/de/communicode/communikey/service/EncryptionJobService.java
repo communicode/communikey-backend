@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_JOBS;
 import static de.communicode.communikey.controller.RequestMappings.QUEUE_JOB_ABORT;
 import static de.communicode.communikey.security.AuthoritiesConstants.ADMIN;
 import static java.util.Objects.requireNonNull;
@@ -156,7 +157,7 @@ public class EncryptionJobService {
     private void advertise(EncryptionJob encryptionJob) {
         keyService.getQualifiedEncoders(encryptionJob.getKey())
             .forEach(subscriberInfo -> {
-                messagingTemplate.convertAndSendToUser(subscriberInfo.getUser(), "/queue/encryption/jobs", encryptionJob);
+                messagingTemplate.convertAndSendToUser(subscriberInfo.getUser(), QUEUE_JOBS, encryptionJob);
                 log.debug("Sent out advertisement for EncryptionJob '{}' and user '{}'.", encryptionJob.getId(), subscriberInfo.getUser());
             });
         log.debug("Sent out advertisements for EncryptionJob '{}'.", encryptionJob.getId());

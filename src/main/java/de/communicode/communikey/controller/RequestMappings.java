@@ -175,6 +175,76 @@ public final class RequestMappings {
      *
      * @since 0.15.0
      */
+    public static final String QUEUE_JOBS = QUEUE + "/encryption/jobs";
+
+    /**
+     * The user messaging update endpoint for key entities.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE_UPDATES = QUEUE + "/updates";
+
+    /**
+     * The user messaging update endpoint for key entities.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE_UPDATES_KEYS = QUEUE_UPDATES + "/keys";
+
+    /**
+     * The user messaging update endpoint for deleted key entities.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE_UPDATES_KEYS_DELETE = QUEUE_UPDATES_KEYS + "/delete";
+
+    /**
+     * The user messaging update endpoint for key entities.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE_UPDATES_CATEGORIES = QUEUE_UPDATES + "/categories";
+
+    /**
+     * The user messaging update endpoint for deleted key entities.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE_UPDATES_CATEGORIES_DELETE = QUEUE_UPDATES_CATEGORIES + "/delete";
+
+    /**
+     * The user messaging update endpoint for key entities.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE_UPDATES_GROUPS = QUEUE_UPDATES + "/groups";
+
+    /**
+     * The user messaging update endpoint for deleted key entities.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE_UPDATES_GROUPS_DELETE = QUEUE_UPDATES_GROUPS + "/delete";
+
+    /**
+     * The user messaging update endpoint for key entities.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE_UPDATES_USERS = QUEUE_UPDATES + "/users";
+
+    /**
+     * The user messaging update endpoint for deleted key entities.
+     *
+     * @since 0.15.0
+     */
+    public static final String QUEUE_UPDATES_USERS_DELETE = QUEUE_UPDATES_USERS + "/delete";
+
+    /**
+     * The user messaging reply endpoint.
+     *
+     * @since 0.15.0
+     */
     public static final String QUEUE_JOB_ABORT = QUEUE + "/encryption/jobs/aborts";
 
     /**

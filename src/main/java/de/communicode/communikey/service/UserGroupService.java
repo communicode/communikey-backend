@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.service;
 
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_GROUPS;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -257,6 +258,7 @@ public class UserGroupService {
      * @since 0.15.0
      */
     public void sendUpdates(UserGroup userGroup) {
-        messagingTemplate.convertAndSend("/queue/updates/groups", userGroup);
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_GROUPS, userGroup);
+        log.debug("Sent out updates for group '{}'.", userGroup.getId());
     }
 }

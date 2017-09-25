@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.service;
 
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_KEYS;
 import static de.communicode.communikey.security.AuthoritiesConstants.ADMIN;
 import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLogin;
 import static de.communicode.communikey.security.SecurityUtils.isCurrentUserInRole;
@@ -110,9 +111,7 @@ public class KeyService {
             persistedKey = keyRepository.findOne(persistedKey.getId());
         }
         userService.addKey(userLogin, persistedKey);
-        for (User accessor:getAccessors(key)) {
-            messagingTemplate.convertAndSendToUser(accessor.getLogin(), "/queue/updates/keys", persistedKey);
-        }
+        sendUpdates(key);
         return persistedKey;
     }
 
@@ -250,9 +249,7 @@ public class KeyService {
         final Key savedKey = keyRepository.save(key);
         encryptionJobService.createForKey(savedKey);
 
-        getAccessors(key)
-            .forEach(user -> messagingTemplate.convertAndSendToUser(user.getLogin(), "/queue/updates/keys", savedKey));
-
+        sendUpdates(key);
         return key;
     }
 
@@ -386,5 +383,17 @@ public class KeyService {
             throw new HashidNotValidException();
         }
         return decodedHashid[0];
+    }
+
+    /**
+     * Sends out websocket messages to users for live updates.
+     *
+     * @param key the key that was updated
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendUpdates(Key key) {
+        getAccessors(key).forEach(user -> messagingTemplate.convertAndSendToUser(user.getLogin(), QUEUE_UPDATES_KEYS, key));
+        log.debug("Sent out updates for key '{}'.", key.getId());
     }
 }

@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.service;
 
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_USERS;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -555,6 +556,7 @@ public class UserService {
      * @since 0.15.0
      */
     public void sendUpdates(User user) {
-        messagingTemplate.convertAndSend("/queue/updates/users", user);
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_USERS, user);
+        log.debug("Sent out updates for user '{}'.", user.getId());
     }
 }
