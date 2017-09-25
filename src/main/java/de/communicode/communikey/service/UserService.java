@@ -122,6 +122,7 @@ public class UserService {
                 user.setActivated(true);
                 user.setActivationToken(null);
                 userRepository.save(user);
+                sendUpdates(user);
                 log.debug("Activated user '{}' with activation token '{}'", user.getLogin(), activationToken);
                 return user;
             }).orElseThrow(() -> new ActivationTokenNotFoundException(activationToken));
