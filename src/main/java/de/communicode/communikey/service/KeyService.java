@@ -110,6 +110,9 @@ public class KeyService {
             persistedKey = keyRepository.findOne(persistedKey.getId());
         }
         userService.addKey(userLogin, persistedKey);
+        for (User accessor:getAccessors(key)) {
+            messagingTemplate.convertAndSendToUser(accessor.getLogin(), "/queue/updates/keys", persistedKey);
+        }
         return persistedKey;
     }
 

@@ -44,6 +44,7 @@ import javax.validation.Valid;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * The REST API controller to process {@link User}.

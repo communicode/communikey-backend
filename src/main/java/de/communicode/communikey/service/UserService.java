@@ -37,6 +37,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The REST API service to process {@link User} via a {@link UserRepository}.
@@ -72,6 +74,7 @@ public class UserService {
     private final UserService userService;
     private final EncryptionJobService encryptionJobService;
     private final CommunikeyProperties communikeyProperties;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     public UserService(
@@ -87,7 +90,8 @@ public class UserService {
             AuthorityService authorityService,
             @Lazy UserService userService,
             CommunikeyProperties communikeyProperties,
-            @Lazy EncryptionJobService encryptionJobService) {
+            @Lazy EncryptionJobService encryptionJobService,
+            SimpMessagingTemplate messagingTemplate) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
@@ -101,6 +105,7 @@ public class UserService {
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
         this.communikeyProperties = requireNonNull(communikeyProperties, "communikeyProperties must not be null!");
+        this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
     }
 
     /**
@@ -196,6 +201,7 @@ public class UserService {
         user.addAuthorities(authorities);
 
         userRepository.save(user);
+        sendUpdates(user);
         log.debug("Created new user: {}", user);
         return user;
     }
@@ -394,6 +400,7 @@ public class UserService {
                 user.setLastName(payload.getLastName());
 
                 userRepository.save(user);
+                sendUpdates(user);
                 log.debug("Updated user with login '{}'", user.getLogin());
                 return user;
             }).orElseThrow(() -> new UserNotFoundException(login));
@@ -536,5 +543,16 @@ public class UserService {
         if (ofNullable(userRepository.findOneByEmail(email)).isPresent()) {
             throw new UserConflictException("email '" + email + "' already exists");
         }
+    }
+
+    /**
+     * Sends out websocket messages to users for live updates.
+     *
+     * @param user the user that was updated
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendUpdates(User user) {
+        messagingTemplate.convertAndSend("/queue/updates/users", user);
     }
 }

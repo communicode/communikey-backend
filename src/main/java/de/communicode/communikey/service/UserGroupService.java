@@ -21,6 +21,7 @@ import de.communicode.communikey.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
@@ -43,16 +44,19 @@ public class UserGroupService {
     private final UserService userService;
     private final KeyService keyService;
     private final EncryptionJobService encryptionJobService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     public UserGroupService(UserGroupRepository userGroupRepository, UserService userService, UserRepository userRepository,
-            KeyCategoryRepository keyCategoryRepository, KeyService keyService, EncryptionJobService encryptionJobService) {
+            KeyCategoryRepository keyCategoryRepository, KeyService keyService, EncryptionJobService encryptionJobService,
+                            SimpMessagingTemplate messagingTemplate) {
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
         this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
+        this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
     }
 
     /**
@@ -92,6 +96,8 @@ public class UserGroupService {
         userGroup.setName(payload.getName());
 
         userGroupRepository.save(userGroup);
+
+        sendUpdates(userGroup);
         log.debug("Created new user group '{}'", userGroup.getName());
         return userGroup;
     }
@@ -201,6 +207,7 @@ public class UserGroupService {
                     validateUniqueName(payload.getName());
                     userGroup.setName(payload.getName());
                     userGroupRepository.save(userGroup);
+                    sendUpdates(userGroup);
                     log.debug("Updated user group '{}'", userGroup.getName());
                 }
                 return userGroup;
@@ -240,5 +247,16 @@ public class UserGroupService {
         if (userGroupRepository.findOneByName(name) != null) {
             throw new UserGroupConflictException("user group '" + name +"' already exists");
         }
+    }
+
+    /**
+     * Sends out websocket messages to users for live updates.
+     *
+     * @param userGroup the user group that was updated
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendUpdates(UserGroup userGroup) {
+        messagingTemplate.convertAndSend("/queue/updates/groups", userGroup);
     }
 }

@@ -9,6 +9,7 @@ package de.communicode.communikey.service;
 import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLogin;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
 
 import de.communicode.communikey.domain.*;
 import de.communicode.communikey.exception.KeyCategoryConflictException;
@@ -20,6 +21,7 @@ import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserGroupRepository;
 import de.communicode.communikey.repository.UserRepository;
+import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,9 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * The REST API service to process {@link KeyCategory} entities via a {@link KeyCategoryRepository}.
@@ -53,13 +54,15 @@ public class KeyCategoryService {
     private final Hashids hashids;
     private final EncryptionJobService encryptionJobService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final AuthorityService authorityService;
 
     @Autowired
     public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService,
                               KeyService keyService, KeyRepository keyRepository, UserRepository userRepository,
                               UserGroupService userGroupService, UserGroupRepository userGroupRepository,
                               Hashids hashids, EncryptionJobService encryptionJobService,
-                              SimpMessagingTemplate messagingTemplate) {
+                              SimpMessagingTemplate messagingTemplate,
+                              AuthorityService authorityService) {
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
@@ -70,6 +73,7 @@ public class KeyCategoryService {
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
         this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
         this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
+        this.authorityService = requireNonNull(authorityService, "authorityService must not be null!");
     }
 
     /**
@@ -173,9 +177,10 @@ public class KeyCategoryService {
         keyCategory.setHashid(hashids.encode(keyCategory.getId()));
         keyCategory = keyCategoryRepository.save(keyCategory);
         setResponsibleUser(keyCategory.getId(), user.getLogin());
-
         user.addResponsibleKeyCategory(keyCategory);
         userRepository.save(user);
+
+        sendUpdates(keyCategory);
         log.debug("Created new key category with ID '{}'", keyCategory.getId());
         return keyCategory;
     }
@@ -302,6 +307,7 @@ public class KeyCategoryService {
             validateUniqueKeyCategoryName(payload.getName(), ofNullable(keyCategory.getParent()).map(KeyCategory::getId).orElse(null));
             keyCategory.setName(payload.getName());
             keyCategory = keyCategoryRepository.save(keyCategory);
+            sendUpdates(keyCategory);
             log.debug("Updated key category with ID '{}'", keyCategory.getId());
         }
         return keyCategory;
@@ -407,6 +413,40 @@ public class KeyCategoryService {
         for (KeyCategory child : keyCategory.getChildren()) {
             child.setTreeLevel(keyCategory.getTreeLevel() + 1);
             updateChildrenTreeLevel(child);
+        }
+    }
+
+    /**
+     * Returns a set of Users that should have access to a key category.
+     *
+     * @param keyCategory the category of which the accessors are wanted
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public Set<User> getAccessors(KeyCategory keyCategory) {
+        Stream<User> subscriberStream = Optional.of(keyCategory)
+            .map(KeyCategory::getGroups)
+            .map(Collection::stream)
+            .orElse(Stream.empty())
+            .flatMap(userGroup -> userGroup.getUsers().stream());
+
+        Stream<User> adminStream = userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
+            .stream();
+
+        return Stream.concat(subscriberStream, adminStream)
+            .collect(toSet());
+    }
+
+    /**
+     * Sends out websocket messages to users for live updates.
+     *
+     * @param keyCategory the category that was updated
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendUpdates(KeyCategory keyCategory) {
+        for (User accessor:getAccessors(keyCategory)) {
+            messagingTemplate.convertAndSendToUser(accessor.getLogin(), "/queue/updates/categories", keyCategory);
         }
     }
 }
