@@ -6,9 +6,9 @@
  */
 package de.communicode.communikey.controller;
 
+import static de.communicode.communikey.controller.PathVariables.JOB_TOKEN;
 import static de.communicode.communikey.controller.PathVariables.KEYCATEGORY_ID;
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
-import static de.communicode.communikey.controller.PathVariables.JOB_TOKEN;
 
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.Key;

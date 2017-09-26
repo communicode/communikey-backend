@@ -1,11 +1,23 @@
+/*
+ * Copyright (C) communicode AG - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * 2017
+ */
 package de.communicode.communikey.controller;
 
+import de.communicode.communikey.domain.EncryptionJob;
 import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.EncryptionJobService;
 import de.communicode.communikey.service.payload.EncryptionJobPayload;
 import de.communicode.communikey.service.payload.EncryptionJobStatusPayload;
+
+import javax.validation.Valid;
+import static java.util.Objects.requireNonNull;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -14,18 +26,20 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 
-import javax.validation.Valid;
-
-import static de.communicode.communikey.controller.RequestMappings.QUEUE_JOBS;
-import static de.communicode.communikey.controller.PathVariables.JOB_TOKEN;
 import static de.communicode.communikey.controller.RequestMappings.JOBS_FULFILL;
+import static de.communicode.communikey.controller.PathVariables.JOB_TOKEN;
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_JOBS;
 import static de.communicode.communikey.controller.RequestMappings.QUEUE_REPLY;
-import static java.util.Objects.requireNonNull;
 
+/**
+ * The WSS controller to process {@link EncryptionJob} services.
+ *
+ * @author dvonderbey@communicode.de
+ * @since 0.15.0
+ */
 @Controller
 public class CrowdEncryptionController {
 
-    private static final Logger log = LogManager.getLogger();
     private final EncryptionJobService encryptionJobService;
 
     @Autowired
@@ -48,6 +62,10 @@ public class CrowdEncryptionController {
      * Handles a job fulfillment from the client to create a user encrypted password.
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#JOBS_FULFILL}".
+     *
+     * @param jobToken the token of the encryption job
+     * @param payload the fulfillment payload
+     * @return the encryption job fulfillment result
      *
      */
     @MessageMapping(value = JOBS_FULFILL)

@@ -6,9 +6,9 @@
  */
 package de.communicode.communikey.controller;
 
+import de.communicode.communikey.domain.EncryptionJob;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
-import de.communicode.communikey.domain.EncryptionJob;
 
 /**
  * Provides path variables constants.

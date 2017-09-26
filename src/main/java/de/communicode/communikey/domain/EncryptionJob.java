@@ -12,8 +12,17 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import de.communicode.communikey.security.SecurityUtils;
 
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.Id;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GenerationType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
  * Represents an encryption job.
