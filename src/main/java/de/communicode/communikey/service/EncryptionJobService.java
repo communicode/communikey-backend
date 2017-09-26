@@ -8,6 +8,7 @@ package de.communicode.communikey.service;
 
 import de.communicode.communikey.domain.*;
 import de.communicode.communikey.exception.EncryptionJobNotFoundException;
+import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.repository.*;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
@@ -45,13 +46,15 @@ public class EncryptionJobService {
     private final UserRepository userRepository;
     private final KeyRepository keyRepository;
     private final KeyCategoryRepository keyCategoryRepository;
+    private final UserService userService;
 
     @Autowired
     public EncryptionJobService(EncryptionJobRepository encryptionJobRepository, KeyService keyService,
                                 SimpMessagingTemplate messagingTemplate,
                                 UserEncryptedPasswordRepository userEncryptedPasswordRepository,
                                 UserRepository userRepository, KeyRepository keyRepository,
-                                KeyCategoryRepository keyCategoryRepository) {
+                                KeyCategoryRepository keyCategoryRepository,
+                                UserService userService) {
         this.encryptionJobRepository = requireNonNull(encryptionJobRepository, "encryptionJobRepository must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
         this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
@@ -59,6 +62,7 @@ public class EncryptionJobService {
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
+        this.userService = requireNonNull(userService, "userService must not be null!");
     }
 
     /**
@@ -154,13 +158,36 @@ public class EncryptionJobService {
      *
      * @param encryptionJob the encryptionJob that should be advertised
      */
+    private void advertiseJobToUser(String userLogin, EncryptionJob encryptionJob) {
+        messagingTemplate.convertAndSendToUser(userLogin, QUEUE_JOBS, encryptionJob);
+        log.debug("Sent out advertisement for EncryptionJob '{}' and user '{}'.", encryptionJob.getId(), userLogin);
+    }
+
+    /**
+     * Sends out the websocket messages to users that should be able to fulfill the encryption job.
+     *
+     * @param encryptionJob the encryptionJob that should be advertised
+     */
     private void advertise(EncryptionJob encryptionJob) {
         keyService.getQualifiedEncoders(encryptionJob.getKey())
             .forEach(subscriberInfo -> {
-                messagingTemplate.convertAndSendToUser(subscriberInfo.getUser(), QUEUE_JOBS, encryptionJob);
-                log.debug("Sent out advertisement for EncryptionJob '{}' and user '{}'.", encryptionJob.getId(), subscriberInfo.getUser());
+                advertiseJobToUser(subscriberInfo.getUser(), encryptionJob);
             });
         log.debug("Sent out advertisements for EncryptionJob '{}'.", encryptionJob.getId());
+    }
+
+    /**
+     * Sends the user all the past encryption jobs that he can fulfill.
+     *
+     * @param userLogin the login of the user whom the jobs should be sent to.
+     * @throws UserNotFoundException if the encryption job with the specified token has not been found
+     */
+    public void advertiseJobsToUser(String userLogin) throws UserNotFoundException {
+        User user = userService.validate(userLogin);
+        encryptionJobRepository.findAll().stream()
+            .filter(encryptionJob -> userEncryptedPasswordRepository.findOneByOwnerAndKey(user, encryptionJob.getKey()) != null)
+            .forEach(encryptionJob -> advertiseJobToUser(user.getLogin(), encryptionJob));
+        log.debug("Sent out the encryption jobs for the user '{}'.", user.getId());
     }
 
     /**

@@ -15,6 +15,7 @@ import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.domain.EncryptionJob;
 
 /**
  * Provides request mapping constants.
@@ -248,14 +249,19 @@ public final class RequestMappings {
     public static final String QUEUE_JOB_ABORT = QUEUE + "/encryption/jobs/aborts";
 
     /**
-     * The endpoint for {@link Key} entities.
+     * The endpoint for {@link EncryptionJob} entities.
      */
     public static final String JOBS = "/jobs";
 
     /**
-     * The request parameter for a {@link Key} entity Hashid.
+     * The request parameter for an {@link EncryptionJob} token.
      */
     public static final String FULFILL = "/{" + JOB_TOKEN + "}";
+
+    /**
+     * The endpoint to fulfill an {@link EncryptionJob}.
+     */
+    public static final String JOBS_FULFILL = JOBS + FULFILL;
 
     private RequestMappings() {}
 }
