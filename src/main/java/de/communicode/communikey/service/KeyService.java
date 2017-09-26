@@ -282,6 +282,13 @@ public class KeyService {
             });
     }
 
+    /**
+     * Removes all user encrypted passwords of a user.
+     *
+     * @param user the user whose passwords should be deleted
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
     public void removeAllUserEncryptedPasswordsForUser(User user) {
         userEncryptedPasswordRepository.findAllByOwner(user)
             .forEach(userEncryptedPassword -> {
