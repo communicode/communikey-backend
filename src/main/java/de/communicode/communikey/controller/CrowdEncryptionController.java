@@ -15,9 +15,6 @@ import de.communicode.communikey.service.payload.EncryptionJobStatusPayload;
 import javax.validation.Valid;
 import static java.util.Objects.requireNonNull;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;

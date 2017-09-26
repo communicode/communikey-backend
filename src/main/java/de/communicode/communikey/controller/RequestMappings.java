@@ -34,7 +34,27 @@ public final class RequestMappings {
     /**
      * The endpoint for {@link Key} entities.
      */
-    public static final String KEYS = API + "/keys";
+    public static final String ENDPOINT_KEYS = "/keys";
+
+    /**
+     * The endpoint for {@link Key} entities.
+     */
+    public static final String ENDPOINT_GROUPS = "/groups";
+
+    /**
+     * The endpoint for {@link Key} entities.
+     */
+    public static final String ENDPOINT_USERS = "/users";
+
+    /**
+     * The endpoint for {@link Key} entities.
+     */
+    public static final String ENDPOINT_DELETE = "/delete";
+
+    /**
+     * The endpoint for {@link Key} entities.
+     */
+    public static final String KEYS = API + ENDPOINT_KEYS;
 
     /**
      * The endpoint for {@link KeyCategory} entities.
@@ -56,12 +76,12 @@ public final class RequestMappings {
      *
      * @since 0.3.0
      */
-    public static final String KEY_CATEGORY_GROUPS = KEY_CATEGORIES_HASHID + "/groups";
+    public static final String KEY_CATEGORY_GROUPS = KEY_CATEGORIES_HASHID + ENDPOINT_GROUPS;
 
     /**
      * The request mapping for the {@link KeyCategory} {@link Key}s.
      */
-    public static final String KEY_CATEGORY_KEYS = KEY_CATEGORIES_HASHID + "/keys";
+    public static final String KEY_CATEGORY_KEYS = KEY_CATEGORIES_HASHID + ENDPOINT_KEYS;
 
     /**
      * The request mapping for the responsible {@link KeyCategory} user.
@@ -86,12 +106,12 @@ public final class RequestMappings {
     /**
      * The endpoint for {@link User} entities.
      */
-    public static final String USERS = API + "/users";
+    public static final String USERS = API + ENDPOINT_USERS;
 
     /**
      * The endpoint for {@link UserGroup}s.
      */
-    public static final String USER_GROUPS = API + "/groups";
+    public static final String USER_GROUPS = API + ENDPOINT_GROUPS;
 
     /**
      * The request parameter for a {@link UserGroup} ID.
@@ -101,7 +121,7 @@ public final class RequestMappings {
     /**
      * The endpoint for {@link UserGroup}s.
      */
-    public static final String USER_GROUPS_USERS = USER_GROUPS_ID + "/users";
+    public static final String USER_GROUPS_USERS = USER_GROUPS_ID + ENDPOINT_USERS;
 
     /**
      * The request parameter for a {@link User} login.
@@ -116,7 +136,7 @@ public final class RequestMappings {
     /**
      * The endpoint to get {@link Key}s of a {@link User}.
      */
-    public static final String USER_KEYS = USERS_LOGIN + "/keys";
+    public static final String USER_KEYS = USERS_LOGIN + ENDPOINT_KEYS;
 
     /**
      * The endpoint to activate a {@link User}.
@@ -190,14 +210,14 @@ public final class RequestMappings {
      *
      * @since 0.15.0
      */
-    public static final String QUEUE_UPDATES_KEYS = QUEUE_UPDATES + "/keys";
+    public static final String QUEUE_UPDATES_KEYS = QUEUE_UPDATES + ENDPOINT_KEYS;
 
     /**
      * The user messaging update endpoint for deleted key entities.
      *
      * @since 0.15.0
      */
-    public static final String QUEUE_UPDATES_KEYS_DELETE = QUEUE_UPDATES_KEYS + "/delete";
+    public static final String QUEUE_UPDATES_KEYS_DELETE = QUEUE_UPDATES_KEYS + ENDPOINT_DELETE;
 
     /**
      * The user messaging update endpoint for key entities.
@@ -211,35 +231,35 @@ public final class RequestMappings {
      *
      * @since 0.15.0
      */
-    public static final String QUEUE_UPDATES_CATEGORIES_DELETE = QUEUE_UPDATES_CATEGORIES + "/delete";
+    public static final String QUEUE_UPDATES_CATEGORIES_DELETE = QUEUE_UPDATES_CATEGORIES + ENDPOINT_DELETE;
 
     /**
      * The user messaging update endpoint for key entities.
      *
      * @since 0.15.0
      */
-    public static final String QUEUE_UPDATES_GROUPS = QUEUE_UPDATES + "/groups";
+    public static final String QUEUE_UPDATES_GROUPS = QUEUE_UPDATES + ENDPOINT_GROUPS;
 
     /**
      * The user messaging update endpoint for deleted key entities.
      *
      * @since 0.15.0
      */
-    public static final String QUEUE_UPDATES_GROUPS_DELETE = QUEUE_UPDATES_GROUPS + "/delete";
+    public static final String QUEUE_UPDATES_GROUPS_DELETE = QUEUE_UPDATES_GROUPS + ENDPOINT_DELETE;
 
     /**
      * The user messaging update endpoint for key entities.
      *
      * @since 0.15.0
      */
-    public static final String QUEUE_UPDATES_USERS = QUEUE_UPDATES + "/users";
+    public static final String QUEUE_UPDATES_USERS = QUEUE_UPDATES + ENDPOINT_USERS;
 
     /**
      * The user messaging update endpoint for deleted key entities.
      *
      * @since 0.15.0
      */
-    public static final String QUEUE_UPDATES_USERS_DELETE = QUEUE_UPDATES_USERS + "/delete";
+    public static final String QUEUE_UPDATES_USERS_DELETE = QUEUE_UPDATES_USERS + ENDPOINT_DELETE;
 
     /**
      * The user messaging reply endpoint.
