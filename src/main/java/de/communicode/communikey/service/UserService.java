@@ -7,6 +7,7 @@
 package de.communicode.communikey.service;
 
 import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_USERS;
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_USERS_DELETE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -240,6 +241,7 @@ public class UserService {
         User user = dissolveReferences(validate(login));
         keyService.removeObsoletePasswords(user);
         userRepository.delete(user);
+        sendRemovalUpdates(user);
         log.debug("Deleted user with login '{}'", login);
     }
 
@@ -285,6 +287,7 @@ public class UserService {
                 user.setPublicKeyResetToken(SecurityUtils.generateRandomResetToken());
                 user.setPublicKeyResetDate(ZonedDateTime.now());
                 userRepository.save(user);
+                keyService.removeAllUserEncryptedPasswordsForUser(user);
                 log.debug("Generated publicKeyResetToken '{}' for user with email '{}'", user.getPublicKeyResetToken(), email);
                 return ImmutableMap.<String, String>builder().
                     put("publicKeyResetToken", user.getPublicKeyResetToken()).
@@ -559,5 +562,18 @@ public class UserService {
     public void sendUpdates(User user) {
         messagingTemplate.convertAndSend(QUEUE_UPDATES_USERS, user);
         log.debug("Sent out updates for user '{}'.", user.getId());
+    }
+
+
+    /**
+     * Sends out websocket messages to users for live updates on removals.
+     *
+     * @param user the user that was removed
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendRemovalUpdates(User user) {
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_USERS_DELETE, user);
+        log.debug("Sent out removal update for user '{}'.", user.getId());
     }
 }

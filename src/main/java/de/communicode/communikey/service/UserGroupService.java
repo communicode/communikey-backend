@@ -7,6 +7,7 @@
 package de.communicode.communikey.service;
 
 import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_GROUPS;
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_GROUPS_DELETE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -123,6 +124,7 @@ public class UserGroupService {
             log.debug("Removed user group with name '{}' from key category with ID '{}'", userGroup.getName(), keyCategory.getId());
         });
         userGroupRepository.delete(userGroup);
+        sendRemovalUpdates(userGroup);
         log.debug("Deleted user group with ID '{}'", userGroupId);
     }
 
@@ -259,6 +261,18 @@ public class UserGroupService {
      */
     public void sendUpdates(UserGroup userGroup) {
         messagingTemplate.convertAndSend(QUEUE_UPDATES_GROUPS, userGroup);
-        log.debug("Sent out updates for group '{}'.", userGroup.getId());
+        log.debug("Sent out update for group '{}'.", userGroup.getId());
+    }
+
+    /**
+     * Sends out websocket messages to users for live updates.
+     *
+     * @param userGroup the user group that was removed
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendRemovalUpdates(UserGroup userGroup) {
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_GROUPS_DELETE, userGroup);
+        log.debug("Sent out removal update for group '{}'.", userGroup.getId());
     }
 }

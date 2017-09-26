@@ -7,6 +7,7 @@
 package de.communicode.communikey.service;
 
 import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_CATEGORIES;
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_CATEGORIES_DELETE;
 import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLogin;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
@@ -102,6 +103,7 @@ public class KeyCategoryService {
             child.setParent(parent);
             child.setTreeLevel(parent.getTreeLevel() + 1);
             updateChildrenTreeLevel(child);
+            sendUpdates(child);
             log.debug("Added key category with ID '{}' as child to key category with ID '{}'", child.getId(), parent.getId());
             return keyCategoryRepository.save(parent);
         }
@@ -196,6 +198,7 @@ public class KeyCategoryService {
         KeyCategory keyCategory = validate(keyCategoryId);
         keyCategory = dissolveReferences(keyCategory);
         keyCategoryRepository.delete(keyCategory);
+        sendRemovalUpdates(keyCategory);
         log.debug("Deleted key category with ID '{}'", keyCategoryId);
     }
 
@@ -425,5 +428,18 @@ public class KeyCategoryService {
     public void sendUpdates(KeyCategory keyCategory) {
         messagingTemplate.convertAndSend(QUEUE_UPDATES_CATEGORIES, keyCategory);
         log.debug("Sent out updates for key category '{}'.", keyCategory.getId());
+    }
+
+
+    /**
+     * Sends out websocket messages to users for live updates on removals.
+     *
+     * @param keyCategory the category that was removed
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendRemovalUpdates(KeyCategory keyCategory) {
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_CATEGORIES_DELETE, keyCategory);
+        log.debug("Sent out removal update for key category '{}'.", keyCategory.getId());
     }
 }

@@ -7,6 +7,7 @@
 package de.communicode.communikey.service;
 
 import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_KEYS;
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_KEYS_DELETE;
 import static de.communicode.communikey.security.AuthoritiesConstants.ADMIN;
 import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLogin;
 import static de.communicode.communikey.security.SecurityUtils.isCurrentUserInRole;
@@ -39,7 +40,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
@@ -50,6 +50,7 @@ import java.util.stream.Stream;
  * The REST API service to process {@link Key} entities via a {@link KeyRepository}.
  *
  * @author sgreb@communicode.de
+ * @author dvonderbey@communicode.de
  * @since 0.1.0
  */
 @Service
@@ -143,6 +144,7 @@ public class KeyService {
         userEncryptedPasswordRepository.deleteByKey(key);
         encryptionJobRepository.deleteByKey(key);
         keyRepository.delete(key);
+        sendRemovalUpdates(key);
         log.debug("Deleted key with ID '{}'", keyId);
     }
 
@@ -223,7 +225,7 @@ public class KeyService {
         key.setName(payload.getName());
         key.setLogin(payload.getLogin());
         key.setNotes(payload.getNotes());
-        key.getUserEncryptedPasswords().stream()
+        key.getUserEncryptedPasswords()
             .forEach(userEncryptedPassword -> {
                 userEncryptedPassword.getOwner().removeUserEncryptedPassword(userEncryptedPassword);
                 userRepository.save(userEncryptedPassword.getOwner());
@@ -281,7 +283,14 @@ public class KeyService {
     }
 
     public void removeAllUserEncryptedPasswordsForUser(User user) {
-        userEncryptedPasswordRepository.removeAllByOwner(user);
+        userEncryptedPasswordRepository.findAllByOwner(user)
+            .forEach(userEncryptedPassword -> {
+                user.removeUserEncryptedPassword(userEncryptedPassword);
+                userRepository.save(user);
+                userEncryptedPassword.getKey().removeUserEncryptedPassword(userEncryptedPassword);
+                userEncryptedPasswordRepository.save(userEncryptedPassword);
+                userEncryptedPasswordRepository.delete(userEncryptedPassword);
+            });
         log.debug("Removed all encrypted passwords for user '{}'", user.getLogin());
     }
 
@@ -393,7 +402,21 @@ public class KeyService {
      * @since 0.15.0
      */
     public void sendUpdates(Key key) {
-        getAccessors(key).forEach(user -> messagingTemplate.convertAndSendToUser(user.getLogin(), QUEUE_UPDATES_KEYS, key));
+        getAccessors(key)
+            .forEach(user -> messagingTemplate.convertAndSendToUser(user.getLogin(), QUEUE_UPDATES_KEYS, key));
         log.debug("Sent out updates for key '{}'.", key.getId());
+    }
+
+    /**
+     * Sends out websocket messages to users for live removals.
+     *
+     * @param key the key that was removed
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendRemovalUpdates(Key key) {
+        getAccessors(key)
+            .forEach(user -> messagingTemplate.convertAndSendToUser(user.getLogin(), QUEUE_UPDATES_KEYS_DELETE, key));
+        log.debug("Sent out removal updates for key '{}'.", key.getId());
     }
 }
