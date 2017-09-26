@@ -59,15 +59,13 @@ public class KeyCategoryService {
     private final Hashids hashids;
     private final EncryptionJobService encryptionJobService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final AuthorityService authorityService;
 
     @Autowired
     public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService,
                               KeyService keyService, KeyRepository keyRepository, UserRepository userRepository,
                               UserGroupService userGroupService, UserGroupRepository userGroupRepository,
                               Hashids hashids, EncryptionJobService encryptionJobService,
-                              SimpMessagingTemplate messagingTemplate,
-                              AuthorityService authorityService) {
+                              SimpMessagingTemplate messagingTemplate) {
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
@@ -78,7 +76,6 @@ public class KeyCategoryService {
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
         this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
         this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
-        this.authorityService = requireNonNull(authorityService, "authorityService must not be null!");
     }
 
     /**
