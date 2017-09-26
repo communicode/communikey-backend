@@ -287,6 +287,7 @@ public class UserService {
                 user.setPublicKeyResetToken(SecurityUtils.generateRandomResetToken());
                 user.setPublicKeyResetDate(ZonedDateTime.now());
                 userRepository.save(user);
+                userEncryptedPasswordRepository.removeAllByOwner(user);
                 keyService.removeAllUserEncryptedPasswordsForUser(user);
                 log.debug("Generated publicKeyResetToken '{}' for user with email '{}'", user.getPublicKeyResetToken(), email);
                 return ImmutableMap.<String, String>builder().

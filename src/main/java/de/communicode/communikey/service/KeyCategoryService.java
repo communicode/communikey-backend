@@ -11,9 +11,11 @@ import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES
 import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLogin;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toSet;
 
-import de.communicode.communikey.domain.*;
+import de.communicode.communikey.domain.KeyCategory;
+import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.User;
 import de.communicode.communikey.exception.KeyCategoryConflictException;
 import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import de.communicode.communikey.exception.KeyNotFoundException;
@@ -23,7 +25,6 @@ import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserGroupRepository;
 import de.communicode.communikey.repository.UserRepository;
-import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,11 +33,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * The REST API service to process {@link KeyCategory} entities via a {@link KeyCategoryRepository}.
+ * The REST API service to process {@link KeyCategory}
+ * entities via a {@link KeyCategoryRepository}.
  *
  * @author sgreb@communicode.de
  * @author dvonderbey@communicode.de
@@ -86,7 +89,7 @@ public class KeyCategoryService {
      * @return the updated parent key category
      * @throws KeyCategoryNotFoundException if a key category with specified ID has not been found
      */
-    public KeyCategory addChild(Long parentKeyCategoryId, Long childKeyCategoryId) throws KeyCategoryNotFoundException {
+    public KeyCategory addChild(Long parentKeyCategoryId, Long childKeyCategoryId) {
         KeyCategory child = this.validate(childKeyCategoryId);
         KeyCategory parent = validate(parentKeyCategoryId);
 
@@ -119,7 +122,7 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if the key category with specified ID has not been found
      * @throws UserGroupNotFoundException if the user group with specified name has not been found
      */
-    public KeyCategory addUserGroup(Long keyCategoryId, Long userGroupId) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
+    public KeyCategory addUserGroup(Long keyCategoryId, Long userGroupId) {
         KeyCategory keyCategory = validate(keyCategoryId);
         UserGroup userGroup = userGroupService.validate(userGroupId);
 
@@ -131,7 +134,7 @@ public class KeyCategoryService {
             log.debug("Added user group '{}' to key category with ID '{}'", userGroup.getName(), keyCategoryId);
             return (keyCategory);
         }
-         return keyCategory;
+        return keyCategory;
     }
 
     /**
@@ -165,7 +168,7 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if the parent key category with the specified ID has not been found
      * @throws UserNotFoundException if the user with the specified ID has not been found
      */
-    public KeyCategory create(KeyCategoryPayload payload) throws KeyCategoryNotFoundException, UserNotFoundException {
+    public KeyCategory create(KeyCategoryPayload payload) {
         String name = payload.getName();
         validateUniqueKeyCategoryName(name, null);
 
@@ -194,7 +197,7 @@ public class KeyCategoryService {
      * @param keyCategoryId the ID of the key category to delete
      * @throws KeyCategoryNotFoundException if the key category with the specified ID has been found
      */
-    public void delete(Long keyCategoryId) throws KeyCategoryNotFoundException {
+    public void delete(Long keyCategoryId) {
         KeyCategory keyCategory = validate(keyCategoryId);
         keyCategory = dissolveReferences(keyCategory);
         keyCategoryRepository.delete(keyCategory);
@@ -226,7 +229,7 @@ public class KeyCategoryService {
      * @return the found key category entity
      * @throws KeyCategoryNotFoundException if the key category entity with the specified ID has not been found
      */
-    public KeyCategory get(Long keyCategoryId) throws KeyCategoryNotFoundException {
+    public KeyCategory get(Long keyCategoryId) {
         return validate(keyCategoryId);
     }
 
@@ -239,7 +242,7 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if the key category with specified ID has not been found
      * @throws UserGroupNotFoundException if the user group with specified name has not been found
      */
-    public KeyCategory removeUserGroup(Long keyCategoryId, Long userGroupId) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
+    public KeyCategory removeUserGroup(Long keyCategoryId, Long userGroupId) {
         KeyCategory keyCategory = validate(keyCategoryId);
         UserGroup userGroup = userGroupService.validate(userGroupId);
 
@@ -283,7 +286,7 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if the key category with the specified ID has not been found
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public KeyCategory setResponsibleUser(Long keyCategoryId, String userLogin) throws KeyCategoryNotFoundException, UserNotFoundException {
+    public KeyCategory setResponsibleUser(Long keyCategoryId, String userLogin) {
         User user = userService.validate(userLogin);
         KeyCategory keyCategory = validate(keyCategoryId);
 
@@ -333,7 +336,7 @@ public class KeyCategoryService {
      * @param parentKeyCategoryId the ID of the parent key category to validate
      * @throws KeyCategoryConflictException if the specified key category name is not unique
      */
-    private void validateUniqueKeyCategoryName(String name, Long parentKeyCategoryId) throws KeyCategoryConflictException {
+    private void validateUniqueKeyCategoryName(String name, Long parentKeyCategoryId) {
         if (Objects.nonNull(parentKeyCategoryId)) {
             if (ofNullable(keyCategoryRepository.findOne(parentKeyCategoryId))
                 .map(keyCategory -> keyCategory.getChildren().stream()
