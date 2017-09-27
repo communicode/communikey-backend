@@ -82,7 +82,7 @@ public class KeyService {
      */
     public Key create(KeyPayload payload) {
         Key key = new Key();
-        if (!checkKeyCreationPrivilege(payload)) throw new KeyNotAccessibleByUserException();
+        checkPayloadKeyAccess(key, payload);
         String userLogin = getCurrentUserLogin();
         User user = userService.validate(userLogin);
         key.setCreator(user);
@@ -206,9 +206,7 @@ public class KeyService {
      */
     public Key update(Long keyId, KeyPayload payload) {
         Key key = validate(keyId);
-        for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload.getEncryptedPasswords()) {
-            if (!checkKeyCategoryAccess(key, encryptedPasswordsPayload)) throw new KeyNotAccessibleByUserException();
-        }
+        checkPayloadKeyAccess(key, payload);
         key.setLogin(payload.getLogin());
         key.setName(payload.getName());
         key.setLogin(payload.getLogin());
@@ -256,42 +254,17 @@ public class KeyService {
     }
 
     /**
-     * Checks if the given login in a payload object contradicts the current login.
-     * Only allows the creator himself to own an userEncryptedPassword on key
-     * creation.
-     * Prevents users from adding a encryptedPassword in the encryptedPasswords set for
-     * other users they know the login of, since this is considered a malicious action.
-     *
-     * @param payload the payload to inspect
-     * @author lleifermann@communicode.de
-     * @return boolean
-     * @since 0.15.0
-     */
-
-    public boolean checkKeyCreationPrivilege(KeyPayload payload) {
-        for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload.getEncryptedPasswords()) {
-            String encryptedPasswordLogin = encryptedPasswordsPayload.getLogin();
-            if (encryptedPasswordLogin.equals(getCurrentUserLogin())){
-                return true;
-            }
-        }
-        log.info("User '{}' tried to add an encryptedPassword for a different login", getCurrentUserLogin());
-        return false;
-    }
-
-    /**
      * Checks if the intended owner of the userEncryptedPassword has access to the key itself.
      * Returns true, if the user who intents to PUT a new encrypted Password in the Set has indeed
      * access to it. Otherwise returns false
      *
+     * @author lleifermann@communicode.de
      * @param key the key
      * @param payload the payload to inspect
-     * @author lleifermann@communicode.de
      * @return boolean
      * @since 0.15.0
      */
-
-    public boolean checkKeyCategoryAccess(Key key, KeyPayloadEncryptedPasswords payload) {
+    private boolean checkKeyAccess(Key key, KeyPayloadEncryptedPasswords payload) {
         KeyCategory keyCategory = key.getCategory();
         User user = userService.validate(payload.getLogin());
         if(user.getAuthorities().contains(authorityService.get(AuthoritiesConstants.ADMIN)))
@@ -306,6 +279,20 @@ public class KeyService {
     public void removeAllUserEncryptedPasswordsForUser(User user) {
         userEncryptedPasswordRepository.removeAllByOwner(user);
         log.debug("Removed all encrypted passwords for user '{}'", user.getLogin());
+    }
+
+    /**
+     * Check encryptedPasswords in a given payload for key access.
+     *
+     * @author lleifermann@communicode.de
+     * @param key the key
+     * @param keyPayload the payload to inspect
+     * @since 0.15.0
+     */
+    private void checkPayloadKeyAccess(Key key, KeyPayload keyPayload) {
+        for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : keyPayload.getEncryptedPasswords()) {
+            if (!checkKeyAccess(key, encryptedPasswordsPayload)) throw new KeyNotAccessibleByUserException();
+        }
     }
 
     /**
