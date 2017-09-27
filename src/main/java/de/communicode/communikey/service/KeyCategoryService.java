@@ -87,13 +87,14 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if a key category with specified ID has not been found
      */
     public KeyCategory addChild(Long parentKeyCategoryId, Long childKeyCategoryId) {
-        KeyCategory child = this.validate(childKeyCategoryId);
-        KeyCategory parent = validate(parentKeyCategoryId);
-
         if (Objects.equals(parentKeyCategoryId, childKeyCategoryId)) {
             throw new KeyCategoryConflictException(
                 "parent key category ID '" + parentKeyCategoryId + "' equals child key category ID '" + childKeyCategoryId + "'");
         }
+
+        KeyCategory child = this.validate(childKeyCategoryId);
+        KeyCategory parent = validate(parentKeyCategoryId);
+
         if (child.getTreeLevel() < parent.getTreeLevel()) {
             checkPathCollision(parent, childKeyCategoryId);
         }
@@ -322,7 +323,7 @@ public class KeyCategoryService {
      * @return the key category if validated
      * @throws KeyCategoryNotFoundException if the key category with the specified ID has not been found
      */
-    public KeyCategory validate(Long keyCategoryId) throws KeyCategoryNotFoundException {
+    public KeyCategory validate(Long keyCategoryId) {
         return ofNullable(keyCategoryRepository.findOne(keyCategoryId)).orElseThrow(KeyCategoryNotFoundException::new);
     }
 

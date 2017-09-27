@@ -51,7 +51,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * The REST API service to process {@link User} via a {@link UserRepository}.
@@ -73,7 +72,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JdbcTokenStore jdbcTokenStore;
     private final AuthorityService authorityService;
-    private final UserService userService;
     private final EncryptionJobService encryptionJobService;
     private final CommunikeyProperties communikeyProperties;
     private final SimpMessagingTemplate messagingTemplate;
@@ -90,7 +88,6 @@ public class UserService {
             PasswordEncoder passwordEncoder,
             JdbcTokenStore jdbcTokenStore,
             AuthorityService authorityService,
-            @Lazy UserService userService,
             CommunikeyProperties communikeyProperties,
             @Lazy EncryptionJobService encryptionJobService,
             SimpMessagingTemplate messagingTemplate) {
@@ -104,7 +101,6 @@ public class UserService {
         this.passwordEncoder = requireNonNull(passwordEncoder, "passwordEncoder must not be null!");
         this.jdbcTokenStore = requireNonNull(jdbcTokenStore, "jdbcTokenStore must not be null!");
         this.authorityService = requireNonNull(authorityService, "authorityService must not be null!");
-        this.userService = requireNonNull(userService, "userService must not be null!");
         this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
         this.communikeyProperties = requireNonNull(communikeyProperties, "communikeyProperties must not be null!");
         this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
@@ -117,7 +113,7 @@ public class UserService {
      * @return the activated user
      * @throws ActivationTokenNotFoundException if the specified activation token has not been found
      */
-    public User activate(String activationToken) throws ActivationTokenNotFoundException {
+    public User activate(String activationToken) {
         return ofNullable(userRepository.findOneByActivationToken(activationToken))
             .map(user -> {
                 user.setActivated(true);
@@ -138,7 +134,7 @@ public class UserService {
      * @throws UserNotFoundException if the user with specified login has not been found
      * @throws AuthorityNotFoundException if the authority with specified name has not been found
      */
-    public User addAuthority(String login, String authorityName) throws UserNotFoundException, AuthorityNotFoundException {
+    public User addAuthority(String login, String authorityName) {
         User user = validate(login);
         Authority authority = authorityService.validate(authorityName);
 
@@ -187,7 +183,7 @@ public class UserService {
      * @return the created user
      * @throws UserConflictException if a user with the specified email already exists
      */
-    public User create(UserCreationPayload payload) throws UserConflictException {
+    public User create(UserCreationPayload payload) {
         String email = payload.getEmail();
         validateUniqueEmail(email);
 
@@ -217,7 +213,7 @@ public class UserService {
      * @return the deactivated user
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public User deactivate(String login) throws UserNotFoundException {
+    public User deactivate(String login) {
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
                 user.setActivated(false);
@@ -236,7 +232,7 @@ public class UserService {
      * @param login the login of the user to delete
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public void delete(String login) throws UserNotFoundException {
+    public void delete(String login) {
         deleteOauth2AccessTokens(login);
         User user = dissolveReferences(validate(login));
         keyService.removeObsoletePasswords(user);
@@ -334,7 +330,7 @@ public class UserService {
      * @throws UserNotFoundException if the user with specified login has not been found
      * @throws AuthorityNotFoundException if the authority with specified name has not been found
      */
-    public User removeAuthority(String login, String authorityName) throws UserNotFoundException, AuthorityNotFoundException {
+    public User removeAuthority(String login, String authorityName) {
         User user = validate(login);
         Authority authority = authorityService.validate(authorityName);
 
@@ -393,7 +389,7 @@ public class UserService {
      * @return the updated user
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public User update(String login, UserPayload payload) throws UserNotFoundException {
+    public User update(String login, UserPayload payload) {
         String email = payload.getEmail();
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
@@ -422,7 +418,7 @@ public class UserService {
      * @return the updated user
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public User updateAuthorities(String login, Set<String> payload) throws UserNotFoundException {
+    public User updateAuthorities(String login, Set<String> payload) {
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
                 Set<Authority> payloadAuthorities = payload.stream()
@@ -448,7 +444,7 @@ public class UserService {
      * @return the user if validated
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public User validate(String login) throws UserNotFoundException {
+    public User validate(String login) {
         return ofNullable(userRepository.findOneByLogin(login)).orElseThrow(() -> new UserNotFoundException(login));
     }
 
@@ -473,7 +469,7 @@ public class UserService {
      * @return the user if validated
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public User validateWithAuthorities(String login) throws UserNotFoundException {
+    public User validateWithAuthorities(String login) {
         return ofNullable(userRepository.findOneWithAuthoritiesByLogin(login)).orElseThrow(() -> new UserNotFoundException(login));
     }
 
@@ -502,7 +498,7 @@ public class UserService {
     private User dissolveReferences(User user) {
         user.getKeyCategories()
                 .forEach(keyCategory -> {
-                    keyCategory.setCreator(userService.validate(communikeyProperties.getSecurity().getRoot().getLogin()));
+                    keyCategory.setCreator(validate(communikeyProperties.getSecurity().getRoot().getLogin()));
                     keyCategoryRepository.save(keyCategory);
                     log.debug("Assigned key category with ID '{}' created by user '{}' to user '{}'",
                             keyCategory.getId(), user.getLogin(), communikeyProperties.getSecurity().getRoot().getLogin()
@@ -522,7 +518,7 @@ public class UserService {
                 });
         user.getKeys()
                 .forEach(key -> {
-                    key.setCreator(userService.validate(communikeyProperties.getSecurity().getRoot().getLogin()));
+                    key.setCreator(validate(communikeyProperties.getSecurity().getRoot().getLogin()));
                     keyRepository.save(key);
                     log.debug("Assigned key with ID '{}' (created by user '{}') to user '{}'",
                             key.getId(), user.getLogin(), communikeyProperties.getSecurity().getRoot().getLogin()
@@ -547,7 +543,7 @@ public class UserService {
      * @param email the email to validate
      * @throws UserConflictException if the specified email is not unique
      */
-    private void validateUniqueEmail(String email) throws UserConflictException {
+    private void validateUniqueEmail(String email) {
         if (ofNullable(userRepository.findOneByEmail(email)).isPresent()) {
             throw new UserConflictException("email '" + email + "' already exists");
         }

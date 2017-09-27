@@ -35,6 +35,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     /**
      * Finds all user entities with a specific authority of the repository.
      *
+     * @param authority the authority the users should be in
      * @return a collection of found user entities
      * @since 0.15.0
      */
@@ -43,6 +44,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     /**
      * Finds all user entities with a specific usergroup.
      *
+     * @param userGroup the userGroup the users should be in
      * @return a collection of found user entities
      * @since 0.15.0
      */

@@ -6,12 +6,20 @@
  */
 package de.communicode.communikey.service;
 
-import de.communicode.communikey.domain.*;
+import de.communicode.communikey.domain.EncryptionJob;
+import de.communicode.communikey.domain.User;
+import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.KeyCategory;
+import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.domain.UserEncryptedPassword;
 import de.communicode.communikey.exception.EncryptionJobNotFoundException;
 import de.communicode.communikey.exception.UserNotFoundException;
-import de.communicode.communikey.repository.*;
+import de.communicode.communikey.repository.EncryptionJobRepository;
+import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
+import de.communicode.communikey.repository.UserRepository;
+import de.communicode.communikey.repository.KeyRepository;
+import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
-import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.EncryptionJobAbortPayload;
 import de.communicode.communikey.service.payload.EncryptionJobPayload;
 import de.communicode.communikey.service.payload.EncryptionJobStatusPayload;
@@ -25,7 +33,6 @@ import java.util.Optional;
 
 import static de.communicode.communikey.controller.RequestMappings.QUEUE_JOBS;
 import static de.communicode.communikey.controller.RequestMappings.QUEUE_JOB_ABORT;
-import static de.communicode.communikey.security.AuthoritiesConstants.ADMIN;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -119,9 +126,7 @@ public class EncryptionJobService {
      */
     public void createForCategoryForUsergroup(KeyCategory keyCategory, UserGroup userGroup) {
         keyRepository.findAllByCategory(keyCategory)
-            .forEach(key -> {
-                userRepository.findAllByGroupsContains(userGroup).forEach(user -> create(key, user));
-            });
+            .forEach(key -> userRepository.findAllByGroupsContains(userGroup).forEach(user -> create(key, user)));
         log.debug("Created all EncryptionJobs for the keys in category '{}' for users in usergroup '{}'.", keyCategory.getId(), userGroup.getId());
     }
 
@@ -144,8 +149,7 @@ public class EncryptionJobService {
      * @param user the user
      */
     public void createForUser(User user) {
-        if (user.getAuthorities().stream().anyMatch(authority -> authority.getName().equals(AuthoritiesConstants.ADMIN)))
-        {
+        if (user.getAuthorities().stream().anyMatch(authority -> authority.getName().equals(AuthoritiesConstants.ADMIN))) {
             keyRepository.findAll().forEach(key -> create(key, user));
         } else {
             user.getGroups().forEach(userGroup -> createForUsergroupForUser(userGroup, user));
@@ -170,9 +174,7 @@ public class EncryptionJobService {
      */
     private void advertise(EncryptionJob encryptionJob) {
         keyService.getQualifiedEncoders(encryptionJob.getKey())
-            .forEach(subscriberInfo -> {
-                advertiseJobToUser(subscriberInfo.getUser(), encryptionJob);
-            });
+            .forEach(subscriberInfo -> advertiseJobToUser(subscriberInfo.getUser(), encryptionJob));
         log.debug("Sent out advertisements for EncryptionJob '{}'.", encryptionJob.getId());
     }
 
@@ -182,7 +184,7 @@ public class EncryptionJobService {
      * @param userLogin the login of the user whom the jobs should be sent to.
      * @throws UserNotFoundException if the encryption job with the specified token has not been found
      */
-    public void advertiseJobsToUser(String userLogin) throws UserNotFoundException {
+    public void advertiseJobsToUser(String userLogin) {
         User user = userService.validate(userLogin);
         encryptionJobRepository.findAll().stream()
             .filter(encryptionJob -> userEncryptedPasswordRepository.findOneByOwnerAndKey(user, encryptionJob.getKey()) != null)
@@ -197,14 +199,16 @@ public class EncryptionJobService {
      * @return the encryption job if validated
      * @throws EncryptionJobNotFoundException if the encryption job with the specified token has not been found
      */
-    public EncryptionJob validate(String token) throws EncryptionJobNotFoundException {
+    public EncryptionJob validate(String token) {
         return ofNullable(encryptionJobRepository.findByToken(token)).orElseThrow(EncryptionJobNotFoundException::new);
     }
 
     /**
      * Sends out the websocket messages to users that should be able to fulfill the encryption job.
      *
+     * @param jobToken the token of the job
      * @param encryptionJobPayload the encryptionJobPayload that should fulfill an encryptionJob
+     * @return the EncryptionJobStatusPayload that is sent to the user via websocket
      */
     public EncryptionJobStatusPayload fulfill(String jobToken, EncryptionJobPayload encryptionJobPayload) {
         EncryptionJob encryptionJob = validate(jobToken);

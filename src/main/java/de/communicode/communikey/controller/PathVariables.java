@@ -19,8 +19,6 @@ import de.communicode.communikey.domain.KeyCategory;
  */
 public final class PathVariables {
 
-    private PathVariables() {}
-
     public static final String USER_ACTIVATION_TOKEN = "activation_token";
     public static final String USER_EMAIL = "email";
     public static final String USER_LOGIN = "login";
@@ -49,4 +47,6 @@ public final class PathVariables {
      * @since 0.15.0
      */
     public static final String JOB_TOKEN = "token";
+
+    private PathVariables() {}
 }

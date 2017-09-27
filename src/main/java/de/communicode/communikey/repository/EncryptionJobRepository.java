@@ -35,6 +35,7 @@ public interface EncryptionJobRepository extends CrudRepository<EncryptionJob, L
     /**
      * Finds the encryption job with the specified token
      *
+     * @param token the token
      * @return the encryption job
      */
     EncryptionJob findByToken(String token);
@@ -42,6 +43,8 @@ public interface EncryptionJobRepository extends CrudRepository<EncryptionJob, L
     /**
      * Finds the encryption job with the specified user and token
      *
+     * @param user the user for whom the job is there
+     * @param key the key contained in the job
      * @return the encryption job
      */
     EncryptionJob findByUserAndKey(User user, Key key);

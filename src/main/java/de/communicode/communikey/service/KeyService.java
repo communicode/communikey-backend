@@ -91,6 +91,7 @@ public class KeyService {
      * Creates a new key.
      *
      * @param payload the key payload
+     * @return the created key
      */
     public Key create(KeyPayload payload) {
         Key key = new Key();
@@ -139,7 +140,7 @@ public class KeyService {
      * @param keyId the ID of the key to delete
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    public void delete(Long keyId) throws KeyNotFoundException {
+    public void delete(Long keyId) {
         Key key = validate(keyId);
         userEncryptedPasswordRepository.deleteByKey(key);
         encryptionJobRepository.deleteByKey(key);
@@ -166,7 +167,7 @@ public class KeyService {
      * @return the key, {@link Optional#empty()} otherwise
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    public Optional<Key> get(Long keyId) throws KeyNotFoundException {
+    public Optional<Key> get(Long keyId) {
         if (isCurrentUserInRole(ADMIN)) {
             return Optional.ofNullable(validate(keyId));
         }
@@ -199,9 +200,10 @@ public class KeyService {
     /**
      * Gets a userEncryptedPassword for the specified hashid
      *
+     * @param hashid the hashid of the key
      * @return a userEncryptedPassword
      */
-    public Optional<UserEncryptedPassword> getUserEncryptedPassword(Long hashid) throws KeyNotFoundException, UserEncryptedPasswordNotFoundException {
+    public Optional<UserEncryptedPassword> getUserEncryptedPassword(Long hashid) {
         String login = SecurityUtils.getCurrentUserLogin();
         User user = userService.validate(login);
         Key key = validate(hashid);
@@ -232,7 +234,7 @@ public class KeyService {
                 log.debug("Removed userEncryptedPassword with id '{}' for user '{}'",
                             userEncryptedPassword.getId(),
                             userEncryptedPassword.getOwner().getId());
-                });
+            });
         key.removeAllUserEncryptedPasswords();
         key = keyRepository.save(key);
         userEncryptedPasswordRepository.deleteByKey(key);
@@ -269,12 +271,15 @@ public class KeyService {
                 KeyCategory category = key.getCategory();
                 if (category != null) {
                     Set<UserGroup> userGroups = category.getGroups();
-                    if (userGroups.isEmpty()) deleteUserEncryptedPassword(key, userEncryptedPassword);
-                    else userGroups.forEach(userGroup -> {
-                        if (!user.getGroups().contains(userGroup)) {
-                            deleteUserEncryptedPassword(key, userEncryptedPassword);
-                        }
-                    });
+                    if (userGroups.isEmpty()) {
+                        deleteUserEncryptedPassword(key, userEncryptedPassword);
+                    } else {
+                        userGroups.forEach(userGroup -> {
+                            if (!user.getGroups().contains(userGroup)) {
+                                deleteUserEncryptedPassword(key, userEncryptedPassword);
+                            }
+                        });
+                    }
 
                 } else if (!key.getCreator().equals(user)){
                     deleteUserEncryptedPassword(key, userEncryptedPassword);
@@ -307,6 +312,7 @@ public class KeyService {
      * are able to "see" the key. Also adds all admins to the list.
      *
      * @param keyId the keyId of the key of which the subscribers are wanted
+     * @return An optional containing a collection of user subscriber info
      * @author dvonderbey@communicode.de
      * @since 0.15.0
      */
@@ -321,6 +327,7 @@ public class KeyService {
      * Returns a set of Users that should have access to a key.
      *
      * @param key the key of which the accessors are wanted
+     * @return A collection of users
      * @author dvonderbey@communicode.de
      * @since 0.15.0
      */
@@ -364,6 +371,7 @@ public class KeyService {
      * Returns a list of users that own a UserEncryptedPassword of the specified key.
      *
      * @param key the key the user should have an userEncryptedPassword of
+     * @return a collection of user subscriber info
      * @author dvonderbey@communicode.de
      * @since 0.15.0
      */
@@ -381,7 +389,7 @@ public class KeyService {
      * @return the key if validated
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    public Key validate(Long keyId) throws KeyNotFoundException {
+    public Key validate(Long keyId) {
         return ofNullable(keyRepository.findOne(keyId)).orElseThrow(KeyNotFoundException::new);
     }
 
@@ -393,7 +401,7 @@ public class KeyService {
      * @throws KeyNotFoundException if the Hashid is invalid and the key has not been found
      * @since 0.13.0
      */
-    private Long decodeSingleValueHashid(String hashid) throws HashidNotValidException {
+    private Long decodeSingleValueHashid(String hashid) {
         long[] decodedHashid = hashids.decode(hashid);
         if (decodedHashid.length == 0) {
             throw new HashidNotValidException();
