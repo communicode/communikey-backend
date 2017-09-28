@@ -22,6 +22,7 @@ import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.domain.UserEncryptedPassword;
 import de.communicode.communikey.exception.HashidNotValidException;
+import de.communicode.communikey.exception.KeyNotAccessibleByUserException;
 import de.communicode.communikey.exception.UserEncryptedPasswordNotFoundException;
 import de.communicode.communikey.repository.EncryptionJobRepository;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
@@ -95,6 +96,7 @@ public class KeyService {
      */
     public Key create(KeyPayload payload) {
         Key key = new Key();
+        checkPayloadKeyAccess(key, payload);
         String userLogin = getCurrentUserLogin();
         User user = userService.validate(userLogin);
         key.setCreator(user);
@@ -223,6 +225,7 @@ public class KeyService {
      */
     public Key update(Long keyId, KeyPayload payload) {
         Key key = validate(keyId);
+        checkPayloadKeyAccess(key, payload);
         key.setLogin(payload.getLogin());
         key.setName(payload.getName());
         key.setLogin(payload.getLogin());
@@ -288,6 +291,29 @@ public class KeyService {
     }
 
     /**
+     * Checks if the intended owner of the userEncryptedPassword has access to the key itself.
+     * Returns true, if the user who intents to PUT a new encrypted Password in the Set has indeed
+     * access to it. Otherwise returns false
+     *
+     * @author lleifermann@communicode.de
+     * @param key the key
+     * @param payload the payload to inspect
+     * @return boolean
+     * @since 0.15.0
+     */
+    private boolean checkKeyAccess(Key key, KeyPayloadEncryptedPasswords payload) {
+        KeyCategory keyCategory = key.getCategory();
+        User user = userService.validate(payload.getLogin());
+        if(user.getAuthorities().contains(authorityService.get(AuthoritiesConstants.ADMIN)))
+            return true;
+        for (UserGroup userGroup:keyCategory.getGroups()) {
+            if(user.getGroups().contains(userGroup)) return true;
+        }
+        log.info("User '{}' tried to add an encryptedPassword for user {} without access to the key.", getCurrentUserLogin(), user.getLogin());
+        return false;
+    }
+
+    /**
      * Removes all user encrypted passwords of a user.
      *
      * @param user the user whose passwords should be deleted
@@ -304,6 +330,20 @@ public class KeyService {
                 userEncryptedPasswordRepository.delete(userEncryptedPassword);
             });
         log.debug("Removed all encrypted passwords for user '{}'", user.getLogin());
+    }
+
+    /**
+     * Check encryptedPasswords in a given payload for key access.
+     *
+     * @author lleifermann@communicode.de
+     * @param key the key
+     * @param keyPayload the payload to inspect
+     * @since 0.15.0
+     */
+    private void checkPayloadKeyAccess(Key key, KeyPayload keyPayload) {
+        for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : keyPayload.getEncryptedPasswords()) {
+            if (!checkKeyAccess(key, encryptedPasswordsPayload)) throw new KeyNotAccessibleByUserException();
+        }
     }
 
     /**
