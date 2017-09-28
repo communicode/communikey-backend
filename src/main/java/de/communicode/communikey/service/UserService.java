@@ -286,9 +286,7 @@ public class UserService {
                 userEncryptedPasswordRepository.removeAllByOwner(user);
                 keyService.removeAllUserEncryptedPasswordsForUser(user);
                 log.debug("Generated publicKeyResetToken '{}' for user with email '{}'", user.getPublicKeyResetToken(), email);
-                return ImmutableMap.<String, String>builder().
-                    put("publicKeyResetToken", user.getPublicKeyResetToken()).
-                    build();
+                return ImmutableMap.of("publicKeyResetToken", user.getPublicKeyResetToken());
             }).orElseThrow(() -> new UserNotFoundException(email));
     }
 
