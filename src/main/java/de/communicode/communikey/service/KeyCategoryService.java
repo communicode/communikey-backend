@@ -6,14 +6,16 @@
  */
 package de.communicode.communikey.service;
 
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_CATEGORIES;
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_CATEGORIES_DELETE;
 import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLogin;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
-import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
-import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
+import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.User;
 import de.communicode.communikey.exception.KeyCategoryConflictException;
 import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import de.communicode.communikey.exception.KeyNotFoundException;
@@ -28,14 +30,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The REST API service to process {@link KeyCategory} entities via a {@link KeyCategoryRepository}.
+ * The REST API service to process {@link KeyCategory}
+ * entities via a {@link KeyCategoryRepository}.
  *
  * @author sgreb@communicode.de
  * @author dvonderbey@communicode.de
@@ -53,10 +57,15 @@ public class KeyCategoryService {
     private final UserGroupService userGroupService;
     private final UserGroupRepository userGroupRepository;
     private final Hashids hashids;
+    private final EncryptionJobService encryptionJobService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService, KeyService keyService, KeyRepository keyRepository,
-                              UserRepository userRepository, UserGroupService userGroupService, UserGroupRepository userGroupRepository, Hashids hashids) {
+    public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService,
+                              KeyService keyService, KeyRepository keyRepository, UserRepository userRepository,
+                              UserGroupService userGroupService, UserGroupRepository userGroupRepository,
+                              Hashids hashids, EncryptionJobService encryptionJobService,
+                              SimpMessagingTemplate messagingTemplate) {
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
@@ -65,6 +74,8 @@ public class KeyCategoryService {
         this.userGroupService = requireNonNull(userGroupService, "userGroupService must not be null!");
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
+        this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
+        this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
     }
 
     /**
@@ -75,14 +86,15 @@ public class KeyCategoryService {
      * @return the updated parent key category
      * @throws KeyCategoryNotFoundException if a key category with specified ID has not been found
      */
-    public KeyCategory addChild(Long parentKeyCategoryId, Long childKeyCategoryId) throws KeyCategoryNotFoundException {
-        KeyCategory child = this.validate(childKeyCategoryId);
-        KeyCategory parent = validate(parentKeyCategoryId);
-
+    public KeyCategory addChild(Long parentKeyCategoryId, Long childKeyCategoryId) {
         if (Objects.equals(parentKeyCategoryId, childKeyCategoryId)) {
             throw new KeyCategoryConflictException(
                 "parent key category ID '" + parentKeyCategoryId + "' equals child key category ID '" + childKeyCategoryId + "'");
         }
+
+        KeyCategory child = this.validate(childKeyCategoryId);
+        KeyCategory parent = validate(parentKeyCategoryId);
+
         if (child.getTreeLevel() < parent.getTreeLevel()) {
             checkPathCollision(parent, childKeyCategoryId);
         }
@@ -92,6 +104,7 @@ public class KeyCategoryService {
             child.setParent(parent);
             child.setTreeLevel(parent.getTreeLevel() + 1);
             updateChildrenTreeLevel(child);
+            sendUpdates(child);
             log.debug("Added key category with ID '{}' as child to key category with ID '{}'", child.getId(), parent.getId());
             return keyCategoryRepository.save(parent);
         }
@@ -107,17 +120,19 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if the key category with specified ID has not been found
      * @throws UserGroupNotFoundException if the user group with specified name has not been found
      */
-    public KeyCategory addUserGroup(Long keyCategoryId, Long userGroupId) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
+    public KeyCategory addUserGroup(Long keyCategoryId, Long userGroupId) {
         KeyCategory keyCategory = validate(keyCategoryId);
         UserGroup userGroup = userGroupService.validate(userGroupId);
 
         if (keyCategory.addGroup(userGroup)) {
             userGroup.addCategory(keyCategory);
             userGroupRepository.save(userGroup);
+            keyCategoryRepository.save(keyCategory);
+            encryptionJobService.createForCategoryForUsergroup(keyCategory, userGroup);
             log.debug("Added user group '{}' to key category with ID '{}'", userGroup.getName(), keyCategoryId);
-            return keyCategoryRepository.save(keyCategory);
+            return (keyCategory);
         }
-         return keyCategory;
+        return keyCategory;
     }
 
     /**
@@ -136,7 +151,10 @@ public class KeyCategoryService {
         key = keyRepository.save(key);
         keyCategory.addKey(key);
         keyCategory = keyCategoryRepository.save(keyCategory);
+        encryptionJobService.createForKeyInCategory(key, keyCategory);
         log.debug("Added key with ID '{}' to key category with ID '{}'", keyId, keyCategoryId);
+
+        keyService.sendUpdates(key);
         return keyCategory;
     }
 
@@ -148,7 +166,7 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if the parent key category with the specified ID has not been found
      * @throws UserNotFoundException if the user with the specified ID has not been found
      */
-    public KeyCategory create(KeyCategoryPayload payload) throws KeyCategoryNotFoundException, UserNotFoundException {
+    public KeyCategory create(KeyCategoryPayload payload) {
         String name = payload.getName();
         validateUniqueKeyCategoryName(name, null);
 
@@ -161,9 +179,10 @@ public class KeyCategoryService {
         keyCategory.setHashid(hashids.encode(keyCategory.getId()));
         keyCategory = keyCategoryRepository.save(keyCategory);
         setResponsibleUser(keyCategory.getId(), user.getLogin());
-
         user.addResponsibleKeyCategory(keyCategory);
         userRepository.save(user);
+
+        sendUpdates(keyCategory);
         log.debug("Created new key category with ID '{}'", keyCategory.getId());
         return keyCategory;
     }
@@ -176,10 +195,11 @@ public class KeyCategoryService {
      * @param keyCategoryId the ID of the key category to delete
      * @throws KeyCategoryNotFoundException if the key category with the specified ID has been found
      */
-    public void delete(Long keyCategoryId) throws KeyCategoryNotFoundException {
+    public void delete(Long keyCategoryId) {
         KeyCategory keyCategory = validate(keyCategoryId);
         keyCategory = dissolveReferences(keyCategory);
         keyCategoryRepository.delete(keyCategory);
+        sendRemovalUpdates(keyCategory);
         log.debug("Deleted key category with ID '{}'", keyCategoryId);
     }
 
@@ -207,7 +227,7 @@ public class KeyCategoryService {
      * @return the found key category entity
      * @throws KeyCategoryNotFoundException if the key category entity with the specified ID has not been found
      */
-    public KeyCategory get(Long keyCategoryId) throws KeyCategoryNotFoundException {
+    public KeyCategory get(Long keyCategoryId) {
         return validate(keyCategoryId);
     }
 
@@ -220,7 +240,7 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if the key category with specified ID has not been found
      * @throws UserGroupNotFoundException if the user group with specified name has not been found
      */
-    public KeyCategory removeUserGroup(Long keyCategoryId, Long userGroupId) throws KeyCategoryNotFoundException, UserGroupNotFoundException {
+    public KeyCategory removeUserGroup(Long keyCategoryId, Long userGroupId) {
         KeyCategory keyCategory = validate(keyCategoryId);
         UserGroup userGroup = userGroupService.validate(userGroupId);
 
@@ -264,7 +284,7 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if the key category with the specified ID has not been found
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public KeyCategory setResponsibleUser(Long keyCategoryId, String userLogin) throws KeyCategoryNotFoundException, UserNotFoundException {
+    public KeyCategory setResponsibleUser(Long keyCategoryId, String userLogin) {
         User user = userService.validate(userLogin);
         KeyCategory keyCategory = validate(keyCategoryId);
 
@@ -290,6 +310,7 @@ public class KeyCategoryService {
             validateUniqueKeyCategoryName(payload.getName(), ofNullable(keyCategory.getParent()).map(KeyCategory::getId).orElse(null));
             keyCategory.setName(payload.getName());
             keyCategory = keyCategoryRepository.save(keyCategory);
+            sendUpdates(keyCategory);
             log.debug("Updated key category with ID '{}'", keyCategory.getId());
         }
         return keyCategory;
@@ -302,7 +323,7 @@ public class KeyCategoryService {
      * @return the key category if validated
      * @throws KeyCategoryNotFoundException if the key category with the specified ID has not been found
      */
-    public KeyCategory validate(Long keyCategoryId) throws KeyCategoryNotFoundException {
+    public KeyCategory validate(Long keyCategoryId) {
         return ofNullable(keyCategoryRepository.findOne(keyCategoryId)).orElseThrow(KeyCategoryNotFoundException::new);
     }
 
@@ -313,7 +334,7 @@ public class KeyCategoryService {
      * @param parentKeyCategoryId the ID of the parent key category to validate
      * @throws KeyCategoryConflictException if the specified key category name is not unique
      */
-    private void validateUniqueKeyCategoryName(String name, Long parentKeyCategoryId) throws KeyCategoryConflictException {
+    private void validateUniqueKeyCategoryName(String name, Long parentKeyCategoryId) {
         if (Objects.nonNull(parentKeyCategoryId)) {
             if (ofNullable(keyCategoryRepository.findOne(parentKeyCategoryId))
                 .map(keyCategory -> keyCategory.getChildren().stream()
@@ -396,5 +417,30 @@ public class KeyCategoryService {
             child.setTreeLevel(keyCategory.getTreeLevel() + 1);
             updateChildrenTreeLevel(child);
         }
+    }
+
+    /**
+     * Sends out websocket messages to users for live updates.
+     *
+     * @param keyCategory the category that was updated
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendUpdates(KeyCategory keyCategory) {
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_CATEGORIES, keyCategory);
+        log.debug("Sent out updates for key category '{}'.", keyCategory.getId());
+    }
+
+
+    /**
+     * Sends out websocket messages to users for live updates on removals.
+     *
+     * @param keyCategory the category that was removed
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendRemovalUpdates(KeyCategory keyCategory) {
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_CATEGORIES_DELETE, keyCategory);
+        log.debug("Sent out removal update for key category '{}'.", keyCategory.getId());
     }
 }

@@ -7,6 +7,7 @@
 package de.communicode.communikey.repository;
 
 import de.communicode.communikey.domain.Authority;
+import de.communicode.communikey.domain.UserGroup;
 import org.springframework.data.jpa.repository.EntityGraph;
 import de.communicode.communikey.domain.User;
 import org.springframework.data.repository.CrudRepository;
@@ -34,10 +35,20 @@ public interface UserRepository extends CrudRepository<User, Long> {
     /**
      * Finds all user entities with a specific authority of the repository.
      *
+     * @param authority the authority the users should be in
      * @return a collection of found user entities
      * @since 0.15.0
      */
     Set<User> findAllByAuthorities(Authority authority);
+
+    /**
+     * Finds all user entities with a specific usergroup.
+     *
+     * @param userGroup the userGroup the users should be in
+     * @return a collection of found user entities
+     * @since 0.15.0
+     */
+    Set<User> findAllByGroupsContains(UserGroup userGroup);
 
     /**
      * Finds the user entity with the specified activation token.

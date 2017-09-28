@@ -6,6 +6,8 @@
  */
 package de.communicode.communikey.service;
 
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_USERS;
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_USERS_DELETE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -37,6 +39,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.stereotype.Service;
@@ -69,8 +72,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JdbcTokenStore jdbcTokenStore;
     private final AuthorityService authorityService;
-    private final UserService userService;
+    private final EncryptionJobService encryptionJobService;
     private final CommunikeyProperties communikeyProperties;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     public UserService(
@@ -84,8 +88,9 @@ public class UserService {
             PasswordEncoder passwordEncoder,
             JdbcTokenStore jdbcTokenStore,
             AuthorityService authorityService,
-            @Lazy UserService userService,
-            CommunikeyProperties communikeyProperties) {
+            CommunikeyProperties communikeyProperties,
+            @Lazy EncryptionJobService encryptionJobService,
+            SimpMessagingTemplate messagingTemplate) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
@@ -96,8 +101,9 @@ public class UserService {
         this.passwordEncoder = requireNonNull(passwordEncoder, "passwordEncoder must not be null!");
         this.jdbcTokenStore = requireNonNull(jdbcTokenStore, "jdbcTokenStore must not be null!");
         this.authorityService = requireNonNull(authorityService, "authorityService must not be null!");
-        this.userService = requireNonNull(userService, "userService must not be null!");
+        this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
         this.communikeyProperties = requireNonNull(communikeyProperties, "communikeyProperties must not be null!");
+        this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
     }
 
     /**
@@ -107,12 +113,13 @@ public class UserService {
      * @return the activated user
      * @throws ActivationTokenNotFoundException if the specified activation token has not been found
      */
-    public User activate(String activationToken) throws ActivationTokenNotFoundException {
+    public User activate(String activationToken) {
         return ofNullable(userRepository.findOneByActivationToken(activationToken))
             .map(user -> {
                 user.setActivated(true);
                 user.setActivationToken(null);
                 userRepository.save(user);
+                sendUpdates(user);
                 log.debug("Activated user '{}' with activation token '{}'", user.getLogin(), activationToken);
                 return user;
             }).orElseThrow(() -> new ActivationTokenNotFoundException(activationToken));
@@ -127,12 +134,13 @@ public class UserService {
      * @throws UserNotFoundException if the user with specified login has not been found
      * @throws AuthorityNotFoundException if the authority with specified name has not been found
      */
-    public User addAuthority(String login, String authorityName) throws UserNotFoundException, AuthorityNotFoundException {
+    public User addAuthority(String login, String authorityName) {
         User user = validate(login);
         Authority authority = authorityService.validate(authorityName);
 
         if (user.addAuthority(authority)) {
             log.debug("Added authority with name '{}' to user with login '{}'", authority.getName(), login);
+            encryptionJobService.createForUser(user);
             deleteOauth2AccessTokens(login);
             return userRepository.save(user);
         }
@@ -175,7 +183,7 @@ public class UserService {
      * @return the created user
      * @throws UserConflictException if a user with the specified email already exists
      */
-    public User create(UserCreationPayload payload) throws UserConflictException {
+    public User create(UserCreationPayload payload) {
         String email = payload.getEmail();
         validateUniqueEmail(email);
 
@@ -193,6 +201,7 @@ public class UserService {
         user.addAuthorities(authorities);
 
         userRepository.save(user);
+        sendUpdates(user);
         log.debug("Created new user: {}", user);
         return user;
     }
@@ -204,7 +213,7 @@ public class UserService {
      * @return the deactivated user
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public User deactivate(String login) throws UserNotFoundException {
+    public User deactivate(String login) {
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
                 user.setActivated(false);
@@ -223,11 +232,12 @@ public class UserService {
      * @param login the login of the user to delete
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public void delete(String login) throws UserNotFoundException {
+    public void delete(String login) {
         deleteOauth2AccessTokens(login);
         User user = dissolveReferences(validate(login));
         keyService.removeObsoletePasswords(user);
         userRepository.delete(user);
+        sendRemovalUpdates(user);
         log.debug("Deleted user with login '{}'", login);
     }
 
@@ -273,10 +283,10 @@ public class UserService {
                 user.setPublicKeyResetToken(SecurityUtils.generateRandomResetToken());
                 user.setPublicKeyResetDate(ZonedDateTime.now());
                 userRepository.save(user);
+                userEncryptedPasswordRepository.removeAllByOwner(user);
+                keyService.removeAllUserEncryptedPasswordsForUser(user);
                 log.debug("Generated publicKeyResetToken '{}' for user with email '{}'", user.getPublicKeyResetToken(), email);
-                return ImmutableMap.<String, String>builder().
-                    put("publicKeyResetToken", user.getPublicKeyResetToken()).
-                    build();
+                return ImmutableMap.of("publicKeyResetToken", user.getPublicKeyResetToken());
             }).orElseThrow(() -> new UserNotFoundException(email));
     }
 
@@ -318,12 +328,13 @@ public class UserService {
      * @throws UserNotFoundException if the user with specified login has not been found
      * @throws AuthorityNotFoundException if the authority with specified name has not been found
      */
-    public User removeAuthority(String login, String authorityName) throws UserNotFoundException, AuthorityNotFoundException {
+    public User removeAuthority(String login, String authorityName) {
         User user = validate(login);
         Authority authority = authorityService.validate(authorityName);
 
         if (user.removeAuthority(authority)) {
             log.debug("Removed authority with name '{}' from user with login '{}'", authority.getName(), login);
+            keyService.removeObsoletePasswords(user);
             deleteOauth2AccessTokens(login);
             return userRepository.save(user);
         }
@@ -362,6 +373,7 @@ public class UserService {
                 user.setPublicKeyResetDate(null);
                 userRepository.save(user);
                 keyService.removeAllUserEncryptedPasswordsForUser(user);
+                encryptionJobService.createForUser(user);
                 log.debug("Reset publicKeyResetToken with reset token '{}' for user with login '{}'", publicKeyResetToken, user.getLogin());
                 return user;
             }).orElseThrow(() -> new ResetTokenNotFoundException(publicKeyResetToken));
@@ -375,7 +387,7 @@ public class UserService {
      * @return the updated user
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public User update(String login, UserPayload payload) throws UserNotFoundException {
+    public User update(String login, UserPayload payload) {
         String email = payload.getEmail();
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
@@ -390,6 +402,7 @@ public class UserService {
                 user.setLastName(payload.getLastName());
 
                 userRepository.save(user);
+                sendUpdates(user);
                 log.debug("Updated user with login '{}'", user.getLogin());
                 return user;
             }).orElseThrow(() -> new UserNotFoundException(login));
@@ -403,7 +416,7 @@ public class UserService {
      * @return the updated user
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public User updateAuthorities(String login, Set<String> payload) throws UserNotFoundException {
+    public User updateAuthorities(String login, Set<String> payload) {
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
                 Set<Authority> payloadAuthorities = payload.stream()
@@ -429,7 +442,7 @@ public class UserService {
      * @return the user if validated
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public User validate(String login) throws UserNotFoundException {
+    public User validate(String login) {
         return ofNullable(userRepository.findOneByLogin(login)).orElseThrow(() -> new UserNotFoundException(login));
     }
 
@@ -454,7 +467,7 @@ public class UserService {
      * @return the user if validated
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
-    public User validateWithAuthorities(String login) throws UserNotFoundException {
+    public User validateWithAuthorities(String login) {
         return ofNullable(userRepository.findOneWithAuthoritiesByLogin(login)).orElseThrow(() -> new UserNotFoundException(login));
     }
 
@@ -483,7 +496,7 @@ public class UserService {
     private User dissolveReferences(User user) {
         user.getKeyCategories()
                 .forEach(keyCategory -> {
-                    keyCategory.setCreator(userService.validate(communikeyProperties.getSecurity().getRoot().getLogin()));
+                    keyCategory.setCreator(validate(communikeyProperties.getSecurity().getRoot().getLogin()));
                     keyCategoryRepository.save(keyCategory);
                     log.debug("Assigned key category with ID '{}' created by user '{}' to user '{}'",
                             keyCategory.getId(), user.getLogin(), communikeyProperties.getSecurity().getRoot().getLogin()
@@ -503,7 +516,7 @@ public class UserService {
                 });
         user.getKeys()
                 .forEach(key -> {
-                    key.setCreator(userService.validate(communikeyProperties.getSecurity().getRoot().getLogin()));
+                    key.setCreator(validate(communikeyProperties.getSecurity().getRoot().getLogin()));
                     keyRepository.save(key);
                     log.debug("Assigned key with ID '{}' (created by user '{}') to user '{}'",
                             key.getId(), user.getLogin(), communikeyProperties.getSecurity().getRoot().getLogin()
@@ -528,9 +541,34 @@ public class UserService {
      * @param email the email to validate
      * @throws UserConflictException if the specified email is not unique
      */
-    private void validateUniqueEmail(String email) throws UserConflictException {
+    private void validateUniqueEmail(String email) {
         if (ofNullable(userRepository.findOneByEmail(email)).isPresent()) {
             throw new UserConflictException("email '" + email + "' already exists");
         }
+    }
+
+    /**
+     * Sends out websocket messages to users for live updates.
+     *
+     * @param user the user that was updated
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendUpdates(User user) {
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_USERS, user);
+        log.debug("Sent out updates for user '{}'.", user.getId());
+    }
+
+
+    /**
+     * Sends out websocket messages to users for live updates on removals.
+     *
+     * @param user the user that was removed
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendRemovalUpdates(User user) {
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_USERS_DELETE, user);
+        log.debug("Sent out removal update for user '{}'.", user.getId());
     }
 }

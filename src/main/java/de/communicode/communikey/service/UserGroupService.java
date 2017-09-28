@@ -6,6 +6,8 @@
  */
 package de.communicode.communikey.service;
 
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_GROUPS;
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_GROUPS_DELETE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -21,10 +23,9 @@ import de.communicode.communikey.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -42,15 +43,20 @@ public class UserGroupService {
     private final KeyCategoryRepository keyCategoryRepository;
     private final UserService userService;
     private final KeyService keyService;
+    private final EncryptionJobService encryptionJobService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     public UserGroupService(UserGroupRepository userGroupRepository, UserService userService, UserRepository userRepository,
-            KeyCategoryRepository keyCategoryRepository, KeyService keyService) {
+            KeyCategoryRepository keyCategoryRepository, KeyService keyService, EncryptionJobService encryptionJobService,
+                            SimpMessagingTemplate messagingTemplate) {
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
+        this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
+        this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
     }
 
     /**
@@ -63,11 +69,13 @@ public class UserGroupService {
      * @throws UserGroupNotFoundException if the user group with the specified ID has not been found
      */
     public UserGroup addUser(Long userGroupId, String login) {
+        User user = userService.validate(login);
         return ofNullable(userGroupRepository.findOne(userGroupId))
             .map(userGroup -> {
-                if (userGroup.addUser(userService.validate(login))) {
+                if (userGroup.addUser(user)) {
                     userGroupRepository.save(userGroup);
                     log.debug("Added user with login '{}' to user group '{}'", login, userGroup.getName());
+                    encryptionJobService.createForUsergroupForUser(userGroup, user);
                     return userGroup;
                 }
                 return userGroup;
@@ -81,13 +89,15 @@ public class UserGroupService {
      * @return the created user group
      * @throws UserGroupConflictException if a user group with the specified name already exists
      */
-    public UserGroup create(UserGroup payload) throws UserGroupConflictException {
+    public UserGroup create(UserGroup payload) {
         validateUniqueName(payload.getName());
 
         UserGroup userGroup = new UserGroup();
         userGroup.setName(payload.getName());
 
         userGroupRepository.save(userGroup);
+
+        sendUpdates(userGroup);
         log.debug("Created new user group '{}'", userGroup.getName());
         return userGroup;
     }
@@ -112,6 +122,7 @@ public class UserGroupService {
             log.debug("Removed user group with name '{}' from key category with ID '{}'", userGroup.getName(), keyCategory.getId());
         });
         userGroupRepository.delete(userGroup);
+        sendRemovalUpdates(userGroup);
         log.debug("Deleted user group with ID '{}'", userGroupId);
     }
 
@@ -134,7 +145,7 @@ public class UserGroupService {
      * @throws UserGroupNotFoundException if the user group with the specified ID has not been found
      * @since 0.9.0
      */
-    public UserGroup get(Long userGroupId) throws UserGroupNotFoundException {
+    public UserGroup get(Long userGroupId) {
         return validate(userGroupId);
     }
 
@@ -154,7 +165,7 @@ public class UserGroupService {
      * @return the user group
      * @throws UserGroupNotFoundException if the user group with the specified name has not been found
      */
-    public UserGroup getByName(String name) throws UserGroupNotFoundException {
+    public UserGroup getByName(String name) {
         return validate(name);
     }
 
@@ -190,13 +201,14 @@ public class UserGroupService {
      * @return the updated user group
      * @throws UserGroupNotFoundException if the user group with the specified name has not been found
      */
-    public UserGroup update(Long userGroupId, UserGroup payload) throws UserGroupNotFoundException {
+    public UserGroup update(Long userGroupId, UserGroup payload) {
         return ofNullable(validate(userGroupId))
             .map(userGroup -> {
                 if (!userGroup.getName().equals(payload.getName())) {
                     validateUniqueName(payload.getName());
                     userGroup.setName(payload.getName());
                     userGroupRepository.save(userGroup);
+                    sendUpdates(userGroup);
                     log.debug("Updated user group '{}'", userGroup.getName());
                 }
                 return userGroup;
@@ -210,7 +222,7 @@ public class UserGroupService {
      * @return the user group if validated
      * @throws UserGroupNotFoundException if the user group with the specified name has not been found
      */
-    public UserGroup validate(String name) throws UserGroupNotFoundException {
+    public UserGroup validate(String name) {
         return ofNullable(userGroupRepository.findOneByName(name)).orElseThrow(() -> new UserGroupNotFoundException(name));
     }
 
@@ -222,7 +234,7 @@ public class UserGroupService {
      * @throws UserGroupNotFoundException if the user group with the specified name has not been found
      * @since 0.9.0
      */
-    public UserGroup validate(Long userGroupId) throws UserGroupNotFoundException {
+    public UserGroup validate(Long userGroupId) {
         return ofNullable(userGroupRepository.findOne(userGroupId)).orElseThrow(() -> new UserGroupNotFoundException(userGroupId));
     }
 
@@ -232,9 +244,33 @@ public class UserGroupService {
      * @param name the name to validate
      * @throws UserGroupConflictException if the specified name is not unique
      */
-    private void validateUniqueName(String name) throws UserGroupConflictException {
+    private void validateUniqueName(String name) {
         if (userGroupRepository.findOneByName(name) != null) {
             throw new UserGroupConflictException("user group '" + name +"' already exists");
         }
+    }
+
+    /**
+     * Sends out websocket messages to users for live updates.
+     *
+     * @param userGroup the user group that was updated
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendUpdates(UserGroup userGroup) {
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_GROUPS, userGroup);
+        log.debug("Sent out update for group '{}'.", userGroup.getId());
+    }
+
+    /**
+     * Sends out websocket messages to users for live updates.
+     *
+     * @param userGroup the user group that was removed
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendRemovalUpdates(UserGroup userGroup) {
+        messagingTemplate.convertAndSend(QUEUE_UPDATES_GROUPS_DELETE, userGroup);
+        log.debug("Sent out removal update for group '{}'.", userGroup.getId());
     }
 }

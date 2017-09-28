@@ -6,6 +6,8 @@
  */
 package de.communicode.communikey.service;
 
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_KEYS;
+import static de.communicode.communikey.controller.RequestMappings.QUEUE_UPDATES_KEYS_DELETE;
 import static de.communicode.communikey.security.AuthoritiesConstants.ADMIN;
 import static de.communicode.communikey.security.SecurityUtils.getCurrentUserLogin;
 import static de.communicode.communikey.security.SecurityUtils.isCurrentUserInRole;
@@ -22,6 +24,7 @@ import de.communicode.communikey.domain.UserEncryptedPassword;
 import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.exception.KeyNotAccessibleByUserException;
 import de.communicode.communikey.exception.UserEncryptedPasswordNotFoundException;
+import de.communicode.communikey.repository.EncryptionJobRepository;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
@@ -35,6 +38,7 @@ import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -47,6 +51,7 @@ import java.util.stream.Stream;
  * The REST API service to process {@link Key} entities via a {@link KeyRepository}.
  *
  * @author sgreb@communicode.de
+ * @author dvonderbey@communicode.de
  * @since 0.1.0
  */
 @Service
@@ -60,12 +65,17 @@ public class KeyService {
     private final Hashids hashids;
     private final UserRepository userRepository;
     private final AuthorityService authorityService;
+    private final EncryptionJobService encryptionJobService;
+    private final EncryptionJobRepository encryptionJobRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     public KeyService(KeyRepository keyRepository, @Lazy KeyCategoryService keyCategoryService,
                       UserService userRestService, Hashids hashids, UserEncryptedPasswordRepository
                       userEncryptedPasswordRepository, UserRepository userRepository,
-                      AuthorityService authorityService) {
+                      AuthorityService authorityService, @Lazy EncryptionJobService encryptionJobService,
+                      EncryptionJobRepository encryptionJobRepository,
+                      SimpMessagingTemplate messagingTemplate) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.userEncryptedPasswordRepository = requireNonNull(userEncryptedPasswordRepository, "userEncryptedPasswordRepository must not be null!");
         this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
@@ -73,12 +83,16 @@ public class KeyService {
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.authorityService = requireNonNull(authorityService, "authorityService must not be null!");
+        this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
+        this.encryptionJobRepository = requireNonNull(encryptionJobRepository, "encryptionJobRepository must not be null!");
+        this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
     }
 
     /**
      * Creates a new key.
      *
      * @param payload the key payload
+     * @return the created key
      */
     public Key create(KeyPayload payload) {
         Key key = new Key();
@@ -101,6 +115,7 @@ public class KeyService {
             persistedKey = keyRepository.findOne(persistedKey.getId());
         }
         userService.addKey(userLogin, persistedKey);
+        sendUpdates(key);
         return persistedKey;
     }
 
@@ -127,10 +142,12 @@ public class KeyService {
      * @param keyId the ID of the key to delete
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    public void delete(Long keyId) throws KeyNotFoundException {
+    public void delete(Long keyId) {
         Key key = validate(keyId);
         userEncryptedPasswordRepository.deleteByKey(key);
+        encryptionJobRepository.deleteByKey(key);
         keyRepository.delete(key);
+        sendRemovalUpdates(key);
         log.debug("Deleted key with ID '{}'", keyId);
     }
 
@@ -152,7 +169,7 @@ public class KeyService {
      * @return the key, {@link Optional#empty()} otherwise
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    public Optional<Key> get(Long keyId) throws KeyNotFoundException {
+    public Optional<Key> get(Long keyId) {
         if (isCurrentUserInRole(ADMIN)) {
             return Optional.ofNullable(validate(keyId));
         }
@@ -185,9 +202,10 @@ public class KeyService {
     /**
      * Gets a userEncryptedPassword for the specified hashid
      *
+     * @param hashid the hashid of the key
      * @return a userEncryptedPassword
      */
-    public Optional<UserEncryptedPassword> getUserEncryptedPassword(Long hashid) throws KeyNotFoundException, UserEncryptedPasswordNotFoundException {
+    public Optional<UserEncryptedPassword> getUserEncryptedPassword(Long hashid) {
         String login = SecurityUtils.getCurrentUserLogin();
         User user = userService.validate(login);
         Key key = validate(hashid);
@@ -212,18 +230,33 @@ public class KeyService {
         key.setName(payload.getName());
         key.setLogin(payload.getLogin());
         key.setNotes(payload.getNotes());
+        key.getUserEncryptedPasswords()
+            .forEach(userEncryptedPassword -> {
+                userEncryptedPassword.getOwner().removeUserEncryptedPassword(userEncryptedPassword);
+                userRepository.save(userEncryptedPassword.getOwner());
+                log.debug("Removed userEncryptedPassword with id '{}' for user '{}'",
+                            userEncryptedPassword.getId(),
+                            userEncryptedPassword.getOwner().getId());
+            });
+        key.removeAllUserEncryptedPasswords();
         key = keyRepository.save(key);
+        userEncryptedPasswordRepository.deleteByKey(key);
         for (KeyPayloadEncryptedPasswords encryptedPasswordsPayload : payload.getEncryptedPasswords()) {
             UserEncryptedPassword userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(
                 userService.validate(encryptedPasswordsPayload.getLogin()), validate(keyId));
             if(userEncryptedPassword != null) {
+                log.debug("HTTP- Updating old userEncryptedPassword");
                 userEncryptedPassword.setPassword(encryptedPasswordsPayload.getEncryptedPassword());
                 userEncryptedPasswordRepository.save(userEncryptedPassword);
             } else {
+                log.debug("HTTP- Creating new userEncryptedPassword");
                 createUserEncryptedPasswords(key, encryptedPasswordsPayload);
             }
         }
-        key = keyRepository.save(key);
+        final Key savedKey = keyRepository.save(key);
+        encryptionJobService.createForKey(savedKey);
+
+        sendUpdates(key);
         return key;
     }
 
@@ -241,12 +274,15 @@ public class KeyService {
                 KeyCategory category = key.getCategory();
                 if (category != null) {
                     Set<UserGroup> userGroups = category.getGroups();
-                    if (userGroups.isEmpty()) deleteUserEncryptedPassword(key, userEncryptedPassword);
-                    else userGroups.forEach(userGroup -> {
-                        if (!user.getGroups().contains(userGroup)) {
-                            deleteUserEncryptedPassword(key, userEncryptedPassword);
-                        }
-                    });
+                    if (userGroups.isEmpty()) {
+                        deleteUserEncryptedPassword(key, userEncryptedPassword);
+                    } else {
+                        userGroups.forEach(userGroup -> {
+                            if (!user.getGroups().contains(userGroup)) {
+                                deleteUserEncryptedPassword(key, userEncryptedPassword);
+                            }
+                        });
+                    }
 
                 } else if (!key.getCreator().equals(user)){
                     deleteUserEncryptedPassword(key, userEncryptedPassword);
@@ -277,8 +313,22 @@ public class KeyService {
         return false;
     }
 
+    /**
+     * Removes all user encrypted passwords of a user.
+     *
+     * @param user the user whose passwords should be deleted
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
     public void removeAllUserEncryptedPasswordsForUser(User user) {
-        userEncryptedPasswordRepository.removeAllByOwner(user);
+        userEncryptedPasswordRepository.findAllByOwner(user)
+            .forEach(userEncryptedPassword -> {
+                user.removeUserEncryptedPassword(userEncryptedPassword);
+                userRepository.save(user);
+                userEncryptedPassword.getKey().removeUserEncryptedPassword(userEncryptedPassword);
+                userEncryptedPasswordRepository.save(userEncryptedPassword);
+                userEncryptedPasswordRepository.delete(userEncryptedPassword);
+            });
         log.debug("Removed all encrypted passwords for user '{}'", user.getLogin());
     }
 
@@ -302,25 +352,38 @@ public class KeyService {
      * are able to "see" the key. Also adds all admins to the list.
      *
      * @param keyId the keyId of the key of which the subscribers are wanted
+     * @return An optional containing a collection of user subscriber info
      * @author dvonderbey@communicode.de
      * @since 0.15.0
      */
     public Optional<Set<User.SubscriberInfo>> getSubscribers(Long keyId) {
-        Stream<User.SubscriberInfo> subscriberStream = get(keyId)
+        return getAccessors(validate(keyId)).stream()
+            .filter(user -> user.getPublicKey() != null)
+            .map(User::getSubscriberInfo)
+            .collect(collectingAndThen(toSet(), Optional::of));
+    }
+
+    /**
+     * Returns a set of Users that should have access to a key.
+     *
+     * @param key the key of which the accessors are wanted
+     * @return A collection of users
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public Set<User> getAccessors(Key key) {
+        Stream<User> subscriberStream = Optional.of(key)
             .map(Key::getCategory)
             .map(KeyCategory::getGroups)
             .map(Collection::stream)
             .orElse(Stream.empty())
-            .flatMap(userGroup -> userGroup.getUsers().stream())
-            .filter(user -> user.getPublicKey() != null)
-            .map(User::getSubscriberInfo);
+            .flatMap(userGroup -> userGroup.getUsers().stream());
 
-        Stream<User.SubscriberInfo> adminStream = userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
-            .stream()
-            .map(User::getSubscriberInfo);
+        Stream<User> adminStream = userRepository.findAllByAuthorities(authorityService.get(AuthoritiesConstants.ADMIN))
+            .stream();
 
         return Stream.concat(subscriberStream, adminStream)
-            .collect(collectingAndThen(toSet(), Optional::of));
+            .collect(toSet());
     }
 
     /**
@@ -345,13 +408,28 @@ public class KeyService {
     }
 
     /**
+     * Returns a list of users that own a UserEncryptedPassword of the specified key.
+     *
+     * @param key the key the user should have an userEncryptedPassword of
+     * @return a collection of user subscriber info
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public Set<User.SubscriberInfo> getQualifiedEncoders(Key key) {
+        return userEncryptedPasswordRepository.findAllByKey(key).stream()
+            .map(UserEncryptedPassword::getOwner)
+            .map(User::getSubscriberInfo)
+            .collect(toSet());
+    }
+
+    /**
      * Validates a key with the specified ID.
      *
      * @param keyId the ID of the key to validate
      * @return the key if validated
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
-    public Key validate(Long keyId) throws KeyNotFoundException {
+    public Key validate(Long keyId) {
         return ofNullable(keyRepository.findOne(keyId)).orElseThrow(KeyNotFoundException::new);
     }
 
@@ -363,11 +441,37 @@ public class KeyService {
      * @throws KeyNotFoundException if the Hashid is invalid and the key has not been found
      * @since 0.13.0
      */
-    private Long decodeSingleValueHashid(String hashid) throws HashidNotValidException {
+    private Long decodeSingleValueHashid(String hashid) {
         long[] decodedHashid = hashids.decode(hashid);
         if (decodedHashid.length == 0) {
             throw new HashidNotValidException();
         }
         return decodedHashid[0];
+    }
+
+    /**
+     * Sends out websocket messages to users for live updates.
+     *
+     * @param key the key that was updated
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendUpdates(Key key) {
+        getAccessors(key)
+            .forEach(user -> messagingTemplate.convertAndSendToUser(user.getLogin(), QUEUE_UPDATES_KEYS, key));
+        log.debug("Sent out updates for key '{}'.", key.getId());
+    }
+
+    /**
+     * Sends out websocket messages to users for live removals.
+     *
+     * @param key the key that was removed
+     * @author dvonderbey@communicode.de
+     * @since 0.15.0
+     */
+    public void sendRemovalUpdates(Key key) {
+        getAccessors(key)
+            .forEach(user -> messagingTemplate.convertAndSendToUser(user.getLogin(), QUEUE_UPDATES_KEYS_DELETE, key));
+        log.debug("Sent out removal updates for key '{}'.", key.getId());
     }
 }

@@ -6,6 +6,7 @@
  */
 package de.communicode.communikey.controller;
 
+import de.communicode.communikey.domain.EncryptionJob;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
 
@@ -17,8 +18,6 @@ import de.communicode.communikey.domain.KeyCategory;
  * @since 0.2.0
  */
 public final class PathVariables {
-
-    private PathVariables() {}
 
     public static final String USER_ACTIVATION_TOKEN = "activation_token";
     public static final String USER_EMAIL = "email";
@@ -41,4 +40,13 @@ public final class PathVariables {
      * @since 0.13.0
      */
     public static final String KEYCATEGORY_ID = "keyCategoryId";
+
+    /**
+     * The Token of a {@link EncryptionJob}.
+     *
+     * @since 0.15.0
+     */
+    public static final String JOB_TOKEN = "token";
+
+    private PathVariables() {}
 }
