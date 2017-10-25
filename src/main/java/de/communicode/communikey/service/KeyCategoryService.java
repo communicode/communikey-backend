@@ -21,6 +21,7 @@ import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.exception.UserGroupNotFoundException;
 import de.communicode.communikey.exception.UserNotFoundException;
+import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.repository.KeyCategoryRepository;
 import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserGroupRepository;
@@ -168,16 +169,32 @@ public class KeyCategoryService {
      */
     public KeyCategory create(KeyCategoryPayload payload) {
         String name = payload.getName();
-        validateUniqueKeyCategoryName(name, null);
+        KeyCategory parentCategory = null;
+
+        if (Objects.nonNull(payload.getParent())) {
+            parentCategory = validate(decodeSingleValueHashid(payload.getParent()));
+            validateUniqueKeyCategoryName(name, parentCategory.getId());
+        } else {
+            validateUniqueKeyCategoryName(name, null);
+        }
 
         KeyCategory keyCategory = new KeyCategory();
         User user = userService.validate(getCurrentUserLogin());
 
         keyCategory.setName(name);
         keyCategory.setCreator(user);
+        if (Objects.nonNull(parentCategory)) {
+            keyCategory.setParent(parentCategory);
+        }
         keyCategory = keyCategoryRepository.save(keyCategory);
         keyCategory.setHashid(hashids.encode(keyCategory.getId()));
         keyCategory = keyCategoryRepository.save(keyCategory);
+
+        if (Objects.nonNull(parentCategory)) {
+            parentCategory.addChild(keyCategory);
+            keyCategoryRepository.save(parentCategory);
+        }
+
         setResponsibleUser(keyCategory.getId(), user.getLogin());
         user.addResponsibleKeyCategory(keyCategory);
         userRepository.save(user);
@@ -442,5 +459,21 @@ public class KeyCategoryService {
     public void sendRemovalUpdates(KeyCategory keyCategory) {
         messagingTemplate.convertAndSend(QUEUE_UPDATES_CATEGORIES_DELETE, keyCategory);
         log.debug("Sent out removal update for key category '{}'.", keyCategory.getId());
+    }
+
+    /**
+     * Decodes the specified Hashid.
+     *
+     * @param hashid the Hashid of the category to decode
+     * @return the decoded Hashid if valid
+     * @throws KeyNotFoundException if the Hashid is invalid and the category has not been found
+     * @since 0.16.0
+     */
+    private Long decodeSingleValueHashid(String hashid) {
+        long[] decodedHashid = hashids.decode(hashid);
+        if (decodedHashid.length == 0) {
+            throw new HashidNotValidException();
+        }
+        return decodedHashid[0];
     }
 }

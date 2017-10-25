@@ -13,6 +13,7 @@ import org.hibernate.validator.constraints.NotBlank;
  * A payload object for a {@link KeyCategory}.
  *
  * @author sgreb@communicode.de
+ * @author dvonderbey@communicode.de
  * @since 0.2.0
  */
 public class KeyCategoryPayload {
@@ -20,10 +21,16 @@ public class KeyCategoryPayload {
     @NotBlank
     private String name;
 
+    private String parent;
+
     public KeyCategoryPayload() {}
 
     public String getName() {
         return name.trim();
+    }
+
+    public String getParent() {
+        return parent;
     }
 
     @Override
