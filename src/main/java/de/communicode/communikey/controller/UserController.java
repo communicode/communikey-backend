@@ -116,10 +116,9 @@ public class UserController {
     @GetMapping(value = USERS_DEACTIVATE)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<User> deactivate(@RequestParam(value = USER_LOGIN) String login) {
-        if(SecurityUtils.isRoot(login)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        return new ResponseEntity<>(userService.deactivate(login), HttpStatus.OK);
+        return SecurityUtils.isRoot(login)
+            ? new ResponseEntity<>(HttpStatus.FORBIDDEN)
+            : new ResponseEntity<>(userService.deactivate(login), HttpStatus.OK);
     }
 
     /**
