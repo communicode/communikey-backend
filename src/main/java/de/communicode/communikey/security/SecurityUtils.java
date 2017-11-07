@@ -70,6 +70,16 @@ public final class SecurityUtils {
     }
 
     /**
+     * Check if the current user is authenticated as root (security role).
+     *
+     * @param login The login to check
+     * @return {@code true} if the login is root, {@code false} otherwise
+     */
+    public static boolean isRoot(String login){
+        return login.equals(AuthoritiesConstants.ROOT);
+    }
+
+    /**
      * Generates a random password.
      *
      * @return the generated password

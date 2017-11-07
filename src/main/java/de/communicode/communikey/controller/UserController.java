@@ -21,6 +21,7 @@ import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.security.AuthoritiesConstants;
+import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.UserService;
 import de.communicode.communikey.service.payload.UserCreationPayload;
 import de.communicode.communikey.service.payload.UserPasswordResetPayload;
@@ -115,6 +116,9 @@ public class UserController {
     @GetMapping(value = USERS_DEACTIVATE)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<User> deactivate(@RequestParam(value = USER_LOGIN) String login) {
+        if(SecurityUtils.isRoot(login)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         return new ResponseEntity<>(userService.deactivate(login), HttpStatus.OK);
     }
 
@@ -143,6 +147,9 @@ public class UserController {
     @DeleteMapping(value = USERS_LOGIN)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Void> delete(@PathVariable String login) {
+        if(SecurityUtils.isRoot(login)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         userService.delete(login);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -223,7 +230,9 @@ public class UserController {
     @DeleteMapping(value = USER_AUTHORITIES)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<User> removeAuthority(@PathVariable (value = USER_LOGIN) String login, @RequestParam String authorityName) {
-        return new ResponseEntity<>(userService.removeAuthority(login, authorityName), HttpStatus.OK);
+        return SecurityUtils.isRoot(login)
+            ? new ResponseEntity<>(HttpStatus.FORBIDDEN)
+            : new ResponseEntity<>(userService.removeAuthority(login, authorityName), HttpStatus.OK);
     }
 
     /**
