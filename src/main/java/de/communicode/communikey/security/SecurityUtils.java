@@ -75,8 +75,18 @@ public final class SecurityUtils {
      * @param login The login to check
      * @return {@code true} if the login is root, {@code false} otherwise
      */
-    public static boolean isRoot(String login){
+    public static boolean isRootByUsername(String login){
         return login.equals(AuthoritiesConstants.ROOT);
+    }
+
+    /**
+     * Check if the current user is authenticated as root (security role).
+     *
+     * @param email The login to check
+     * @return {@code true} if the login is root, {@code false} otherwise
+     */
+    public static boolean isRootByEmail(String email){
+        return email.equals(AuthoritiesConstants.ROOT_EMAIL);
     }
 
     /**
