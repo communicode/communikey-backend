@@ -10,7 +10,6 @@ import static de.communicode.communikey.controller.PathVariables.KEYCATEGORY_ID;
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES_HASHID;
-import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_CHILDREN;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_GROUPS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_KEYS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_RESPONSIBLE;
@@ -24,7 +23,7 @@ import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
 import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import de.communicode.communikey.service.KeyCategoryService;
-import de.communicode.communikey.service.payload.MoveKeyCategoryPayload;
+import de.communicode.communikey.service.payload.KeyCategoryMovePayload;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -247,7 +246,7 @@ public class KeyCategoryController {
      */
     @PostMapping(value = KEY_CATEGORY_MOVE)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> move(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashidSource, @Valid @RequestBody MoveKeyCategoryPayload payload) {
+    public ResponseEntity<KeyCategory> move(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashidSource, @Valid @RequestBody KeyCategoryMovePayload payload) {
         return new ResponseEntity<>(keyCategoryService.move(decodeSingleValueHashid(keyCategoryHashidSource), payload), HttpStatus.OK);
     }
 

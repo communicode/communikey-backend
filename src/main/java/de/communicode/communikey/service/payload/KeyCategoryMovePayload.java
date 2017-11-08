@@ -16,11 +16,11 @@ import org.hibernate.validator.constraints.NotBlank;
  * @author dvonderbey@communicode.de
  * @since 0.2.0
  */
-public class MoveKeyCategoryPayload {
+public class KeyCategoryMovePayload {
 
     private String parent;
 
-    public MoveKeyCategoryPayload() {}
+    public KeyCategoryMovePayload() {}
 
     public String getParent() { return parent; }
 

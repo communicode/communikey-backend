@@ -27,7 +27,7 @@ import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserGroupRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
-import de.communicode.communikey.service.payload.MoveKeyCategoryPayload;
+import de.communicode.communikey.service.payload.KeyCategoryMovePayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
@@ -305,15 +305,15 @@ public class KeyCategoryService {
      * Moves a category to another one
      *
      * @param sourceKeyCategoryId the ID of the key category to move
-     * @param moveKeyCategoryPayload the moveKeyCategoryPayload which acts as a target
+     * @param keyCategoryMovePayload the keyCategoryMovePayload which acts as a target
      * @return the updated key category
      * @since 0.17.0
      */
-    public KeyCategory move(Long sourceKeyCategoryId, MoveKeyCategoryPayload moveKeyCategoryPayload) {
+    public KeyCategory move(Long sourceKeyCategoryId, KeyCategoryMovePayload keyCategoryMovePayload) {
         KeyCategory sourcekeyCategory = validate(sourceKeyCategoryId);
 
-        if(Objects.nonNull(moveKeyCategoryPayload.getParent())){
-            Long moveKeyCategoryId = decodeSingleValueHashid(moveKeyCategoryPayload.getParent());
+        if(Objects.nonNull(keyCategoryMovePayload.getParent())){
+            Long moveKeyCategoryId = decodeSingleValueHashid(keyCategoryMovePayload.getParent());
             if (Objects.equals(sourceKeyCategoryId, moveKeyCategoryId)) {
                 throw new KeyCategoryConflictException(
                     "parent key category ID '" + sourceKeyCategoryId + "' equals child key category ID '" + moveKeyCategoryId + "'");

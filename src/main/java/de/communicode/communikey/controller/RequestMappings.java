@@ -72,11 +72,6 @@ public final class RequestMappings {
     public static final String KEY_CATEGORY_MOVE = KEY_CATEGORIES_HASHID + "/move";
 
     /**
-     * The request mapping for {@link KeyCategory} children.
-     */
-    public static final String KEY_CATEGORY_CHILDREN = KEY_CATEGORIES_HASHID + "/children";
-
-    /**
      * The request mapping for {@link KeyCategory} user groups.
      *
      * @since 0.3.0
