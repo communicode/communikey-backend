@@ -116,7 +116,7 @@ public class UserController {
     @GetMapping(value = USERS_DEACTIVATE)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<User> deactivate(@RequestParam(value = USER_LOGIN) String login) {
-        return SecurityUtils.isRoot(login)
+        return SecurityUtils.isRootByUsername(login)
             ? new ResponseEntity<>(HttpStatus.FORBIDDEN)
             : new ResponseEntity<>(userService.deactivate(login), HttpStatus.OK);
     }
@@ -146,7 +146,7 @@ public class UserController {
     @DeleteMapping(value = USERS_LOGIN)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Void> delete(@PathVariable String login) {
-        if(SecurityUtils.isRoot(login)) {
+        if(SecurityUtils.isRootByUsername(login)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         userService.delete(login);
@@ -213,7 +213,9 @@ public class UserController {
     @GetMapping(value = USERS_PUBLICKEY_RESET)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Map<String, String>> getPublicKeyResetToken(@RequestParam(value = USER_EMAIL) String email) {
-        return new ResponseEntity<>(userService.generatePublicKeyResetToken(email), HttpStatus.OK);
+        return SecurityUtils.isRootByEmail(email)
+            ? new ResponseEntity<>(HttpStatus.FORBIDDEN)
+            : new ResponseEntity<>(userService.generatePublicKeyResetToken(email), HttpStatus.OK);
     }
 
     /**
@@ -229,7 +231,7 @@ public class UserController {
     @DeleteMapping(value = USER_AUTHORITIES)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<User> removeAuthority(@PathVariable (value = USER_LOGIN) String login, @RequestParam String authorityName) {
-        return SecurityUtils.isRoot(login)
+        return SecurityUtils.isRootByUsername(login)
             ? new ResponseEntity<>(HttpStatus.FORBIDDEN)
             : new ResponseEntity<>(userService.removeAuthority(login, authorityName), HttpStatus.OK);
     }
@@ -292,6 +294,8 @@ public class UserController {
     @PutMapping(value = USER_AUTHORITIES)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<User> updateAuthorities(@PathVariable String login, @RequestBody Set<String> payload) {
-        return new ResponseEntity<>(userService.updateAuthorities(login, payload), HttpStatus.OK);
+        return SecurityUtils.isRootByUsername(login)
+            ? new ResponseEntity<>(HttpStatus.FORBIDDEN)
+            : new ResponseEntity<>(userService.updateAuthorities(login, payload), HttpStatus.OK);
     }
 }
