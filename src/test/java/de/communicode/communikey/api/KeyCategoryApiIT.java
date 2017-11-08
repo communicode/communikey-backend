@@ -37,6 +37,7 @@ import java.util.Set;
 public class KeyCategoryApiIT extends IntegrationBaseTest {
 
     private Map<String, String> keyCategoryPayload = new HashMap<>();
+    private Map<String, String> keyCategoryMovePayload = new HashMap<>();
     private Map<String, String> userGroupPayload = new HashMap<>();
     private Map<String, Object> keyPayload = new HashMap<>();
 
@@ -62,16 +63,17 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .then()
                 .extract().jsonPath().getString("id");
 
+        initializeTestKeyCategoryMovePayload(createdParentKeyCategoryHashid);
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam(KEYCATEGORY_ID, createdParentKeyCategoryHashid)
-                .param("childKeyCategoryId", createdChildKeyCategoryHashid)
+                .contentType(ContentType.JSON)
+                .pathParam(KEYCATEGORY_ID, createdChildKeyCategoryHashid)
+                .body(keyCategoryMovePayload)
         .when()
-                .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_CHILDREN)
+                .post(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_MOVE)
         .then()
                 .statusCode(HttpStatus.OK.value())
-                .root("children")
-                .body("size()", equalTo(1));
+                .body("parent", equalTo(createdParentKeyCategoryHashid));
     }
 
     @Test
@@ -96,12 +98,14 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         .then()
                 .extract().jsonPath().getString("id");
 
+        initializeTestKeyCategoryMovePayload(createdParentKeyCategoryHashid);
         given()
                 .auth().oauth2(userOAuth2AccessToken)
-                .pathParam(KEYCATEGORY_ID, createdParentKeyCategoryHashid)
-                .param("childKeyCategoryId", createdChildKeyCategoryHashid)
+                .contentType(ContentType.JSON)
+                .pathParam(KEYCATEGORY_ID, createdChildKeyCategoryHashid)
+                .body(keyCategoryMovePayload)
         .when()
-                .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_CHILDREN)
+                .post(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_MOVE)
         .then()
                 .statusCode(HttpStatus.FORBIDDEN.value());
     }
@@ -853,6 +857,14 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
      */
     private void initializeTestKeyCategoryPayload() {
         keyCategoryPayload.put("name", fairy.textProducer().word(1));
+    }
+
+    /**
+     * Initializes the test key category move payload.
+     * @param hashid The hashid of the parent
+     */
+    private void initializeTestKeyCategoryMovePayload(String hashid) {
+        keyCategoryMovePayload.put("parent", hashid);
     }
 
     /**
