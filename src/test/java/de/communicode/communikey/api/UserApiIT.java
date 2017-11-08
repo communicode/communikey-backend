@@ -175,9 +175,9 @@ public class UserApiIT extends IntegrationBaseTest {
     public void testDeactivateAdminAsAdmin() {
         given()
                 .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("login", "root")
+                .queryParam("login", "root")
         .when()
-                .delete(RequestMappings.USERS + RequestMappings.USERS_DEACTIVATE)
+                .get(RequestMappings.USERS + RequestMappings.USERS_DEACTIVATE)
         .then()
                 .statusCode(HttpStatus.FORBIDDEN.value());
     }
