@@ -14,6 +14,7 @@ import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_GROUPS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_KEYS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_RESPONSIBLE;
+import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_MOVE;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.KeyCategory;
@@ -23,6 +24,7 @@ import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
 import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import de.communicode.communikey.service.KeyCategoryService;
+import de.communicode.communikey.service.payload.MoveKeyCategoryPayload;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,23 +63,6 @@ public class KeyCategoryController {
     public KeyCategoryController(KeyCategoryService keyCategoryService, Hashids hashids) {
         this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
-    }
-
-    /**
-     * Adds a key category as child to a parent key category with the specified ID.
-     *
-     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_CHILDREN}".
-     *
-     * @param keyCategoryHashid the ID of the parent key category to add the child to
-     * @param childKeyCategoryId the ID of the child key category to be added
-     * @return the updated parent key category as response entity
-     */
-    @GetMapping(value = KEY_CATEGORY_CHILDREN)
-    @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> addChild(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam String childKeyCategoryId) {
-        return new ResponseEntity<>(keyCategoryService.addChild(decodeSingleValueHashid(keyCategoryHashid),
-                                                                decodeSingleValueHashid(childKeyCategoryId)),
-                                    HttpStatus.OK);
     }
 
     /**
@@ -248,6 +233,22 @@ public class KeyCategoryController {
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<KeyCategory> update(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @Valid @RequestBody KeyCategoryPayload payload) {
         return new ResponseEntity<>(keyCategoryService.update(decodeSingleValueHashid(keyCategoryHashid), payload), HttpStatus.OK);
+    }
+
+    /**
+     * Moves a category
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_MOVE}".
+     *
+     * @param keyCategoryHashidSource the hashid of the key category to move
+     * @param payload The moveKeyCategoryPayload which functions as a target
+     * @return the updated key category as response entity
+     * @since 0.17.0
+     */
+    @PostMapping(value = KEY_CATEGORY_MOVE)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<KeyCategory> move(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashidSource, @Valid @RequestBody MoveKeyCategoryPayload payload) {
+        return new ResponseEntity<>(keyCategoryService.move(decodeSingleValueHashid(keyCategoryHashidSource), payload), HttpStatus.OK);
     }
 
     /**

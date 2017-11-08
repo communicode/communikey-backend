@@ -67,6 +67,11 @@ public final class RequestMappings {
     public static final String KEY_CATEGORIES_HASHID = "/{" + KEYCATEGORY_ID + "}";
 
     /**
+     * The request mapping for moving {@link KeyCategory} categories.
+     */
+    public static final String KEY_CATEGORY_MOVE = KEY_CATEGORIES_HASHID + "/move";
+
+    /**
      * The request mapping for {@link KeyCategory} children.
      */
     public static final String KEY_CATEGORY_CHILDREN = KEY_CATEGORIES_HASHID + "/children";
