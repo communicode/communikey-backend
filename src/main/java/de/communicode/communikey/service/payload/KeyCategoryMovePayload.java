@@ -12,9 +12,8 @@ import org.hibernate.validator.constraints.NotBlank;
 /**
  * A payload object for a {@link KeyCategory}.
  *
- * @author sgreb@communicode.de
- * @author dvonderbey@communicode.de
- * @since 0.2.0
+ * @author lleifermann@communicode.de
+ * @since 0.17.0
  */
 public class KeyCategoryMovePayload {
 
