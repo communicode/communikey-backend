@@ -239,15 +239,15 @@ public class KeyCategoryController {
      *
      * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_MOVE}".
      *
-     * @param keyCategoryHashidSource the hashid of the key category to move
-     * @param payload The moveKeyCategoryPayload which functions as a target
+     * @param keyCategorySourceHashid the hashid of the key category to move
+     * @param payload The moveKeyCategoryPayload which contains the wanted parent
      * @return the updated key category as response entity
      * @since 0.17.0
      */
     @PostMapping(value = KEY_CATEGORY_MOVE)
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<KeyCategory> move(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashidSource, @Valid @RequestBody KeyCategoryMovePayload payload) {
-        return new ResponseEntity<>(keyCategoryService.move(decodeSingleValueHashid(keyCategoryHashidSource), payload), HttpStatus.OK);
+    public ResponseEntity<KeyCategory> move(@PathVariable(name = KEYCATEGORY_ID) String keyCategorySourceHashid, @Valid @RequestBody KeyCategoryMovePayload payload) {
+        return new ResponseEntity<>(keyCategoryService.move(decodeSingleValueHashid(keyCategorySourceHashid), payload), HttpStatus.OK);
     }
 
     /**

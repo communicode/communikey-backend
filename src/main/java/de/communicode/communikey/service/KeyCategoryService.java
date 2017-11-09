@@ -310,25 +310,25 @@ public class KeyCategoryService {
      * @since 0.17.0
      */
     public KeyCategory move(Long sourceKeyCategoryId, KeyCategoryMovePayload keyCategoryMovePayload) {
-        KeyCategory sourcekeyCategory = validate(sourceKeyCategoryId);
+        KeyCategory sourceKeyCategory = validate(sourceKeyCategoryId);
 
         if(Objects.nonNull(keyCategoryMovePayload.getParent())){
-            Long moveKeyCategoryId = decodeSingleValueHashid(keyCategoryMovePayload.getParent());
-            if (Objects.equals(sourceKeyCategoryId, moveKeyCategoryId)) {
+            Long targetKeyCategoryId = decodeSingleValueHashid(keyCategoryMovePayload.getParent());
+            if (Objects.equals(sourceKeyCategoryId, targetKeyCategoryId)) {
                 throw new KeyCategoryConflictException(
-                    "parent key category ID '" + sourceKeyCategoryId + "' equals child key category ID '" + moveKeyCategoryId + "'");
+                    "parent key category ID '" + sourceKeyCategoryId + "' equals child key category ID '" + targetKeyCategoryId + "'");
             }
-            KeyCategory targetkeyCategory = validate(moveKeyCategoryId);
-            if (sourcekeyCategory.getTreeLevel() < targetkeyCategory.getTreeLevel()) {
-                checkPathCollision(targetkeyCategory, sourcekeyCategory.getId());
+            KeyCategory targetkeyCategory = validate(targetKeyCategoryId);
+            if (sourceKeyCategory.getTreeLevel() < targetkeyCategory.getTreeLevel()) {
+                checkPathCollision(targetkeyCategory, sourceKeyCategory.getId());
             }
-            validateUniqueKeyCategoryName(sourcekeyCategory.getName(), targetkeyCategory.getId());
-            sourcekeyCategory.setParent(targetkeyCategory);
+            validateUniqueKeyCategoryName(sourceKeyCategory.getName(), targetkeyCategory.getId());
+            sourceKeyCategory.setParent(targetkeyCategory);
         } else {
-            validateUniqueKeyCategoryName(sourcekeyCategory.getName(), null);
-            sourcekeyCategory.setParent(null);
+            validateUniqueKeyCategoryName(sourceKeyCategory.getName(), null);
+            sourceKeyCategory.setParent(null);
         }
-        return keyCategoryRepository.save(sourcekeyCategory);
+        return keyCategoryRepository.save(sourceKeyCategory);
     }
 
     /**

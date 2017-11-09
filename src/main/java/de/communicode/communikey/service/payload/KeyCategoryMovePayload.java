@@ -7,10 +7,9 @@
 package de.communicode.communikey.service.payload;
 
 import de.communicode.communikey.domain.KeyCategory;
-import org.hibernate.validator.constraints.NotBlank;
 
 /**
- * A payload object for a {@link KeyCategory}.
+ * A payload object for a {@link KeyCategory} move action.
  *
  * @author lleifermann@communicode.de
  * @since 0.17.0
