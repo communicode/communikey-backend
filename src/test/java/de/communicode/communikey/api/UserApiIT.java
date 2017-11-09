@@ -41,6 +41,8 @@ public class UserApiIT extends IntegrationBaseTest {
     private String testUserLogin = "test";
     private String testUserEmail = testUserLogin + "@communicode.de";
     private User testUser = new User();
+    private Set<String> authorityPayload = new HashSet<>();
+
 
     @Test
     public void testActivateUserAsAdmin() {
@@ -156,6 +158,65 @@ public class UserApiIT extends IntegrationBaseTest {
                 .delete(RequestMappings.USERS + RequestMappings.USERS_LOGIN)
         .then()
                 .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    public void testDeleteAdminAsAdmin() {
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .pathParam("login", "root")
+        .when()
+                .delete(RequestMappings.USERS + RequestMappings.USERS_LOGIN)
+        .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void testDeactivateAdminAsAdmin() {
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .queryParam("login", "root")
+        .when()
+                .get(RequestMappings.USERS + RequestMappings.USERS_DEACTIVATE)
+        .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void testRemoveAdminAuthorityAsAdmin() {
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .pathParam("login", "root")
+                .queryParam("authorityName", "ROLE_ADMIN")
+        .when()
+                .delete(RequestMappings.USERS + RequestMappings.USER_AUTHORITIES)
+        .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void testPutAuthoritiesWithoutAdminOnAdminAsAdmin() {
+        initializePayload("ROLE_ADMIN");
+        given()
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .pathParam("login", "root")
+            .contentType(ContentType.JSON)
+            .body(authorityPayload)
+        .when()
+            .put(RequestMappings.USERS + RequestMappings.USER_AUTHORITIES)
+        .then()
+            .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void testGetAdminPublicKeyResetToken() {
+        given()
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .queryParam("email", AuthoritiesConstants.ROOT_EMAIL)
+        .when()
+            .get(RequestMappings.USERS + RequestMappings.USERS_PUBLICKEY_RESET)
+        .then()
+            .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
     @Test
@@ -425,5 +486,13 @@ public class UserApiIT extends IntegrationBaseTest {
         testUser.setLastName(fairy.person().getLastName());
         testUser.setActivated(activated);
         testUser.setPassword(passwordEncoder.encode(decodedUserPassword));
+    }
+
+    /**
+     * Initializes the test payload.
+     */
+    private void initializePayload(String authority) {
+        authorityPayload = new HashSet<>();
+        authorityPayload.add(authority);
     }
 }
