@@ -27,6 +27,7 @@ import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserGroupRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.service.payload.KeyCategoryPayload;
+import de.communicode.communikey.service.payload.KeyCategoryMovePayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
@@ -77,39 +78,6 @@ public class KeyCategoryService {
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
         this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
         this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
-    }
-
-    /**
-     * Adds a key category as a child of a parent key category.
-     *
-     * @param parentKeyCategoryId the ID of the parent key category to add the child key category to
-     * @param childKeyCategoryId the ID of the parent key category to be added to the parent key category
-     * @return the updated parent key category
-     * @throws KeyCategoryNotFoundException if a key category with specified ID has not been found
-     */
-    public KeyCategory addChild(Long parentKeyCategoryId, Long childKeyCategoryId) {
-        if (Objects.equals(parentKeyCategoryId, childKeyCategoryId)) {
-            throw new KeyCategoryConflictException(
-                "parent key category ID '" + parentKeyCategoryId + "' equals child key category ID '" + childKeyCategoryId + "'");
-        }
-
-        KeyCategory child = this.validate(childKeyCategoryId);
-        KeyCategory parent = validate(parentKeyCategoryId);
-
-        if (child.getTreeLevel() < parent.getTreeLevel()) {
-            checkPathCollision(parent, childKeyCategoryId);
-        }
-        validateUniqueKeyCategoryName(child.getName(), parentKeyCategoryId);
-
-        if (parent.addChild(child)) {
-            child.setParent(parent);
-            child.setTreeLevel(parent.getTreeLevel() + 1);
-            updateChildrenTreeLevel(child);
-            sendUpdates(child);
-            log.debug("Added key category with ID '{}' as child to key category with ID '{}'", child.getId(), parent.getId());
-            return keyCategoryRepository.save(parent);
-        }
-        return parent;
     }
 
     /**
@@ -331,6 +299,36 @@ public class KeyCategoryService {
             log.debug("Updated key category with ID '{}'", keyCategory.getId());
         }
         return keyCategory;
+    }
+
+    /**
+     * Moves a category to another one
+     *
+     * @param sourceKeyCategoryId the ID of the key category to move
+     * @param keyCategoryMovePayload the keyCategoryMovePayload which acts as a target
+     * @return the updated key category
+     * @since 0.17.0
+     */
+    public KeyCategory move(Long sourceKeyCategoryId, KeyCategoryMovePayload keyCategoryMovePayload) {
+        KeyCategory sourceKeyCategory = validate(sourceKeyCategoryId);
+
+        if(Objects.nonNull(keyCategoryMovePayload.getParent())){
+            Long targetKeyCategoryId = decodeSingleValueHashid(keyCategoryMovePayload.getParent());
+            if (Objects.equals(sourceKeyCategoryId, targetKeyCategoryId)) {
+                throw new KeyCategoryConflictException(
+                    "parent key category ID '" + sourceKeyCategoryId + "' equals child key category ID '" + targetKeyCategoryId + "'");
+            }
+            KeyCategory targetkeyCategory = validate(targetKeyCategoryId);
+            if (sourceKeyCategory.getTreeLevel() < targetkeyCategory.getTreeLevel()) {
+                checkPathCollision(targetkeyCategory, sourceKeyCategory.getId());
+            }
+            validateUniqueKeyCategoryName(sourceKeyCategory.getName(), targetkeyCategory.getId());
+            sourceKeyCategory.setParent(targetkeyCategory);
+        } else {
+            validateUniqueKeyCategoryName(sourceKeyCategory.getName(), null);
+            sourceKeyCategory.setParent(null);
+        }
+        return keyCategoryRepository.save(sourceKeyCategory);
     }
 
     /**
