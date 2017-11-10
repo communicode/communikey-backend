@@ -25,12 +25,7 @@ import de.communicode.communikey.exception.AuthorityNotFoundException;
 import de.communicode.communikey.exception.ResetTokenNotFoundException;
 import de.communicode.communikey.exception.UserConflictException;
 import de.communicode.communikey.exception.UserNotFoundException;
-import de.communicode.communikey.repository.AuthorityRepository;
-import de.communicode.communikey.repository.KeyCategoryRepository;
-import de.communicode.communikey.repository.KeyRepository;
-import de.communicode.communikey.repository.UserGroupRepository;
-import de.communicode.communikey.repository.UserRepository;
-import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
+import de.communicode.communikey.repository.*;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.UserCreationPayload;
@@ -67,6 +62,7 @@ public class UserService {
     private final UserGroupRepository userGroupRepository;
     private final UserRepository userRepository;
     private final UserEncryptedPasswordRepository userEncryptedPasswordRepository;
+    private final EncryptionJobRepository encryptionJobRepository;
     private final KeyService keyService;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
@@ -83,6 +79,7 @@ public class UserService {
             UserGroupRepository userGroupRepository,
             UserRepository userRepository,
             UserEncryptedPasswordRepository userEncryptedPasswordRepository,
+            EncryptionJobRepository encryptionJobRepository,
             @Lazy KeyService keyService,
             AuthorityRepository authorityRepository,
             PasswordEncoder passwordEncoder,
@@ -96,6 +93,7 @@ public class UserService {
         this.userGroupRepository = requireNonNull(userGroupRepository, "userGroupRepository must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
         this.userEncryptedPasswordRepository = requireNonNull(userEncryptedPasswordRepository, "userEncryptedPasswordRepository must not be null!");
+        this.encryptionJobRepository = requireNonNull(encryptionJobRepository, "encryptionJobRepository must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
         this.authorityRepository = requireNonNull(authorityRepository, "authorityRepository must not be null!");
         this.passwordEncoder = requireNonNull(passwordEncoder, "passwordEncoder must not be null!");
@@ -284,6 +282,7 @@ public class UserService {
                 user.setPublicKeyResetDate(ZonedDateTime.now());
                 userRepository.save(user);
                 userEncryptedPasswordRepository.removeAllByOwner(user);
+                encryptionJobRepository.removeAllByUser(user);
                 keyService.removeAllUserEncryptedPasswordsForUser(user);
                 log.debug("Generated publicKeyResetToken '{}' for user with email '{}'", user.getPublicKeyResetToken(), email);
                 return ImmutableMap.of("publicKeyResetToken", user.getPublicKeyResetToken());

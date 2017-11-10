@@ -64,4 +64,12 @@ public interface EncryptionJobRepository extends CrudRepository<EncryptionJob, L
      */
     @Transactional
     void deleteByToken(String token);
+
+    /**
+     * Deletes all encryption job of the specified user
+     *
+     * @param user The user of the encryption job
+     */
+    @Transactional
+    void removeAllByUser(User user);
 }
