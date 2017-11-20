@@ -209,7 +209,14 @@ public class KeyService {
         String login = SecurityUtils.getCurrentUserLogin();
         User user = userService.validate(login);
         Key key = validate(hashid);
-        UserEncryptedPassword userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key);
+        UserEncryptedPassword userEncryptedPassword = null;
+        if(user.getAuthorities().contains(authorityService.get(AuthoritiesConstants.ADMIN)))
+            userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key);
+        for (UserGroup userGroup:key.getCategory().getGroups()) {
+            if(user.getGroups().contains(userGroup)) {
+                userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key);
+            }
+        }
         ofNullable(userEncryptedPassword)
             .orElseThrow(UserEncryptedPasswordNotFoundException::new);
         return Optional.of(userEncryptedPassword);
@@ -268,26 +275,29 @@ public class KeyService {
      * @since 0.15.0
      */
     public void removeObsoletePasswords(User user) {
-        userEncryptedPasswordRepository.findAllByOwner(user)
-            .forEach(userEncryptedPassword -> {
-                Key key = userEncryptedPassword.getKey();
-                KeyCategory category = key.getCategory();
-                if (category != null) {
-                    Set<UserGroup> userGroups = category.getGroups();
-                    if (userGroups.isEmpty()) {
-                        deleteUserEncryptedPassword(key, userEncryptedPassword);
-                    } else {
-                        userGroups.forEach(userGroup -> {
-                            if (!user.getGroups().contains(userGroup)) {
-                                deleteUserEncryptedPassword(key, userEncryptedPassword);
-                            }
-                        });
-                    }
+        if (user.getAuthorities().stream()
+            .noneMatch(authority -> authority.getName().equals(AuthoritiesConstants.ADMIN))) {
+            userEncryptedPasswordRepository.findAllByOwner(user)
+                .forEach(userEncryptedPassword -> {
+                    Key key = userEncryptedPassword.getKey();
+                    KeyCategory category = key.getCategory();
+                    if (category != null) {
+                        Set<UserGroup> userGroups = category.getGroups();
+                        if (userGroups.isEmpty()) {
+                            deleteUserEncryptedPassword(key, userEncryptedPassword);
+                        } else {
+                            userGroups.forEach(userGroup -> {
+                                if (!user.getGroups().contains(userGroup)) {
+                                    deleteUserEncryptedPassword(key, userEncryptedPassword);
+                                }
+                            });
+                        }
 
-                } else if (!key.getCreator().equals(user)){
-                    deleteUserEncryptedPassword(key, userEncryptedPassword);
-                }
-            });
+                    } else if (!key.getCreator().equals(user)) {
+                        deleteUserEncryptedPassword(key, userEncryptedPassword);
+                    }
+                });
+        }
     }
 
     /**
