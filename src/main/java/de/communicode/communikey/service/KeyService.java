@@ -278,7 +278,7 @@ public class KeyService {
      */
     public void removeObsoletePasswords(User user) {
         if (user.getAuthorities().stream()
-            .noneMatch(authority -> authority.getName().equals(AuthoritiesConstants.ADMIN))) {
+            .noneMatch(authority -> authority.getName().equals(ADMIN))) {
             userEncryptedPasswordRepository.findAllByOwner(user)
                 .forEach(userEncryptedPassword -> {
                     Key key = userEncryptedPassword.getKey();
@@ -315,7 +315,7 @@ public class KeyService {
      */
     private boolean checkKeyAccess(Key key, KeyPayloadEncryptedPasswords payload) {
         User user = userService.validate(payload.getLogin());
-        if(user.getAuthorities().contains(authorityService.get(AuthoritiesConstants.ADMIN))) {
+        if(user.getAuthorities().contains(authorityService.get(ADMIN))) {
             return true;
         }
         KeyCategory keyCategory = key.getCategory();
