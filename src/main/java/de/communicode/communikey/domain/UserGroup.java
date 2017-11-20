@@ -49,7 +49,7 @@ public class UserGroup extends AbstractEntity implements Serializable {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "user_groups_users",
         joinColumns = @JoinColumn(name = "user_group_id", referencedColumnName = "id"),
@@ -59,7 +59,7 @@ public class UserGroup extends AbstractEntity implements Serializable {
     @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<User> users = Sets.newConcurrentHashSet();
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "groups")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     @JsonView(AuthoritiesRestView.Admin.class)

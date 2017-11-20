@@ -72,7 +72,7 @@ public class Key extends AbstractEntity implements Serializable {
     private String login;
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "key")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "key")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     private Set<UserEncryptedPassword> userEncryptedPasswords = Sets.newConcurrentHashSet();

@@ -107,7 +107,7 @@ public class User extends AbstractEntity implements Serializable {
     @JsonView(AuthoritiesRestView.Admin.class)
     private ZonedDateTime publicKeyResetDate = null;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "users_authorities",
         joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
@@ -117,29 +117,29 @@ public class User extends AbstractEntity implements Serializable {
     @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<Authority> authorities = Sets.newConcurrentHashSet();
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<UserGroup> groups = Sets.newConcurrentHashSet();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "creator")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     private final Set<Key> keys = Sets.newConcurrentHashSet();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     private final Set<UserEncryptedPassword> encryptedPasswords = Sets.newConcurrentHashSet();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "creator")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "creator")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     @JsonView(AuthoritiesRestView.Admin.class)
     private final Set<KeyCategory> keyCategories = Sets.newConcurrentHashSet();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "responsible")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "responsible")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     @JsonView(AuthoritiesRestView.Admin.class)
