@@ -17,6 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * This class acts on startup events of the application.
+ *
+ * @author dvonderbey@communicode.de
+ * @since 0.17.2
+ */
 @Component
 public class ApplicationStartup
     implements ApplicationListener<ApplicationReadyEvent> {
