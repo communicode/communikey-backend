@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -108,6 +109,7 @@ public class UserGroupService {
      * @param userGroupId the ID of the user group to delete
      * @throws UserGroupNotFoundException if the user group with the specified ID has not been found
      */
+    @Transactional
     public void delete(Long userGroupId) {
         UserGroup userGroup = validate(userGroupId);
         userGroup.getUsers().forEach(user -> {
@@ -131,6 +133,7 @@ public class UserGroupService {
      *
      * @since 0.3.0
      */
+    @Transactional
     public void deleteAll() {
         userGroupRepository.findAll()
                 .forEach(userGroup -> delete(userGroup.getId()));

@@ -22,6 +22,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 import static de.communicode.communikey.controller.RequestMappings.JOBS_FULFILL;
 import static de.communicode.communikey.controller.PathVariables.JOB_TOKEN;
@@ -67,6 +68,7 @@ public class CrowdEncryptionController {
      */
     @MessageMapping(value = JOBS_FULFILL)
     @SendToUser(value = QUEUE_REPLY)
+    @Transactional
     public EncryptionJobStatusPayload fulfill(@DestinationVariable(value = JOB_TOKEN) String jobToken, @Payload @Valid EncryptionJobPayload payload) {
         return encryptionJobService.fulfill(jobToken, payload);
     }

@@ -236,6 +236,7 @@ public class UserService {
      * @param login the login of the user to delete
      * @throws UserNotFoundException if the user with the specified login has not been found
      */
+    @Transactional
     public void delete(String login) {
         deleteOauth2AccessTokens(login);
         User user = dissolveReferences(validate(login));
