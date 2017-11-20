@@ -7,7 +7,6 @@
 package de.communicode.communikey.config.util;
 
 import de.communicode.communikey.repository.UserRepository;
-import de.communicode.communikey.service.AuthorityService;
 import de.communicode.communikey.service.EncryptionJobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -27,13 +26,12 @@ import static java.util.Objects.requireNonNull;
 public class ApplicationStartup
     implements ApplicationListener<ApplicationReadyEvent> {
 
-    private EncryptionJobService encryptionJobService;
-    private UserRepository userRepository;
+    private final EncryptionJobService encryptionJobService;
+    private final UserRepository userRepository;
 
     @Autowired
     public ApplicationStartup(EncryptionJobService encryptionJobService,
-                              UserRepository userRepository,
-                              AuthorityService authorityService) {
+                              UserRepository userRepository) {
         this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
         this.userRepository = requireNonNull(userRepository, "userRepository must not be null!");
     }
