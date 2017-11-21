@@ -60,7 +60,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     @NotBlank
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "category")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     @JsonView(AuthoritiesRestView.Admin.class)
@@ -73,7 +73,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     private KeyCategory parent;
 
     @NotNull
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "parent")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parent")
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     private final Set<KeyCategory> children = Sets.newConcurrentHashSet();
@@ -87,7 +87,7 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     @JsonIdentityReference(alwaysAsId = true)
     private User creator;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "key_categories_user_groups",
         joinColumns = {@JoinColumn(name = "key_category_id", referencedColumnName = "id")},
