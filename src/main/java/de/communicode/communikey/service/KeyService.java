@@ -210,7 +210,7 @@ public class KeyService {
         User user = userService.validate(login);
         Key key = validate(hashid);
         UserEncryptedPassword userEncryptedPassword = null;
-        if(user.getAuthorities().contains(authorityService.get(AuthoritiesConstants.ADMIN))) {
+        if(user.getAuthorities().contains(authorityService.get(ADMIN))) {
             userEncryptedPassword = userEncryptedPasswordRepository.findOneByOwnerAndKey(user, key);
         } else {
             for (UserGroup userGroup:key.getCategory().getGroups()) {
