@@ -9,6 +9,7 @@ package de.communicode.communikey.controller;
 import de.communicode.communikey.domain.EncryptionJob;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
+import de.communicode.communikey.domain.Tag;
 
 /**
  * Provides path variables constants.
@@ -47,6 +48,15 @@ public final class PathVariables {
      * @since 0.15.0
      */
     public static final String JOB_TOKEN = "token";
+    
+    /**
+     * The Hashid of a {@link Tag}.
+     *
+     * <p>Exposed as ID through the API.
+     *
+     * @since 0.18.0
+     */
+    public static final String TAG_ID = "tagId";
 
     private PathVariables() {}
 }

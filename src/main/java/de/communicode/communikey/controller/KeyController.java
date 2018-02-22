@@ -180,7 +180,7 @@ public class KeyController {
     @PutMapping(value = KEY_HASHID)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> update(@PathVariable(name = KEY_ID) String keyHashid, @Valid @RequestBody KeyPayload payload) {
-        return new ResponseEntity<>(keyService.update(hashids.decode(keyHashid)[0], payload), HttpStatus.OK);
+        return new ResponseEntity<>(keyService.update(decodeSingleValueHashid(keyHashid), payload), HttpStatus.OK);
     }
 
     /**
