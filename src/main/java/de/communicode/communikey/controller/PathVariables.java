@@ -48,7 +48,7 @@ public final class PathVariables {
      * @since 0.15.0
      */
     public static final String JOB_TOKEN = "token";
-    
+
     /**
      * The Hashid of a {@link Tag}.
      *
