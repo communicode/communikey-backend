@@ -84,9 +84,9 @@ public class TagController {
     }
 
     /**
-     * Deletes all keys.
+     * Deletes all tags.
      *
-     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}".
+     * <p>This endpoint is mapped to "{@value RequestMappings#TAGS}".
      *
      * @return a empty response entity
      */
