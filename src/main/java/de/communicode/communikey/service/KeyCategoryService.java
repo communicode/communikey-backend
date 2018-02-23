@@ -13,12 +13,14 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 import de.communicode.communikey.domain.KeyCategory;
+import de.communicode.communikey.domain.Tag;
 import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.exception.KeyCategoryConflictException;
 import de.communicode.communikey.exception.KeyCategoryNotFoundException;
 import de.communicode.communikey.exception.KeyNotFoundException;
+import de.communicode.communikey.exception.TagNotFoundException;
 import de.communicode.communikey.exception.UserGroupNotFoundException;
 import de.communicode.communikey.exception.UserNotFoundException;
 import de.communicode.communikey.exception.HashidNotValidException;
@@ -32,6 +34,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -61,13 +64,15 @@ public class KeyCategoryService {
     private final Hashids hashids;
     private final EncryptionJobService encryptionJobService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final TagService tagService;
 
     @Autowired
     public KeyCategoryService(KeyCategoryRepository keyCategoryRepository, UserService userService,
                               KeyService keyService, KeyRepository keyRepository, UserRepository userRepository,
                               UserGroupService userGroupService, UserGroupRepository userGroupRepository,
                               Hashids hashids, EncryptionJobService encryptionJobService,
-                              SimpMessagingTemplate messagingTemplate) {
+                              SimpMessagingTemplate messagingTemplate,
+                              @Lazy TagService tagService) {
         this.keyCategoryRepository = requireNonNull(keyCategoryRepository, "keyCategoryRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.keyService = requireNonNull(keyService, "keyService must not be null!");
@@ -78,6 +83,7 @@ public class KeyCategoryService {
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
         this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
         this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
+        this.tagService = requireNonNull(tagService, "tagService must not be null!");
     }
 
     /**
@@ -385,6 +391,9 @@ public class KeyCategoryService {
                     userGroupRepository.save(userGroup);
                     log.debug("Unbind key category with ID '{}' from user group with name '{}'", keyCategory.getId(), userGroup.getName());
                 });
+        keyCategory.getTags().forEach(tag -> {
+            tagService.removeKeyCategory(tag, keyCategory);
+        });
         keyCategory.getChildren().forEach(child -> delete(child.getId()));
 
         keyCategory.setParent(null);
@@ -432,6 +441,60 @@ public class KeyCategoryService {
             child.setTreeLevel(keyCategory.getTreeLevel() + 1);
             updateChildrenTreeLevel(child);
         }
+    }
+
+    /**
+     * Adds the tag to the key category with the specified ID.
+     *
+     * @param keyCategoryId the ID of the key the tag will be added to
+     * @param tagId the ID of the tag to be added
+     * @return the updated key category
+     * @throws KeyCategoryNotFoundException if the key category with the specified ID has not been found
+     * @throws TagNotFoundException if the tag with the specified ID has not been found
+     */
+    public KeyCategory addTag(Long keyCategoryId, Long tagId) {
+        KeyCategory keyCategory = validate(keyCategoryId);
+        Tag tag = tagService.validate(tagId);
+        keyCategory.addTag(tag);
+        keyCategory = keyCategoryRepository.save(keyCategory);
+        tagService.addKeyCategory(tag, keyCategory);
+
+        log.debug("Added tag with ID '{}' to key category with ID '{}'", tagId, keyCategoryId);
+        sendUpdates(keyCategory);
+        return keyCategory;
+    }
+
+    /**
+     * Removes the tag from the key.
+     *
+     * @param keyCategoryId the ID of the key category the tag will be added to
+     * @param tagId the ID of the tag to be added
+     * @return the updated key category
+     * @throws KeyNotFoundException if the key with the specified ID has not been found
+     * @throws TagNotFoundException if the tag with the specified ID has not been found
+     * @since 0.18.0
+     */
+    public KeyCategory removeTag(Long keyCategoryId, Long tagId) {
+        KeyCategory keyCategory = validate(keyCategoryId);
+        Tag tag = tagService.validate(tagId);
+        return deleteTag(keyCategory, tag);
+    }
+
+    /**
+     * Removes the tag from the key category.
+     *
+     * @param keyCategory the key category the tag will be removed from
+     * @param tag the tag to be removed
+     * @return the updated key category
+     * @since 0.18.0
+     */
+    public KeyCategory deleteTag(KeyCategory keyCategory, Tag tag) {
+        keyCategory.removeTag(tag);
+        tagService.removeKeyCategory(tag, keyCategory);
+        KeyCategory savedKeyCategory = keyCategoryRepository.save(keyCategory);
+        log.debug("Removed tag with ID '{}' from the key category with ID '{}'", tag.getId(), savedKeyCategory.getId());
+        sendUpdates(savedKeyCategory);
+        return savedKeyCategory;
     }
 
     /**

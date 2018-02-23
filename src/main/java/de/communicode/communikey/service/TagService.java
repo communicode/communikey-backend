@@ -6,10 +6,11 @@
  */
 package de.communicode.communikey.service;
 
+import de.communicode.communikey.domain.Key;
+import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.Tag;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.exception.HashidNotValidException;
-import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.exception.TagNotFoundException;
 import de.communicode.communikey.repository.TagRepository;
 import de.communicode.communikey.service.payload.TagPayload;
@@ -17,9 +18,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,23 +46,29 @@ public class TagService {
     private final UserService userService;
     private final Hashids hashids;
     private final SimpMessagingTemplate messagingTemplate;
+    private final KeyCategoryService keyCategoryService;
+    private final KeyService keyService;
 
     @Autowired
     public TagService(TagRepository tagRepository,
                       UserService userService,
                       Hashids hashids,
-                      SimpMessagingTemplate messagingTemplate) {
+                      SimpMessagingTemplate messagingTemplate,
+                      @Lazy KeyCategoryService keyCategoryService,
+                      KeyService keyService) {
         this.tagRepository = requireNonNull(tagRepository, "tagRepository must not be null!");
         this.userService = requireNonNull(userService, "userService must not be null!");
         this.hashids = requireNonNull(hashids, "hashids must not be null!");
         this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
+        this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
+        this.keyService = requireNonNull(keyService, "keyService must not be null!");
     }
 
     /**
-     * Creates a new key.
+     * Creates a new tag.
      *
-     * @param payload the key payload
-     * @return the created key
+     * @param payload the tag payload
+     * @return the created tag
      */
     public Tag create(TagPayload payload) {
         Tag tag = new Tag();
@@ -99,11 +108,18 @@ public class TagService {
     /**
      * Deletes the tag with the specified ID.
      *
-     * @param tagId the ID of the key to delete
+     * @param tagId the ID of the tag to delete
      * @throws TagNotFoundException if the tag with the specified ID has not been found
      */
+    @Transactional
     public void delete(Long tagId) {
         Tag tag = validate(tagId);
+        tag.getKeyCategories().forEach(keyCategory -> {
+            keyCategoryService.deleteTag(keyCategory, tag);
+        });
+        tag.getKeys().forEach(key -> {
+            keyService.deleteTag(key, tag);
+        });
         tagRepository.delete(tag);
         sendRemovalUpdates(tag);
         log.debug("Deleted tag with ID '{}'", tagId);
@@ -112,7 +128,10 @@ public class TagService {
     /**
      * Deletes all tags.
      */
+    @Transactional
     public void deleteAll() {
+        tagRepository.findAll()
+            .forEach(tag -> delete(tag.getId()));
         tagRepository.deleteAll();
         log.debug("Deleted all tags");
     }
@@ -122,7 +141,7 @@ public class TagService {
      *
      * @param tagId the ID of the tag to get
      * @return the tag
-     * @throws TagNotFoundException if the key with the specified ID has not been found
+     * @throws TagNotFoundException if the tag with the specified ID has not been found
      */
     public Tag get(Long tagId) {
         return validate(tagId);
@@ -142,19 +161,66 @@ public class TagService {
      *
      * @param tagId the ID of the tag to validate
      * @return the tag if validated
-     * @throws KeyNotFoundException if the key with the specified ID has not been found
+     * @throws TagNotFoundException if the tag with the specified ID has not been found
      */
-    private Tag validate(Long tagId) {
+    public Tag validate(Long tagId) {
         return ofNullable(tagRepository.findOne(tagId)).orElseThrow(TagNotFoundException::new);
+    }
+
+    /**
+     * Adds a key category
+     *
+     * @param tag the tag the key category will be added to
+     * @param keyCategory the key category to add to the tag
+     * @return the tag
+     */
+    public Tag addKeyCategory(Tag tag, KeyCategory keyCategory) {
+        tag.addKeyCategory(keyCategory);
+        return tagRepository.save(tag);
+    }
+
+    /**
+     * Removes a key category
+     *
+     * @param tag the tag the key will be removed from
+     * @param keyCategory the key category to remove from the tag
+     * @return the tag
+     */
+    public Tag removeKeyCategory(Tag tag, KeyCategory keyCategory) {
+        tag.removeKeyCategory(keyCategory);
+        return tagRepository.save(tag);
+    }
+
+    /**
+     * Adds a key
+     *
+     * @param tag the tag the key will be added to
+     * @param key the key to add to the tag
+     * @return the tag
+     */
+    public Tag addKey(Tag tag, Key key) {
+        tag.addKey(key);
+        return tagRepository.save(tag);
+    }
+
+    /**
+     * Removes a key
+     *
+     * @param tag the tag the key will be removed from
+     * @param key the key to remove from the tag
+     * @return the tag
+     */
+    public Tag removeKey(Tag tag, Key key) {
+        tag.removeKey(key);
+        return tagRepository.save(tag);
     }
 
     /**
      * Decodes the specified Hashid.
      *
-     * @param hashid the Hashid of the key to decode
+     * @param hashid the Hashid of the tag to decode
      * @return the decoded Hashid if valid
-     * @throws KeyNotFoundException if the Hashid is invalid and the key has not been found
-     * @since 0.13.0
+     * @throws TagNotFoundException if the Hashid is invalid and the tag has not been found
      */
     private Long decodeSingleValueHashid(String hashid) {
         long[] decodedHashid = hashids.decode(hashid);

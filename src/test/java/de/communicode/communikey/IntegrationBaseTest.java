@@ -119,12 +119,12 @@ public abstract class IntegrationBaseTest {
     @After
     public void cleanUp() {
         userGroupService.deleteAll();
+        tagService.deleteAll();
         keyService.deleteAll();
         keyCategoryService.deleteAll();
         userRepository.findAll().stream()
                 .filter(testUser -> !testUser.getLogin().equals(communikeyProperties.getSecurity().getRoot().getLogin()))
                 .forEach(nonRootUser -> userService.delete(nonRootUser.getLogin()));
-        tagService.deleteAll();
     }
 
     /**

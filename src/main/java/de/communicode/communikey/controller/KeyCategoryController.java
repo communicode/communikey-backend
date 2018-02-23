@@ -8,12 +8,14 @@ package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.controller.PathVariables.KEYCATEGORY_ID;
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
+import static de.communicode.communikey.controller.PathVariables.TAG_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORIES_HASHID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_GROUPS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_KEYS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_RESPONSIBLE;
 import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_MOVE;
+import static de.communicode.communikey.controller.RequestMappings.KEY_CATEGORY_TAGS;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.KeyCategory;
@@ -248,6 +250,42 @@ public class KeyCategoryController {
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<KeyCategory> move(@PathVariable(name = KEYCATEGORY_ID) String keyCategorySourceHashid, @Valid @RequestBody KeyCategoryMovePayload payload) {
         return new ResponseEntity<>(keyCategoryService.move(decodeSingleValueHashid(keyCategorySourceHashid), payload), HttpStatus.OK);
+    }
+
+    /**
+     * Adds the specified tag to the key category with the specified ID.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_TAGS}".
+     *
+     * @param keyCategoryHashid the ID of the key category to add the tag to
+     * @param tagHashid the Hashid of the tag to be added
+     * @return the updated key category entity
+     * @since 0.18.0
+     */
+    @GetMapping(value = KEY_CATEGORY_TAGS)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<KeyCategory> addTag(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam(name = TAG_ID) String tagHashid) {
+        return new ResponseEntity<>(keyCategoryService.addTag(decodeSingleValueHashid(keyCategoryHashid),
+            decodeSingleValueHashid(tagHashid)),
+            HttpStatus.OK);
+    }
+
+    /**
+     * Removes the specified tag from the key category with the specified ID.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEY_CATEGORIES}{@value RequestMappings#KEY_CATEGORY_TAGS}".
+     *
+     * @param keyCategoryHashid the ID of the key category to add the tag to
+     * @param tagHashid the Hashid of the tag to be added
+     * @return the updated key category entity
+     * @since 0.18.0
+     */
+    @DeleteMapping(value = KEY_CATEGORY_TAGS)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<KeyCategory> removeTag(@PathVariable(name = KEYCATEGORY_ID) String keyCategoryHashid, @RequestParam(name = TAG_ID) String tagHashid) {
+        return new ResponseEntity<>(keyCategoryService.removeTag(decodeSingleValueHashid(keyCategoryHashid),
+            decodeSingleValueHashid(tagHashid)),
+            HttpStatus.OK);
     }
 
     /**

@@ -8,6 +8,7 @@ package de.communicode.communikey.api;
 
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
 import static de.communicode.communikey.controller.PathVariables.KEYCATEGORY_ID;
+import static de.communicode.communikey.controller.PathVariables.TAG_ID;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.equalTo;
@@ -40,6 +41,7 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
     private Map<String, String> keyCategoryMovePayload = new HashMap<>();
     private Map<String, String> userGroupPayload = new HashMap<>();
     private Map<String, Object> keyPayload = new HashMap<>();
+    private Map<String, Object> tagPayload = new HashMap<>();
 
     @Test
     public void testAddChildAsAdmin() {
@@ -852,6 +854,162 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
                 .body("responsible", not(equalTo(createdKeyCategoryHashid)));
     }
 
+    @Test
+    public void testAddTagAsAdmin() {
+        initializeTestKeyCategoryPayload();
+        initializeTestTagPayload();
+
+        String createdKeyCategoryHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(keyCategoryPayload)
+        .when()
+                .post(RequestMappings.KEY_CATEGORIES)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        String createdTagHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(tagPayload)
+        .when()
+                .post(RequestMappings.TAGS)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .pathParam(KEYCATEGORY_ID, createdKeyCategoryHashid)
+                .param(TAG_ID, createdTagHashid)
+        .when()
+                .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_TAGS)
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .root("tags")
+                .body("size()", equalTo(1));
+    }
+
+    @Test
+    public void testAddTagAsUser() {
+        initializeTestKeyCategoryPayload();
+        initializeTestTagPayload();
+
+        String createdKeyCategoryHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(keyCategoryPayload)
+        .when()
+                .post(RequestMappings.KEY_CATEGORIES)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        String createdTagHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(tagPayload)
+        .when()
+                .post(RequestMappings.TAGS)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        given()
+                .auth().oauth2(userOAuth2AccessToken)
+                .pathParam(KEYCATEGORY_ID, createdKeyCategoryHashid)
+                .param(TAG_ID, createdTagHashid)
+        .when()
+                .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_TAGS)
+        .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    public void testRemoveTagAsAdmin() {
+        initializeTestKeyCategoryPayload();
+        initializeTestTagPayload();
+
+        String createdKeyCategoryHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(keyCategoryPayload)
+        .when()
+                .post(RequestMappings.KEY_CATEGORIES)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        String createdTagHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(tagPayload)
+        .when()
+                .post(RequestMappings.TAGS)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .pathParam(KEYCATEGORY_ID, createdKeyCategoryHashid)
+                .param(TAG_ID, createdTagHashid)
+        .when()
+                .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_TAGS)
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .root("tags")
+                .body("size()", equalTo(1));
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .pathParam(KEYCATEGORY_ID, createdKeyCategoryHashid)
+                .param(TAG_ID, createdTagHashid)
+        .when()
+                .delete(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_TAGS)
+        .then()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    public void testRemoveTagAsUser() {
+        initializeTestKeyCategoryPayload();
+        initializeTestTagPayload();
+
+        String createdKeyCategoryHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(keyCategoryPayload)
+        .when()
+                .post(RequestMappings.KEY_CATEGORIES)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        String createdTagHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(tagPayload)
+        .when()
+                .post(RequestMappings.TAGS)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .pathParam(KEYCATEGORY_ID, createdKeyCategoryHashid)
+                .param(TAG_ID, createdTagHashid)
+        .when()
+                .get(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_TAGS)
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .root("tags")
+                .body("size()", equalTo(1));
+
+        given()
+                .auth().oauth2(userOAuth2AccessToken)
+                .pathParam(KEYCATEGORY_ID, createdKeyCategoryHashid)
+                .param(TAG_ID, createdTagHashid)
+        .when()
+                .delete(RequestMappings.KEY_CATEGORIES + RequestMappings.KEY_CATEGORY_TAGS)
+        .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
     /**
      * Initializes the test key category payload.
      */
@@ -887,5 +1045,13 @@ public class KeyCategoryApiIT extends IntegrationBaseTest {
         Set<Map> encryptedPasswords = new HashSet<>();
         encryptedPasswords.add(encryptedPassword);
         keyPayload.put("encryptedPasswords", encryptedPasswords);
+    }
+
+    /**
+     * Initializes the test tag payload.
+     */
+    private void initializeTestTagPayload() {
+        tagPayload.put("name", fairy.textProducer().word(2));
+        tagPayload.put("color", fairy.textProducer().word(1));
     }
 }

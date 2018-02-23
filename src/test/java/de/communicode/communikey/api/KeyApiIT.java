@@ -7,6 +7,7 @@
 package de.communicode.communikey.api;
 
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
+import static de.communicode.communikey.controller.PathVariables.TAG_ID;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -39,6 +40,7 @@ public class KeyApiIT extends IntegrationBaseTest {
     private Key key = new Key();
     private UserGroup userGroup = new UserGroup();
     private KeyCategory keyCategory = new KeyCategory();
+    private Map<String, Object> tagPayload = new HashMap<>();
 
     @Test
     public void testCreateKeyAsAdminWithValidPayload() {
@@ -406,6 +408,75 @@ public class KeyApiIT extends IntegrationBaseTest {
 
     }
 
+    @Test
+    public void testAddTagAsAdmin() {
+        initializeTestKeyPayload();
+        initializeTestTagPayload();
+
+        String createdKeyHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(keyPayload)
+        .when()
+                .post(RequestMappings.KEYS)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        String createdTagHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(tagPayload)
+        .when()
+                .post(RequestMappings.TAGS)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .pathParam(KEY_ID, createdKeyHashid)
+                .param(TAG_ID, createdTagHashid)
+        .when()
+                .get(RequestMappings.KEYS + RequestMappings.KEY_TAGS)
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .root("tags")
+                .body("size()", equalTo(1));
+    }
+
+    @Test
+    public void testAddTagAsUser() {
+        initializeTestKeyPayload();
+        initializeTestTagPayload();
+
+        String createdKeyHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(keyPayload)
+        .when()
+                .post(RequestMappings.KEYS)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        String createdTagHashid = given()
+                .auth().oauth2(adminUserOAuth2AccessToken)
+                .contentType(ContentType.JSON)
+                .body(tagPayload)
+        .when()
+                .post(RequestMappings.TAGS)
+        .then()
+                .extract().jsonPath().getString("id");
+
+        given()
+                .auth().oauth2(userOAuth2AccessToken)
+                .pathParam(KEY_ID, createdKeyHashid)
+                .param(TAG_ID, createdTagHashid)
+        .when()
+                .get(RequestMappings.KEYS + RequestMappings.KEY_TAGS)
+        .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+
     private void initializeSubscriberTestData() {
         initializeTestKey();
         key.setCreator(user);
@@ -480,5 +551,13 @@ public class KeyApiIT extends IntegrationBaseTest {
         Set<Map<String, String>> encryptedPasswords = new HashSet<>();
         encryptedPasswords.add(encryptedPassword);
         keyPayload.put("encryptedPasswords", encryptedPasswords);
+    }
+
+    /**
+     * Initializes the test tag payload.
+     */
+    private void initializeTestTagPayload() {
+        tagPayload.put("name", fairy.textProducer().word(2));
+        tagPayload.put("color", fairy.textProducer().word(1));
     }
 }

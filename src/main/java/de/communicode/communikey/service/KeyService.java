@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.toSet;
 
 import de.communicode.communikey.domain.Key;
 import de.communicode.communikey.domain.KeyCategory;
+import de.communicode.communikey.domain.Tag;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.domain.UserEncryptedPassword;
@@ -25,11 +26,13 @@ import de.communicode.communikey.exception.HashidNotValidException;
 import de.communicode.communikey.exception.KeyNotAccessibleByUserException;
 import de.communicode.communikey.exception.UserEncryptedPasswordNotFoundException;
 import de.communicode.communikey.repository.EncryptionJobRepository;
+import de.communicode.communikey.repository.TagRepository;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyPayload;
 import de.communicode.communikey.exception.KeyNotFoundException;
+import de.communicode.communikey.exception.TagNotFoundException;
 import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.service.payload.KeyPayloadEncryptedPasswords;
@@ -40,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -68,6 +72,7 @@ public class KeyService {
     private final EncryptionJobService encryptionJobService;
     private final EncryptionJobRepository encryptionJobRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final TagService tagService;
 
     @Autowired
     public KeyService(KeyRepository keyRepository, @Lazy KeyCategoryService keyCategoryService,
@@ -75,7 +80,8 @@ public class KeyService {
                       userEncryptedPasswordRepository, UserRepository userRepository,
                       AuthorityService authorityService, @Lazy EncryptionJobService encryptionJobService,
                       EncryptionJobRepository encryptionJobRepository,
-                      SimpMessagingTemplate messagingTemplate) {
+                      SimpMessagingTemplate messagingTemplate,
+                      @Lazy TagService tagService) {
         this.keyRepository = requireNonNull(keyRepository, "keyRepository must not be null!");
         this.userEncryptedPasswordRepository = requireNonNull(userEncryptedPasswordRepository, "userEncryptedPasswordRepository must not be null!");
         this.keyCategoryService = requireNonNull(keyCategoryService, "keyCategoryService must not be null!");
@@ -86,6 +92,7 @@ public class KeyService {
         this.encryptionJobService = requireNonNull(encryptionJobService, "encryptionJobService must not be null!");
         this.encryptionJobRepository = requireNonNull(encryptionJobRepository, "encryptionJobRepository must not be null!");
         this.messagingTemplate = requireNonNull(messagingTemplate, "messagingTemplate must not be null!");
+        this.tagService = requireNonNull(tagService, "tagService must not be null!");
     }
 
     /**
@@ -144,6 +151,9 @@ public class KeyService {
      */
     public void delete(Long keyId) {
         Key key = validate(keyId);
+        key.getTags().forEach(tag -> {
+            tagService.removeKey(tag, key);
+        });
         userEncryptedPasswordRepository.deleteByKey(key);
         encryptionJobRepository.deleteByKey(key);
         keyRepository.delete(key);
@@ -154,9 +164,12 @@ public class KeyService {
     /**
      * Deletes all keys.
      */
+    @Transactional
     public void deleteAll() {
         userEncryptedPasswordRepository.deleteAll();
-        keyRepository.deleteAll();
+        keyRepository.findAll().forEach(key -> {
+            delete(key.getId());
+        });
         log.debug("Deleted all keys");
     }
 
@@ -448,6 +461,61 @@ public class KeyService {
      */
     public Key validate(Long keyId) {
         return ofNullable(keyRepository.findOne(keyId)).orElseThrow(KeyNotFoundException::new);
+    }
+
+    /**
+     * Adds the tag to the key with the specified ID.
+     *
+     * @param keyId the ID of the key the tag will be added to
+     * @param tagId the ID of the tag to be added
+     * @return the updated key
+     * @throws KeyNotFoundException if the key with the specified ID has not been found
+     * @throws TagNotFoundException if the tag with the specified ID has not been found
+     * @since 0.18.0
+     */
+    public Key addTag(Long keyId, Long tagId) {
+        Key key = validate(keyId);
+        Tag tag = tagService.validate(tagId);
+        key.addTag(tag);
+        key = keyRepository.save(key);
+        tagService.addKey(tag, key);
+
+        log.debug("Added tag with ID '{}' to key with ID '{}'", tagId, keyId);
+        sendUpdates(key);
+        return key;
+    }
+
+    /**
+     * Removes the tag from the key.
+     *
+     * @param keyId the ID of the key the tag will be added to
+     * @param tagId the ID of the tag to be added
+     * @return the updated key
+     * @throws KeyNotFoundException if the key with the specified ID has not been found
+     * @throws TagNotFoundException if the tag with the specified ID has not been found
+     * @since 0.18.0
+     */
+    public Key removeTag(Long keyId, Long tagId) {
+        Key key = validate(keyId);
+        Tag tag = tagService.validate(tagId);
+        return deleteTag(key, tag);
+    }
+
+    /**
+     * Removes the tag from the key.
+     *
+     * @param key the key the tag will be removed from
+     * @param tag the tag to be removed
+     * @return the updated key
+     * @since 0.18.0
+     */
+    public Key deleteTag(Key key, Tag tag) {
+        key.removeTag(tag);
+        tagService.removeKey(tag, key);
+        Key savedKey = keyRepository.save(key);
+        log.debug("Removed tag with ID '{}' from the key with ID '{}'", tag.getId(), savedKey.getId());
+        sendUpdates(savedKey);
+        return savedKey;
     }
 
     /**

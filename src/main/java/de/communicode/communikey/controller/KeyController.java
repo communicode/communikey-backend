@@ -7,10 +7,12 @@
 package de.communicode.communikey.controller;
 
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
+import static de.communicode.communikey.controller.PathVariables.TAG_ID;
 import static de.communicode.communikey.controller.RequestMappings.KEYS;
 import static de.communicode.communikey.controller.RequestMappings.KEY_ENCRYPTED_PASSWORD;
 import static de.communicode.communikey.controller.RequestMappings.KEY_HASHID;
 import static de.communicode.communikey.controller.RequestMappings.KEY_SUBSCRIBERS;
+import static de.communicode.communikey.controller.RequestMappings.KEY_TAGS;
 import static java.util.Objects.requireNonNull;
 
 import de.communicode.communikey.domain.Key;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -44,6 +47,7 @@ import java.util.Set;
  * <p>Mapped to the "{@value RequestMappings#KEYS}" endpoint.
  *
  * @author sgreb@communicode.de
+ * @author dvonderbey@communicode.de
  * @since 0.1.0
  */
 @RestController
@@ -181,6 +185,42 @@ public class KeyController {
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Key> update(@PathVariable(name = KEY_ID) String keyHashid, @Valid @RequestBody KeyPayload payload) {
         return new ResponseEntity<>(keyService.update(decodeSingleValueHashid(keyHashid), payload), HttpStatus.OK);
+    }
+
+    /**
+     * Adds the specified tag to the key with the specified ID.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEY_TAGS}".
+     *
+     * @param keyHashid the ID of the key to add the tag to
+     * @param tagHashid the Hashid of the tag to be added
+     * @return the updated key entity
+     * @since 0.18.0
+     */
+    @GetMapping(value = KEY_TAGS)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<Key> addTag(@PathVariable(name = KEY_ID) String keyHashid, @RequestParam(name = TAG_ID) String tagHashid) {
+        return new ResponseEntity<>(keyService.addTag(decodeSingleValueHashid(keyHashid),
+            decodeSingleValueHashid(tagHashid)),
+            HttpStatus.OK);
+    }
+
+    /**
+     * Removes the specified tag from the key with the specified ID.
+     *
+     * <p>This endpoint is mapped to "{@value RequestMappings#KEYS}{@value RequestMappings#KEY_TAGS}".
+     *
+     * @param keyHashid the ID of the key to add the tag to
+     * @param tagHashid the Hashid of the tag to be added
+     * @return the updated key entity
+     * @since 0.18.0
+     */
+    @DeleteMapping(value = KEY_TAGS)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<Key> removeTag(@PathVariable(name = KEY_ID) String keyHashid, @RequestParam(name = TAG_ID) String tagHashid) {
+        return new ResponseEntity<>(keyService.removeTag(decodeSingleValueHashid(keyHashid),
+            decodeSingleValueHashid(tagHashid)),
+            HttpStatus.OK);
     }
 
     /**

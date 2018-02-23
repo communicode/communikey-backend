@@ -77,6 +77,11 @@ public class Key extends AbstractEntity implements Serializable {
     @JsonIdentityReference(alwaysAsId = true)
     private Set<UserEncryptedPassword> userEncryptedPasswords = Sets.newConcurrentHashSet();
 
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "keys")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    private Set<Tag> tags = Sets.newConcurrentHashSet();
+
     @Lob
     @Column(length = 500)
     private String notes;
@@ -163,6 +168,30 @@ public class Key extends AbstractEntity implements Serializable {
 
     public void removeAllUserEncryptedPasswords() {
         userEncryptedPasswords.clear();
+    }
+
+    public boolean addTag(Tag tag) {
+        return this.tags.add(tag);
+    }
+
+    public boolean addTags(Set<Tag> tags) {
+        return this.tags.addAll(tags);
+    }
+
+    public boolean removeTag(Tag tag) {
+        return this.tags.remove(tag);
+    }
+
+    public boolean removeTags(Set<Tag> tags) {
+        return this.tags.removeAll(tags);
+    }
+
+    public void removeAllTags() {
+        this.tags.clear();
+    }
+
+    public Set<Tag> getTags() {
+        return Sets.newConcurrentHashSet(this.tags);
     }
 
     public String getNotes() {

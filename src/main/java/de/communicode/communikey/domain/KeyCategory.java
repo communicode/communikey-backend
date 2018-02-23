@@ -103,6 +103,11 @@ public class KeyCategory extends AbstractEntity implements Serializable {
     @JsonIdentityReference(alwaysAsId = true)
     private User responsible;
 
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "keyCategories")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    private Set<Tag> tags = Sets.newConcurrentHashSet();
+
     public Long getId() {
         return id;
     }
@@ -237,5 +242,29 @@ public class KeyCategory extends AbstractEntity implements Serializable {
 
     public void setResponsible(User responsible) {
         this.responsible = responsible;
+    }
+
+    public boolean addTag(Tag tag) {
+        return this.tags.add(tag);
+    }
+
+    public boolean addTags(Set<Tag> tags) {
+        return this.tags.addAll(tags);
+    }
+
+    public boolean removeTag(Tag tag) {
+        return this.tags.remove(tag);
+    }
+
+    public boolean removeTags(Set<Tag> tags) {
+        return this.tags.removeAll(tags);
+    }
+
+    public void removeAllTags() {
+        this.tags.clear();
+    }
+
+    public Set<Tag> getTags() {
+        return Sets.newConcurrentHashSet(this.tags);
     }
 }

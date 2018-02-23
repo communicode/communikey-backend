@@ -93,6 +93,11 @@ public final class RequestMappings {
     public static final String KEY_CATEGORY_KEYS = KEY_CATEGORIES_HASHID + ENDPOINT_KEYS;
 
     /**
+     * The request mapping for the {@link KeyCategory} {@link Tag}s.
+     */
+    public static final String KEY_CATEGORY_TAGS = KEY_CATEGORIES_HASHID + ENDPOINT_TAGS;
+
+    /**
      * The request mapping for the responsible {@link KeyCategory} user.
      */
     public static final String KEY_CATEGORY_RESPONSIBLE = KEY_CATEGORIES_HASHID + "/responsible";
@@ -111,6 +116,11 @@ public final class RequestMappings {
      * The request parameter for a {@link Key} entity userEncryptedPassword.
      */
     public static final String KEY_ENCRYPTED_PASSWORD = KEY_HASHID + "/password";
+
+    /**
+     * The request mapping for the {@link Key} {@link Tag}s.
+     */
+    public static final String KEY_TAGS = KEY_HASHID + ENDPOINT_TAGS;
 
     /**
      * The endpoint for {@link User} entities.
