@@ -61,7 +61,6 @@ public class TagController {
      *
      * @param payload the tag request payload
      * @return the tag as response entity
-     * @since 0.18.0
      */
     @PostMapping
     @Secured(AuthoritiesConstants.ADMIN)
@@ -146,7 +145,6 @@ public class TagController {
      * @param hashid the Hashid of the tag to decode
      * @return the decoded Hashid if valid
      * @throws TagNotFoundException if the Hashid is invalid and the tag has not been found
-     * @since 0.12.0
      */
     private Long decodeSingleValueHashid(String hashid) throws HashidNotValidException {
         long[] decodedHashid = hashids.decode(hashid);
