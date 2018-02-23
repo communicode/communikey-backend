@@ -14,6 +14,7 @@ import de.communicode.communikey.config.CommunikeyProperties;
 import de.communicode.communikey.domain.Authority;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.repository.KeyCategoryRepository;
+import de.communicode.communikey.repository.TagRepository;
 import de.communicode.communikey.repository.UserGroupRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
@@ -22,6 +23,7 @@ import de.communicode.communikey.service.AuthorityService;
 import de.communicode.communikey.service.KeyCategoryService;
 import de.communicode.communikey.service.KeyService;
 import de.communicode.communikey.repository.KeyRepository;
+import de.communicode.communikey.service.TagService;
 import de.communicode.communikey.service.UserGroupService;
 import de.communicode.communikey.service.UserService;
 import org.hashids.Hashids;
@@ -73,6 +75,10 @@ public abstract class IntegrationBaseTest {
     @Autowired
     protected UserGroupRepository userGroupRepository;
     @Autowired
+    protected TagService tagService;
+    @Autowired
+    protected TagRepository tagRepository;
+    @Autowired
     protected PasswordEncoder passwordEncoder;
     @Autowired
     protected AuthorityService authorityService;
@@ -118,6 +124,7 @@ public abstract class IntegrationBaseTest {
         userRepository.findAll().stream()
                 .filter(testUser -> !testUser.getLogin().equals(communikeyProperties.getSecurity().getRoot().getLogin()))
                 .forEach(nonRootUser -> userService.delete(nonRootUser.getLogin()));
+        tagService.deleteAll();
     }
 
     /**
