@@ -27,7 +27,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 - Clone the project using your favorable way of cloning a github project.
 
-- Setup a database preferably named "communikey", with a password & username of your choice. See [prerequisites](##prerequisites) for detailed notes.
+- Setup a database preferably named "communikey", with a password & username of your choice. See [prerequisites](#prerequisites) for detailed notes.
 
 - Edit **application-dev.yml** in the **/src/main/resources** folder to reflect your new database, password & username you just created.
 
