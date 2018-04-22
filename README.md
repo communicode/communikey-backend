@@ -4,7 +4,7 @@
 
 <p align="center">
     <img src="https://api.travis-ci.org/communicode/communikey-backend.svg?branch=master"/>
-    <img src="https://img.shields.io/badge/release-0.17.3-blue.svg"/>
+    <img src="https://img.shields.io/badge/release-0.17.2-blue.svg"/>
 </p>
 
 # communikey
