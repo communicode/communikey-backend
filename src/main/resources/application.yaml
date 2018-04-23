@@ -11,10 +11,6 @@ spring:
     favicon:
       enabled: false
 
-security:
-  basic:
-    enabled: false
-
 communikey:
   security:
     root:

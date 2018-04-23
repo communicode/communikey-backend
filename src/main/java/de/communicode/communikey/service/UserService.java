@@ -443,12 +443,9 @@ public class UserService {
                     .collect(Collectors.toSet());
                 if (!payloadAuthorities.equals(user.getAuthorities())) {
                     user.removeAllAuthorities();
-                    payload.stream()
-                        .map(authorityRepository::findById)
-                        .forEach(authorityOptional -> {
-                            authorityOptional.map(user::addAuthority)
-                                .orElseThrow(() -> new AuthorizationServiceException(""));
-                        });
+                    for (Authority authority: payloadAuthorities) {
+                        user.addAuthority(authority);
+                    }
                 }
                 deleteOauth2AccessTokens(login);
                 userRepository.save(user);

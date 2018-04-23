@@ -50,6 +50,6 @@ public class SecurityAuditorAware implements AuditorAware<String> {
         if (userName != null && !Objects.equals(userName, "anonymousUser")) {
             return ofNullable(userName);
         }
-        return ofNullable(communikeyProperties.getSecurity().getRoot().getLogin());
+        return Optional.empty();
     }
 }

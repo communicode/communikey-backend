@@ -45,7 +45,7 @@ public abstract class AbstractEntity implements Serializable {
     private static final long serialVersionUID = 1;
 
     @CreatedBy
-    @Column(name = "created_by", nullable = false, length = 50, updatable = false)
+    @Column(name = "created_by", length = 50, updatable = false)
     @JsonView(AuthoritiesRestView.Admin.class)
     private String createdBy;
 
