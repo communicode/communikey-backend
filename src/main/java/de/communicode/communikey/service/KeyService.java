@@ -32,15 +32,12 @@ import de.communicode.communikey.domain.KeyCategory;
 import de.communicode.communikey.domain.User;
 import de.communicode.communikey.domain.UserGroup;
 import de.communicode.communikey.domain.UserEncryptedPassword;
-import de.communicode.communikey.exception.HashidNotValidException;
-import de.communicode.communikey.exception.KeyNotAccessibleByUserException;
-import de.communicode.communikey.exception.UserEncryptedPasswordNotFoundException;
+import de.communicode.communikey.exception.*;
 import de.communicode.communikey.repository.EncryptionJobRepository;
 import de.communicode.communikey.repository.UserEncryptedPasswordRepository;
 import de.communicode.communikey.security.AuthoritiesConstants;
 import de.communicode.communikey.security.SecurityUtils;
 import de.communicode.communikey.service.payload.KeyPayload;
-import de.communicode.communikey.exception.KeyNotFoundException;
 import de.communicode.communikey.repository.KeyRepository;
 import de.communicode.communikey.repository.UserRepository;
 import de.communicode.communikey.service.payload.KeyPayloadEncryptedPasswords;
@@ -123,7 +120,7 @@ public class KeyService {
         }
         if (ofNullable(payload.getCategoryId()).isPresent()) {
             keyCategoryService.addKey(decodeSingleValueHashid(payload.getCategoryId()), persistedKey.getId());
-            persistedKey = keyRepository.findOne(persistedKey.getId());
+            persistedKey = keyRepository.findById(persistedKey.getId()).orElseThrow(KeyNotFoundException::new);
         }
         userService.addKey(userLogin, persistedKey);
         sendUpdates(key);
@@ -458,7 +455,7 @@ public class KeyService {
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
     public Key validate(Long keyId) {
-        return ofNullable(keyRepository.findOne(keyId)).orElseThrow(KeyNotFoundException::new);
+        return keyRepository.findById(keyId).orElseThrow(KeyNotFoundException::new);
     }
 
     /**

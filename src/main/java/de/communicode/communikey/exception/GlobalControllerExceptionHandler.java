@@ -23,8 +23,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
-import org.springframework.boot.autoconfigure.web.DefaultErrorAttributes;
-import org.springframework.boot.autoconfigure.web.ErrorAttributes;
+import org.springframework.boot.web.reactive.error.ErrorAttributes;
+import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -154,24 +154,24 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(errorResponse, headers, status);
     }
 
-    /**
-     * The bean to configure the default error response attributes.
-     *
-     * @return the configured error response attributes bean
-     */
-    @Bean
-    public ErrorAttributes errorAttributes() {
-        return new DefaultErrorAttributes() {
-            @Override
-            public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
-                Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, false);
-                errorAttributes.remove("exception");
-                errorAttributes.remove("path");
-                if (errorAttributes.containsKey("message")) {
-                    errorAttributes.remove("message");
-                }
-                return errorAttributes;
-            }
-        };
-    }
+//    /**
+//     * The bean to configure the default error response attributes.
+//     *
+//     * @return the configured error response attributes bean
+//     */
+//    @Bean
+//    public ErrorAttributes errorAttributes() {
+//        return new DefaultErrorAttributes() {
+//            @Override
+//            public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
+//                Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, false);
+//                errorAttributes.remove("exception");
+//                errorAttributes.remove("path");
+//                if (errorAttributes.containsKey("message")) {
+//                    errorAttributes.remove("message");
+//                }
+//                return errorAttributes;
+//            }
+//        };
+//    }
 }

@@ -23,8 +23,10 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Implementation of AuditorAware based on Spring Security.
@@ -43,11 +45,11 @@ public class SecurityAuditorAware implements AuditorAware<String> {
     }
 
     @Override
-    public String getCurrentAuditor() {
+    public Optional<String> getCurrentAuditor() {
         String userName = SecurityUtils.getCurrentUserLogin();
         if (userName != null && !Objects.equals(userName, "anonymousUser")) {
-            return userName;
+            return ofNullable(userName);
         }
-        return communikeyProperties.getSecurity().getRoot().getLogin();
+        return ofNullable(communikeyProperties.getSecurity().getRoot().getLogin());
     }
 }

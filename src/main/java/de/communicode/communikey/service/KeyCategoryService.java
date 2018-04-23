@@ -350,7 +350,7 @@ public class KeyCategoryService {
      * @throws KeyCategoryNotFoundException if the key category with the specified ID has not been found
      */
     public KeyCategory validate(Long keyCategoryId) {
-        return ofNullable(keyCategoryRepository.findOne(keyCategoryId)).orElseThrow(KeyCategoryNotFoundException::new);
+        return keyCategoryRepository.findById(keyCategoryId).orElseThrow(KeyCategoryNotFoundException::new);
     }
 
     /**
@@ -362,7 +362,7 @@ public class KeyCategoryService {
      */
     private void validateUniqueKeyCategoryName(String name, Long parentKeyCategoryId) {
         if (Objects.nonNull(parentKeyCategoryId)) {
-            if (ofNullable(keyCategoryRepository.findOne(parentKeyCategoryId))
+            if (keyCategoryRepository.findById(parentKeyCategoryId)
                 .map(keyCategory -> keyCategory.getChildren().stream()
                     .anyMatch(children -> children.getName().equals(name)))
                 .orElse(true)) {
