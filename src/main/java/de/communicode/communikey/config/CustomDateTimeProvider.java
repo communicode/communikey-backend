@@ -15,31 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.communicode.communikey.service.payload;
+package de.communicode.communikey.config;
 
-import de.communicode.communikey.domain.UserEncryptedPassword;
+import org.springframework.data.auditing.DateTimeProvider;
+import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotBlank;
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAccessor;
+import java.util.Optional;
 
-/**
- * A payload container object for a {@link UserEncryptedPassword}.
- *
- * @author sgreb@communicode.de
- * @author dvonderbey@communicode.de
- * @since 0.15.0
- */
-public class KeyPayloadEncryptedPasswords {
-    @NotBlank
-    private String login;
 
-    @NotBlank
-    private String encryptedPassword;
-
-    public String getLogin() {
-        return login;
-    }
-
-    public String getEncryptedPassword() {
-        return encryptedPassword;
+@Component("dateTimeProvider")
+public class CustomDateTimeProvider implements DateTimeProvider {
+    @Override
+    public Optional<TemporalAccessor> getNow() {
+        return Optional.of(ZonedDateTime.now());
     }
 }

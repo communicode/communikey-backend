@@ -20,7 +20,7 @@ package de.communicode.communikey.service.payload;
 import static de.communicode.communikey.config.SecurityConfig.EMAIL_REGEX;
 
 import de.communicode.communikey.domain.User;
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 
 import javax.validation.constraints.Pattern;
 

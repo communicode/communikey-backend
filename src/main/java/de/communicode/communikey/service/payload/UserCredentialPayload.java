@@ -18,7 +18,7 @@
 package de.communicode.communikey.service.payload;
 
 import de.communicode.communikey.domain.User;
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 
 /**
  * A payload object to provide the {@link User} credentials consisting of the login and the password.

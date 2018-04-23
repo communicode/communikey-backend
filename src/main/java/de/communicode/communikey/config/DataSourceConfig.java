@@ -19,9 +19,7 @@ package de.communicode.communikey.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.hibernate.HikariConfigurationUtil;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -33,8 +31,6 @@ import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
-
 /**
  * Configures Spring Security for the {@link de.communicode.communikey.domain.User} authentication.
  *
@@ -45,7 +41,7 @@ import javax.sql.DataSource;
  */
 @Configuration
 @EnableJpaRepositories("de.communicode.communikey.repository")
-@EnableJpaAuditing(auditorAwareRef = "securityAuditorAware")
+@EnableJpaAuditing(auditorAwareRef = "securityAuditorAware", dateTimeProviderRef = "dateTimeProvider")
 @EnableTransactionManagement
 public class DataSourceConfig {
 

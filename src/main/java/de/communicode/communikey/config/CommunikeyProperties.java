@@ -20,9 +20,9 @@ package de.communicode.communikey.config;
 import static de.communicode.communikey.config.SecurityConfig.APP_ID;
 import static de.communicode.communikey.config.SecurityConfig.EMAIL_REGEX;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 

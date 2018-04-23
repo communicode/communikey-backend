@@ -18,7 +18,7 @@
 package de.communicode.communikey.service.payload;
 
 import de.communicode.communikey.domain.User;
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 
 /**
  * A payload object to reset the password of a {@link User} with a specified reset token.
