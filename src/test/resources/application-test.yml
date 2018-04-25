@@ -2,7 +2,6 @@ spring:
   profiles:
     active: test
   datasource:
-    type: com.zaxxer.hikari.HikariDataSource
     hikari:
       jdbc-url: jdbc:mysql://localhost:3306/communikey?useUnicode=true&characterEncoding=utf8&createDatabaseIfNotExist=true&autoReconnect=true
       username: root
