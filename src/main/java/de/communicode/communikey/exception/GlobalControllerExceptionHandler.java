@@ -32,7 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.ConstraintViolationException;
@@ -154,24 +154,22 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(errorResponse, headers, status);
     }
 
-//    /**
-//     * The bean to configure the default error response attributes.
-//     *
-//     * @return the configured error response attributes bean
-//     */
-//    @Bean
-//    public ErrorAttributes errorAttributes() {
-//        return new DefaultErrorAttributes() {
-//            @Override
-//            public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
-//                Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, false);
-//                errorAttributes.remove("exception");
-//                errorAttributes.remove("path");
-//                if (errorAttributes.containsKey("message")) {
-//                    errorAttributes.remove("message");
-//                }
-//                return errorAttributes;
-//            }
-//        };
-//    }
+    /**
+     * The bean to configure the default error response attributes.
+     *
+     * @return the configured error response attributes bean
+     */
+    @Bean
+    public ErrorAttributes errorAttributes() {
+        return new DefaultErrorAttributes() {
+            @Override
+            public Map<String, Object> getErrorAttributes(ServerRequest request, boolean includeStackTrace) {
+                Map<String, Object> errorAttributes = super.getErrorAttributes(request, false);
+                errorAttributes.remove("exception");
+                errorAttributes.remove("path");
+                errorAttributes.remove("message");
+                return errorAttributes;
+            }
+        };
+    }
 }
