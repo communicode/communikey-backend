@@ -52,7 +52,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <commons-lang.version>3.5</commons-lang.version>
-    <hibernate-envers.version>5.2.4.Final</hibernate-envers.version>
     <rest-assured.version>3.0.2</rest-assured.version>
     <jfairy.version>0.5.6</jfairy.version>
     <springfox.swagger.version>2.6.1</springfox.swagger.version>
@@ -196,10 +195,6 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>${commons-lang.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-hibernate5</artifactId>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>

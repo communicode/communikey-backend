@@ -20,7 +20,6 @@ package de.communicode.communikey.config;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +39,6 @@ public class JacksonConfig {
         ObjectMapper objectMapper = new ObjectMapper();
 
         objectMapper
-            .registerModule(new Hibernate5Module())
             .registerModule(new JavaTimeModule());
 
         objectMapper
