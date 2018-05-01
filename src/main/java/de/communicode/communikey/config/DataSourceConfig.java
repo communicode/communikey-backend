@@ -40,7 +40,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Configuration
 @EnableJpaRepositories("de.communicode.communikey.repository")
-@EnableJpaAuditing(auditorAwareRef = "securityAuditorAware", dateTimeProviderRef="dateTimeProvider")
+@EnableJpaAuditing(auditorAwareRef = "securityAuditorAware")
 public class DataSourceConfig {
 
   private DataSource dataSource;
