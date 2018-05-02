@@ -20,9 +20,11 @@ package de.communicode.communikey.config;
 import static de.communicode.communikey.config.SecurityConfig.APP_ID;
 import static de.communicode.communikey.config.SecurityConfig.EMAIL_REGEX;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -34,8 +36,10 @@ import javax.validation.constraints.Pattern;
  * @author sgreb@communicode.de
  * @since 0.2.0
  */
+@Configuration
 @ConfigurationProperties(prefix = APP_ID, ignoreUnknownFields = false)
-public final class CommunikeyProperties {
+@Validated
+public class CommunikeyProperties {
 
     private final Security security = new Security();
 

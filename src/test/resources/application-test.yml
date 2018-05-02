@@ -1,20 +1,7 @@
 spring:
   profiles:
     active: test
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    hikari:
-      jdbc-url: jdbc:mysql://localhost:3306/communikey?useUnicode=true&characterEncoding=utf8&createDatabaseIfNotExist=true&autoReconnect=true
-      username: root
-      password:
-      data-source-properties:
-        cachePrepStmts: true
-        prepStmtCacheSize: 250
-        prepStmtCacheSqlLimit: 2048
-        useServerPrepStmts: true
   jpa:
-    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-    database: MYSQL
     hibernate:
       ddl-auto: create-drop
 

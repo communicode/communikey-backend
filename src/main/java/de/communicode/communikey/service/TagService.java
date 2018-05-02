@@ -156,7 +156,7 @@ public class TagService {
      * @throws KeyNotFoundException if the key with the specified ID has not been found
      */
     private Tag validate(Long tagId) {
-        return ofNullable(tagRepository.findOne(tagId)).orElseThrow(TagNotFoundException::new);
+        return tagRepository.findById(tagId).orElseThrow(TagNotFoundException::new);
     }
 
     /**

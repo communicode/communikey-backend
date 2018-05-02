@@ -18,7 +18,7 @@
 package de.communicode.communikey.service.payload;
 
 import de.communicode.communikey.domain.User;
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 
 /**
  * A payload object to create a {@link User}.

@@ -52,11 +52,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.naming.AuthenticationException;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Map;
@@ -211,7 +213,7 @@ public class UserService {
         user.setActivationToken(SecurityUtils.generateRandomActivationToken());
         user.setPublicKeyResetToken(SecurityUtils.generateRandomResetToken());
         Set<Authority> authorities = Sets.newConcurrentHashSet();
-        Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
+        Authority authority = authorityRepository.findOneByName(AuthoritiesConstants.USER);
         authorities.add(authority);
         user.addAuthorities(authorities);
 
@@ -437,13 +439,13 @@ public class UserService {
         return ofNullable(userRepository.findOneByLogin(login))
             .map(user -> {
                 Set<Authority> payloadAuthorities = payload.stream()
-                    .map(authorityRepository::findOne)
+                    .map(id -> authorityRepository.findById(id).orElseThrow(() -> new AuthorityNotFoundException(id)))
                     .collect(Collectors.toSet());
                 if (!payloadAuthorities.equals(user.getAuthorities())) {
                     user.removeAllAuthorities();
-                    payload.stream()
-                        .map(authorityRepository::findOne)
-                        .forEach(user::addAuthority);
+                    for (Authority authority: payloadAuthorities) {
+                        user.addAuthority(authority);
+                    }
                 }
                 deleteOauth2AccessTokens(login);
                 userRepository.save(user);

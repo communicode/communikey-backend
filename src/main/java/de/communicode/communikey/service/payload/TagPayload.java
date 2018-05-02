@@ -18,7 +18,7 @@
 package de.communicode.communikey.service.payload;
 
 import de.communicode.communikey.domain.Tag;
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 
 /**
  * A payload object for a {@link Tag}.

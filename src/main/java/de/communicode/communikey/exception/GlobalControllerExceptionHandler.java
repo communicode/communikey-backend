@@ -23,8 +23,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
-import org.springframework.boot.autoconfigure.web.DefaultErrorAttributes;
-import org.springframework.boot.autoconfigure.web.ErrorAttributes;
+import org.springframework.boot.web.reactive.error.ErrorAttributes;
+import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.ConstraintViolationException;
@@ -163,13 +163,11 @@ public class GlobalControllerExceptionHandler {
     public ErrorAttributes errorAttributes() {
         return new DefaultErrorAttributes() {
             @Override
-            public Map<String, Object> getErrorAttributes(RequestAttributes requestAttributes, boolean includeStackTrace) {
-                Map<String, Object> errorAttributes = super.getErrorAttributes(requestAttributes, false);
+            public Map<String, Object> getErrorAttributes(ServerRequest request, boolean includeStackTrace) {
+                Map<String, Object> errorAttributes = super.getErrorAttributes(request, false);
                 errorAttributes.remove("exception");
                 errorAttributes.remove("path");
-                if (errorAttributes.containsKey("message")) {
-                    errorAttributes.remove("message");
-                }
+                errorAttributes.remove("message");
                 return errorAttributes;
             }
         };

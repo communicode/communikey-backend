@@ -82,7 +82,7 @@ public class UserGroupService {
      */
     public UserGroup addUser(Long userGroupId, String login) {
         User user = userService.validate(login);
-        return ofNullable(userGroupRepository.findOne(userGroupId))
+        return userGroupRepository.findById(userGroupId)
             .map(userGroup -> {
                 if (userGroup.addUser(user)) {
                     userGroupRepository.save(userGroup);
@@ -194,7 +194,7 @@ public class UserGroupService {
      */
     public UserGroup removeUser(Long userGroupId, String login) {
         User user = userService.validate(login);
-        UserGroup returnGroup = ofNullable(userGroupRepository.findOne(userGroupId))
+        UserGroup returnGroup = userGroupRepository.findById(userGroupId)
             .map(userGroup -> {
                 userGroup.removeUser(user);
                 userGroupRepository.save(userGroup);
@@ -249,7 +249,7 @@ public class UserGroupService {
      * @since 0.9.0
      */
     public UserGroup validate(Long userGroupId) {
-        return ofNullable(userGroupRepository.findOne(userGroupId)).orElseThrow(() -> new UserGroupNotFoundException(userGroupId));
+        return userGroupRepository.findById(userGroupId).orElseThrow(() -> new UserGroupNotFoundException(userGroupId));
     }
 
     /**

@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.collect.Sets;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -37,6 +36,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Column;
 import javax.persistence.GenerationType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 import java.io.Serializable;
 import java.util.Set;

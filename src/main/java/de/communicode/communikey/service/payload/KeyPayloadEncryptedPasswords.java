@@ -19,7 +19,7 @@ package de.communicode.communikey.service.payload;
 
 import de.communicode.communikey.domain.UserEncryptedPassword;
 
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 
 /**
  * A payload container object for a {@link UserEncryptedPassword}.

@@ -68,11 +68,11 @@ public class ApplicationDataBootstrap {
     }
 
     private void initializeAuthorities() {
-        if (!this.authorityRepository.exists(AuthoritiesConstants.USER)) {
+        if (!this.authorityRepository.existsById(AuthoritiesConstants.USER)) {
             this.roleUser.setName(AuthoritiesConstants.USER);
             this.authorityRepository.save(roleUser);
         }
-        if (!this.authorityRepository.exists(AuthoritiesConstants.ADMIN)) {
+        if (!this.authorityRepository.existsById(AuthoritiesConstants.ADMIN)) {
             this.roleAdmin.setName(AuthoritiesConstants.ADMIN);
             this.authorityRepository.save(roleAdmin);
         }
@@ -89,7 +89,7 @@ public class ApplicationDataBootstrap {
             this.rootUser.setPublicKey(communikeyProperties.getSecurity().getRoot().getPublicKey());
             this.rootUser.setActivated(true);
             final Set<Authority> authorities = Stream.of(AuthoritiesConstants.ADMIN, AuthoritiesConstants.USER)
-                    .map(authorityRepository::findOne)
+                    .map(authorityRepository::findOneByName)
                     .collect(toSet());
             this.rootUser.addAuthorities(authorities);
 
