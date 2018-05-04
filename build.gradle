@@ -1,0 +1,200 @@
+buildscript {
+  ext {
+    springBootVersion = "2.0.1.RELEASE"
+  }
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
+  }
+}
+
+apply plugin: "java"
+apply plugin: "maven"
+apply plugin: "checkstyle"
+apply plugin: "jacoco"
+apply plugin: "idea"
+apply plugin: "org.springframework.boot"
+apply plugin: "io.spring.dependency-management"
+
+group = "de.communicode"
+version = "0.17.2"
+description = "A simple centralized, cross-platform credential manager using GPG encryption."
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+tasks.withType(JavaCompile) {
+  options.encoding = "UTF-8"
+}
+
+def url = "https://communicode.github.io/communikey-backend"
+def name = "communikey"
+def maintainer = "communicode AG"
+def maintainerId = "communicode"
+def maintainerUrl = "https://communicode.de"
+def repositoryUrl = "https://github.com/communicode/communikey-backend.git"
+def repositoryUrlGit = "git://git@github.com:communicode/communikey-backend.git"
+def license = "GPL-3.0"
+def licenseUrl = "https://github.com/communicode/communikey-backend/blob/develop/LICENSE.md"
+def issueManagement = "GitHub"
+def issueManagementUrl = "https://github.com/communicode/communikey-backend/issues"
+
+def checkstyleVersion = "8.0"
+def commonsLangVersion = "3.7"
+def guavaVersion = "25.0-jre"
+def hashidsVersion = "1.0.3"
+def jfairyVersion = "0.5.9"
+def restAssuredVersion = "3.1.0"
+def sockjsClientVersion = "1.1.2"
+def springSecurityOauth2Version = "2.3.2.RELEASE"
+def springSecurityTestVersion = "5.0.4.RELEASE"
+def stompWebsocketVersion = "2.3.3"
+
+bootRun {
+  jvmArgs = ["-Dspring.profiles.active=dev"]
+}
+
+checkstyle {
+  configFile = file("config/checkstyle/communicode-style-guide-1.1.xml")
+  toolVersion = "$checkstyleVersion"
+  ignoreFailures = false
+  showViolations = true
+}
+
+configurations {
+  integrationTestCompile.extendsFrom testCompile
+  integrationTestRuntime.extendsFrom testRuntime
+}
+
+configurations.all {
+  /* Required to use log4j (prevents multiple SLF4J bindings). */
+  exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+}
+
+dependencies {
+  compile("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+  compile("com.google.guava:guava:$guavaVersion")
+  compile("org.apache.commons:commons-lang3:$commonsLangVersion")
+  compile("org.hashids:hashids:$hashidsVersion")
+  compile("org.springframework.boot:spring-boot-starter-data-jpa")
+  compile("org.springframework.boot:spring-boot-starter-json")
+  compile("org.springframework.boot:spring-boot-starter-log4j2")
+  compile("org.springframework.boot:spring-boot-starter-security")
+  compile("org.springframework.boot:spring-boot-starter-web")
+  compile("org.springframework.boot:spring-boot-starter-webflux")
+  compile("org.springframework.boot:spring-boot-starter-websocket")
+  compile("org.springframework.security:spring-security-messaging")
+  compile("org.springframework.security.oauth:spring-security-oauth2:$springSecurityOauth2Version")
+  compile("org.webjars:sockjs-client:$sockjsClientVersion")
+  compile("org.webjars:stomp-websocket:$stompWebsocketVersion")
+  compileOnly("org.springframework.boot:spring-boot-configuration-processor")
+  runtime("mysql:mysql-connector-java")
+  runtime("org.springframework.boot:spring-boot-devtools")
+  testCompile("org.springframework.boot:spring-boot-starter-test")
+  testCompile("io.projectreactor:reactor-test")
+  testCompile("org.springframework.security:spring-security-test:$springSecurityTestVersion")
+  testCompile("io.rest-assured:rest-assured:$restAssuredVersion")
+  testCompile("io.codearte.jfairy:jfairy:$jfairyVersion")
+}
+
+idea {
+  module {
+    downloadJavadoc = true
+    downloadSources = true
+    inheritOutputDirs = false
+    outputDir = file("build/classes/java/main")
+    testOutputDir = file("build/classes/java/test")
+  }
+}
+
+jar {
+  baseName "$rootProject.name"
+  version "$version"
+}
+
+javadoc {
+  failOnError = false
+  excludes = ["**/test/**", "**/integration-test/**"]
+  options {
+    setMemberLevel JavadocMemberLevel.PRIVATE
+    windowTitle = "$project.name $project.version API"
+    addStringOption("bottom", "Copyright © 2016-present $maintainer")
+    addStringOption("doctitle", "$project.name $project.version API")
+    /* Reference: http://openjdk.java.net/jeps/8068562 */
+    tags = [
+      "apiNote:a:API Note:",
+      "implSpec:a:Implementation Specification:",
+      "implNote:a:Implementation Note:"
+    ]
+    links("https://communicode.github.io/communikey-docs/$project.version/javadoc")
+  }
+}
+
+repositories {
+  jcenter()
+  mavenCentral()
+  mavenLocal()
+}
+
+sourceSets {
+  integrationTest {
+    java {
+      compileClasspath += main.output + test.output
+      runtimeClasspath += main.output + test.output
+      srcDir file("src/integration-test/java")
+    }
+    resources.srcDir file("src/integration-test/resources")
+  }
+}
+
+test {
+  testLogging {
+    showStandardStreams = true
+    events = ["passed", "skipped", "failed", "standardOut", "standardError"]
+    showExceptions = true
+    showCauses = true
+    showStackTraces = true
+  }
+  useJUnit {
+    excludeCategories "de.communicode.communikey.CommunikeyIntegrationTest"
+  }
+  reports {
+    junitXml.enabled = true
+    html.enabled = true
+  }
+}
+
+task integrationTest(type: Test) {
+  description = "Runs the API integration tests."
+  testClassesDirs = sourceSets.integrationTest.output.classesDirs
+  classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+task jacocoReport(type: JacocoReport){
+  sourceSets sourceSets.main
+  executionData test, integrationTest
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = "javadoc"
+  from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+  classifier = "sources"
+  from sourceSets.main.allSource
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = "4.7"
+}
+
+artifacts {
+  archives bootJar
+  archives sourcesJar
+  archives javadocJar
+}
+
+check.dependsOn integrationTest
+integrationTest.mustRunAfter test

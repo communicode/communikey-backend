@@ -38,6 +38,7 @@ public final class DefaultProfileUtil {
 
     public static final String COMMUNIKEY_PROFILE_DEVELOPMENT = "dev";
     public static final String COMMUNIKEY_PROFILE_TEST = "test";
+    public static final String COMMUNIKEY_PROFILE_INTEGRATION_TEST = "integration-test";
     public static final String COMMUNIKEY_PROFILE_PRODUCTION = "prod";
 
     private DefaultProfileUtil() {}

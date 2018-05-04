@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    active: integration-test
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
