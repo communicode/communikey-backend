@@ -6,7 +6,7 @@ Configutation:
       name: CONSOLE
       target: SYSTEM_OUT
       PatternLayout:
-        Pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%5p} [%t] %c{1}: %m%n"
+        Pattern: "[%highlight{%-5level}] %d{yyyy-MM-dd HH:mm:ss.SSS} <%t> %c{1}: %m%n"
 
   Loggers:
     Root:
@@ -14,7 +14,7 @@ Configutation:
       AppenderRef:
         - ref: CONSOLE
     Logger:
-      - name: de.communicode.communikey.service
+      - name: de.communicode.communikey
         additivity: false
         level: debug
         AppenderRef:

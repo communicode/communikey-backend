@@ -1,0 +1,26 @@
+Configutation:
+  status: warn
+
+  Appenders:
+    RollingFile:
+      - name: COMMUNIKEY
+        fileName: "./logs/communikey.log"
+        filePattern: "./logs/$${date:yyyy-MM}/my-app-%d{yyyy-MM-dd}-%i.log.gz"
+        PatternLayout:
+          Pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} <%t> %c{1}: %m%n"
+        policies:
+          TimeBasedTriggeringPolicy:
+            interval: 1
+            modulate: true
+
+  Loggers:
+    Root:
+      level: warn
+      AppenderRef:
+        - ref: COMMUNIKEY
+    Logger:
+      - name: de.communicode.communikey
+        additivity: false
+        level: info
+        AppenderRef:
+          - ref: COMMUNIKEY

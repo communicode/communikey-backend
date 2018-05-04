@@ -38,7 +38,11 @@ communikey:
                 -----END PUBLIC KEY-----
 
 server:
+  address: localhost
   port: 8080
   compression:
     enabled: true
     mime-types: application/json
+
+logging:
+  config: classpath:log4j2.yml
