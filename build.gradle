@@ -33,17 +33,20 @@ tasks.withType(JavaCompile) {
   options.encoding = "UTF-8"
 }
 
-def url = "https://communicode.github.io/communikey-backend"
-def name = "communikey"
-def maintainer = "communicode AG"
-def maintainerId = "communicode"
-def maintainerUrl = "https://communicode.de"
-def repositoryUrl = "https://github.com/communicode/communikey-backend.git"
-def repositoryUrlGit = "git://git@github.com:communicode/communikey-backend.git"
-def license = "GPL-3.0"
-def licenseUrl = "https://github.com/communicode/communikey-backend/blob/develop/LICENSE.md"
-def issueManagement = "GitHub"
-def issueManagementUrl = "https://github.com/communicode/communikey-backend/issues"
+ext {
+  documentationUrl = "https://communicode.github.io/communikey-docs"
+  issueManagementSystem = "GitHub"
+  issueManagementUrl = "https://github.com/communicode/communikey-backend/issues"
+  licenseName = "GPL-3.0"
+  licenseUrl = "https://github.com/communicode/communikey-backend/blob/develop/LICENSE.md"
+  maintainerId = "communicode"
+  maintainerName = "communicode AG"
+  maintainerUrl = "https://communicode.de"
+  name = "communikey"
+  repositoryUrl = "https://github.com/communicode/communikey-backend.git"
+  repositoryUrlGit = "git://git@github.com:communicode/communikey-backend.git"
+  url = "https://communicode.github.io/communikey-backend"
+}
 
 def checkstyleVersion = "8.0"
 def commonsLangVersion = "3.7"
@@ -124,7 +127,7 @@ javadoc {
   options {
     setMemberLevel JavadocMemberLevel.PRIVATE
     windowTitle = "$project.name $project.version API"
-    addStringOption("bottom", "Copyright © 2016-present $maintainer")
+    addStringOption("bottom", "Copyright © 2016-present $project.maintainerName")
     addStringOption("doctitle", "$project.name $project.version API")
     /* Reference: http://openjdk.java.net/jeps/8068562 */
     tags = [
