@@ -14,9 +14,9 @@ Please do your best to provide as much information as possible and use a clear a
 
 ## Metadata Head
 
-The metadata head should be added to the top of the pull request as [Markdown text quote](https://help.github.com/articles/basic-writing-and-formatting-syntax) containing the [GitHub issue keywords][gh-help-issue-keywords] to link to the related enhancements suggestions (`Closes`) or bug reports (`Fixes`). You can add additional details like dependencies to other pull requests and the order it needs to be merged.
+The metadata head should be added to the top of the pull request as [Markdown text quote](https://help.github.com/articles/basic-writing-and-formatting-syntax) containing the [GitHub issue keyword(s)](https://help.github.com/articles/closing-issues-using-keywords) to link to the related enhancements suggestions (`Closes`) or bug reports (`Fixes`). You can add additional details like dependencies to other pull requests and the order it needs to be merged.
 
-> Closes ISSUE_ID
+> Closes ISSUE_ID  
 Must be merged **after**/**before** ISSUE_ID
 
 ## Description

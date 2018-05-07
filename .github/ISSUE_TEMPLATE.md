@@ -11,6 +11,7 @@ Please do your best to provide as much information as possible and use a clear a
 * **Ensure the issue has not already been reported by using the [GitHub Issues search](https://github.com/communicode/communikey-backend/issues)** — if it has **and the issue is still open**, add a comment to the existing issue instead of opening this new one. If you find a closed issue that seems to be similar to this one, include a link to the original issue in the [metadata head](#metadata-head) section of this issue.
 * **Ensure the contribution belongs to the correct [communikey repository](https://github.com/communicode?q=communikey).**
 * **Ensure the issue is reproducible** — try to use the [latest version](https://github.com/communicode/communikey-backend/releases/latest) and [`develop`](https://github.com/communicode/communikey-backend/tree/develop) branch.
+* **Remove not fitting sections of this template based on the type of the issue**
 
 ## Metadata Head
 
@@ -34,7 +35,19 @@ Set the *type* of this issue. It determines which information will be required i
 
 ## Description
 
-Describe the enhancement or bug as in many relevant details as possible. If this is a enhancement suggestion add specific use-cases and explain why this feature or improvement would be useful. If this is a bug provide ensure to fill in the [steps to reproduce](#steps-to-reproduce) it.
+Describe the enhancement or bug as in many relevant details as possible. If this is a bug provide ensure to fill in the [steps to reproduce](#steps-to-reproduce) it.
+
+### Benefits
+
+If this is a enhancement suggestion add specific use-cases and explain why this feature or improvement would be useful and maybe include references to related known problems or bug reports.
+
+### Possible Drawbacks
+
+If this is a enhancement suggestion describe possible negative impacts regarding e.g. functionality or usability.
+
+### Alternative Solutions
+
+If this is a enhancement suggestion please describe clearly and concise if you've considered alternative features or solutions.
 
 ### Steps to Reproduce
 
@@ -74,6 +87,10 @@ Paste the full stack trace, error messages or the logfile here ...
 ```
 
 ... or [attach them as files](https://help.github.com/articles/file-attachments-on-issues-and-pull-requests) to this issue.
+
+## Additional Context
+
+Add any other context, screenshots or screencasts which are relevant for this issue.
 
 ## References
 
