@@ -4,7 +4,3 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
-
-server:
-  address: localhost
-  port: 8080
