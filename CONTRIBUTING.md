@@ -6,7 +6,7 @@ This is a set of guidelines for contributing to communikey. Please take a moment
 
 Following these guidelines helps to communicate that you respect the time of the developers managing and developing this open source project. In return, they should reciprocate that respect in addressing your issue, assessing changes, and helping you finalize your pull requests.
 
-As for everything else in the project, the contributions to communikey are governed by our [Code of Conduct][code-of-conduct]. By participating, you are expected to uphold this code. Please report unacceptable behavior to one of the core team members via email.
+As for everything else in the project, the contributions to communikey are governed by our [Code of Conduct][code-of-conduct]. By participating, you are expected to uphold this code. Please report unacceptable behavior to one of the core team members via [email][].
 
 ## Getting Started
 
@@ -28,7 +28,7 @@ Contributions related to [communikey frontend][gh-communikey-frontend] belong to
 
 A bug is a *demonstrable problem* that is caused by the code in the repository. This section guides you through submitting a bug report for communikey. Following these guidelines helps maintainers and the community understand your report, reproduce the behavior and find related reports.
 
-**Do NOT report security vulnerabilities in public issues!** Please contact one of the core team members or the project owner in a responsible manner by email only. We will assess the issue as soon as possible on a best-effort basis and will give you an estimate for when we have a fix and release available for an eventual public disclosure.
+**Do NOT report security vulnerabilities in public issues!** Please contact one of the core team members or the project owner in a responsible manner by [email][] only. We will assess the issue as soon as possible on a best-effort basis and will give you an estimate for when we have a fix and release available for an eventual public disclosure.
 
 * **Use the [GitHub Issues search][gh-issues]** — check if the issue has already been reported. If it has **and the issue is still open**, add a comment to the existing issue instead of opening a new one. If you find a closed issue that seems like it is the same thing that you are experiencing, open a new issue and include a link to the original issue in the body of your new one.
 * **Determine [which repository the contribution belongs to](#port-projects).**
@@ -182,6 +182,7 @@ Thanks for the inspirations and attributions to GitHub's [Open Source Guides](ht
 [changelog]: https://github.com/communicode/communikey-backend/blob/develop/CHANGELOG.md
 [checkstyle]: http://checkstyle.sourceforge.net
 [code-of-conduct]: https://github.com/communicode/communikey-backend/blob/develop/CODE_OF_CONDUCT.md
+[email]: https://github.com/communicode/communikey-backend/blob/develop/.mailmap
 [gh-communikey-frontend]: https://github.com/communicode/communikey-frontend
 [gh-help-attach-files]: https://help.github.com/articles/file-attachments-on-issues-and-pull-requests
 [gh-help-issue-keywords]: https://help.github.com/articles/closing-issues-using-keywords

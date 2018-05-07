@@ -2,7 +2,7 @@
 
 All members, committers and volunteers in this project are required to act according to the following Code of Conduct. We ask you to follow these guidelines which help steer our interactions and strive to keep communikey a positive and growing project and help us provide and ensure a safe environment for everyone.
 
-If you are being harassed, notice that someone else is being harassed, or have any other concerns, please contact one of the core team members via email. Your reports will be taken seriously and not dismissed or argued with.
+If you are being harassed, notice that someone else is being harassed, or have any other concerns, please contact one of the core team members via [email][]. Your reports will be taken seriously and not dismissed or argued with.
 
 ## What we believe in and how we act
 
@@ -33,7 +33,7 @@ The members of the core team and project maintainers are responsible for clarify
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project core team members or owner via [email][email]. The project team will review and investigate all complaints, and will respond in a way that it deems appropriate to the circumstances. The project team is obligated to maintain confidentiality with regard to the reporter of an incident. Further details of specific enforcement policies may be posted separately.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project core team members or owner via [email][]. The project team will review and investigate all complaints, and will respond in a way that it deems appropriate to the circumstances. The project team is obligated to maintain confidentiality with regard to the reporter of an incident. Further details of specific enforcement policies may be posted separately.
 
 Project maintainers who do not follow or enforce the Code of Conduct in good faith may face temporary or permanent repercussions as determined by other members of the project's leadership.
 
@@ -54,3 +54,4 @@ This Code of Conduct applies both within project spaces and in public spaces whe
 Thanks for the inspirations and attributions to GitHub's [Open Source Guides](https://opensource.guide), [Hoodie's Code of Conduct](http://hood.ie/code-of-conduct) and the [Contributor Covenant Version 1.4](http://contributor-covenant.org/version/1/4/).
 
 [ref-gender-neutral-docs]: https://modelviewculture.com/pieces/gendered-language-feature-or-bug-in-software-documentation
+[email]: https://github.com/communicode/communikey-backend/blob/develop/.mailmap
