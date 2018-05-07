@@ -40,7 +40,7 @@ These instructions will get you a copy of the project up and running on your loc
 ## Running tests
 
 - Move into the project root folder and run the following command
-  
+
 -  ``` mvn integration-tests ```
 
 ## Versioning
@@ -50,14 +50,25 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 ## Built With
 
 * [Spring Boot](https://projects.spring.io/spring-boot/) - The application framework used
-* [Maven](https://maven.apache.org/) - Dependency Management 
+* [Maven](https://maven.apache.org/) - Dependency Management
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Read the [contributing guide][gh-contrib] to learn about the development process and how to propose [enhancement suggestions][gh-contrib-enhancements] and [report bugs][gh-contrib-bug-reports], how to [submit pull requests][gh-contrib-pr] and the project's [styleguides][gh-contrib-styleguides], [branch organization][gh-contrib-branch-org] and [versioning][gh-contrib-versioning] model.
+
+The guide also includes information about [minimal, complete, and verifiable examples][gh-contrib-mcve] and other ways to contribute to the project like [improving existing issues][gh-contrib-other-improve-issues] and [giving feedback on issues and pull requests][gh-contrib-other-feedback].
 
 ## License
 
 This project is licensed under the GPLv3 license see the [LICENSE.md](LICENSE.md) file for details.
 
-
+[gh-contrib]: https://github.com/communicode/communikey-backend/blob/develop/CONTRIBUTING.md
+[gh-contrib-branch-org]: https://github.com/communicode/communikey-backend/blob/develop/CONTRIBUTING.md#branch-organization
+[gh-contrib-bug-reports]: https://github.com/communicode/communikey-backend/blob/develop/CONTRIBUTING.md#bug-reports
+[gh-contrib-enhancements]: https://github.com/communicode/communikey-backend/blob/develop/CONTRIBUTING.md#enhancement-suggestions
+[gh-contrib-mcve]: https://github.com/communicode/communikey-backend/blob/develop/CONTRIBUTING.md#mcve
+[gh-contrib-other-feedback]: https://github.com/communicode/communikey-backend/blob/develop/CONTRIBUTING.md#give-feedback-on-issues-and-pull-requests
+[gh-contrib-other-improve-issues]: https://github.com/communicode/communikey-backend/blob/develop/CONTRIBUTING.md#improve-issues
+[gh-contrib-pr]: https://github.com/communicode/communikey-backend/blob/develop/CONTRIBUTING.md#pull-requests
+[gh-contrib-styleguides]: https://github.com/communicode/communikey-backend/blob/develop/CONTRIBUTING.md#styleguides
+[gh-contrib-versioning]: https://github.com/communicode/communikey-backend/blob/develop/CONTRIBUTING.md#versioning
