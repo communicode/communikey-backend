@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.communicode.communikey.api;
 
 import static io.restassured.RestAssured.given;
@@ -34,49 +35,49 @@ import org.springframework.http.HttpStatus;
  * @author sgreb@communicode.de
  * @since 0.4.0
  */
-public class AuthorityApiIT extends IntegrationBaseTest {
+public class AuthorityApiIt extends IntegrationBaseTest {
 
     @Test
     public void testGetAuthorityAsAdmin() {
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("authorityName", AuthoritiesConstants.ADMIN)
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .pathParam("authorityName", AuthoritiesConstants.ADMIN)
         .when()
-                .get(RequestMappings.AUTHORITIES + RequestMappings.AUTHORITIES_NAME)
+            .get(RequestMappings.AUTHORITIES + RequestMappings.AUTHORITIES_NAME)
         .then()
-                .statusCode(HttpStatus.OK.value())
-                .assertThat().extract().body().as(Authority.class).getName().equals(AuthoritiesConstants.ADMIN);
+            .statusCode(HttpStatus.OK.value())
+            .assertThat().extract().body().as(Authority.class).getName().equals(AuthoritiesConstants.ADMIN);
     }
 
     @Test
     public void testGetAuthorityAsUser() {
         given()
-                .auth().oauth2(userOAuth2AccessToken)
-                .pathParam("authorityName", AuthoritiesConstants.ADMIN)
+            .auth().oauth2(userOAuth2AccessToken)
+            .pathParam("authorityName", AuthoritiesConstants.ADMIN)
         .when()
-                .get(RequestMappings.AUTHORITIES + RequestMappings.AUTHORITIES_NAME)
+            .get(RequestMappings.AUTHORITIES + RequestMappings.AUTHORITIES_NAME)
         .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+            .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
     @Test
     public void testGetAllAuthoritiesAsAdmin() {
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
+            .auth().oauth2(adminUserOAuth2AccessToken)
         .when()
-                .get(RequestMappings.AUTHORITIES)
+            .get(RequestMappings.AUTHORITIES)
         .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", not(equalTo(0)));
+            .statusCode(HttpStatus.OK.value())
+            .body("size()", not(equalTo(0)));
     }
 
     @Test
     public void testGetAllAuthoritiesAsUser() {
         given()
-                .auth().oauth2(userOAuth2AccessToken)
+            .auth().oauth2(userOAuth2AccessToken)
         .when()
-                .get(RequestMappings.AUTHORITIES)
+            .get(RequestMappings.AUTHORITIES)
         .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+            .statusCode(HttpStatus.FORBIDDEN.value());
     }
 }

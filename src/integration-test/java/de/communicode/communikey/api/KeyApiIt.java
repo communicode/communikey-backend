@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.communicode.communikey.api;
 
 import static de.communicode.communikey.controller.PathVariables.KEY_ID;
@@ -44,7 +45,7 @@ import java.util.Set;
  * @author sgreb@communicode.de
  * @since 0.4.0
  */
-public class KeyApiIT extends IntegrationBaseTest {
+public class KeyApiIt extends IntegrationBaseTest {
 
     private Map<String, Object> keyPayload = new HashMap<>();
     private Key key = new Key();
@@ -55,247 +56,247 @@ public class KeyApiIT extends IntegrationBaseTest {
     public void testCreateKeyAsAdminWithValidPayload() {
         initializeTestKeyPayload();
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
         .when()
-                .post(RequestMappings.KEYS)
+            .post(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.CREATED.value())
-                .body("category", equalTo(null));
+            .statusCode(HttpStatus.CREATED.value())
+            .body("category", equalTo(null));
     }
 
     @Test
     public void testCreateKeyAsUserWithValidPayload() {
         initializeTestKeyPayload();
         given()
-                .auth().oauth2(userOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
+            .auth().oauth2(userOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
         .when()
-                .post(RequestMappings.KEYS)
+            .post(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+            .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
     @Test
     public void testCreateKeyAsAdminWithInvalidPayload() {
         keyPayload.put("unknownAttribute", "invalidValue");
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
         .when()
-                .post(RequestMappings.KEYS)
+            .post(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value());
+            .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
     public void testDeleteKeyAsAdmin() {
         initializeTestKeyPayload();
         String createdKeyHashid = given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
-        .when()
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
+            .when()
                 .post(RequestMappings.KEYS)
-        .then()
+            .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getString("id");
 
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam(KEY_ID, createdKeyHashid)
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .pathParam(KEY_ID, createdKeyHashid)
         .when()
-                .delete(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+            .delete(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+            .statusCode(HttpStatus.NO_CONTENT.value());
 
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam(KEY_ID, createdKeyHashid)
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .pathParam(KEY_ID, createdKeyHashid)
         .when()
-                .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+            .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+            .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
     @Test
     public void testDeleteKeyAsUser() {
         initializeTestKeyPayload();
         String createdKeyHashid = given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
-        .when()
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
+            .when()
                 .post(RequestMappings.KEYS)
-        .then()
+            .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getString("id");
 
         given()
-                .auth().oauth2(userOAuth2AccessToken)
-                .pathParam(KEY_ID, createdKeyHashid)
+            .auth().oauth2(userOAuth2AccessToken)
+            .pathParam(KEY_ID, createdKeyHashid)
         .when()
-                .delete(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+            .delete(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+            .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
     @Test
     public void testDeleteAllKeysAsAdmin() {
         initializeTestKeyPayload();
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
         .when()
-                .post(RequestMappings.KEYS)
+            .post(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.CREATED.value());
+            .statusCode(HttpStatus.CREATED.value());
 
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
+            .auth().oauth2(adminUserOAuth2AccessToken)
         .when()
-                .delete(RequestMappings.KEYS)
+            .delete(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+            .statusCode(HttpStatus.NO_CONTENT.value());
 
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
+            .auth().oauth2(adminUserOAuth2AccessToken)
         .when()
-                .get(RequestMappings.KEYS)
+            .get(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", equalTo(0));
+            .statusCode(HttpStatus.OK.value())
+            .body("size()", equalTo(0));
     }
 
     @Test
     public void testDeleteAllKeysAsUser() {
         initializeTestKeyPayload();
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
         .when()
-                .post(RequestMappings.KEYS)
+            .post(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.CREATED.value());
+            .statusCode(HttpStatus.CREATED.value());
 
         given()
-                .auth().oauth2(userOAuth2AccessToken)
+            .auth().oauth2(userOAuth2AccessToken)
         .when()
-                .delete(RequestMappings.KEYS)
+            .delete(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+            .statusCode(HttpStatus.FORBIDDEN.value());
 
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
+            .auth().oauth2(adminUserOAuth2AccessToken)
         .when()
-                .get(RequestMappings.KEYS)
+            .get(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", equalTo(1));
+            .statusCode(HttpStatus.OK.value())
+            .body("size()", equalTo(1));
     }
 
     @Test
     public void testGetKeyAsAdmin() {
         initializeTestKeyPayload();
         String createdKeyHashid = given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
-        .when()
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
+            .when()
                 .post(RequestMappings.KEYS)
-        .then()
+            .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getString("id");
 
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam(KEY_ID, createdKeyHashid)
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .pathParam(KEY_ID, createdKeyHashid)
         .when()
-                .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+            .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("id", equalTo(createdKeyHashid));
+            .statusCode(HttpStatus.OK.value())
+            .body("id", equalTo(createdKeyHashid));
     }
 
     @Test
     public void testGetKeyAsUser() {
         initializeTestKeyPayload();
         String createdKeyHashid = given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
-        .when()
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
+            .when()
                 .post(RequestMappings.KEYS)
-        .then()
+            .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getString("id");
 
         given()
-                .auth().oauth2(userOAuth2AccessToken)
-                .pathParam(KEY_ID, createdKeyHashid)
+            .auth().oauth2(userOAuth2AccessToken)
+            .pathParam(KEY_ID, createdKeyHashid)
         .when()
-                .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+            .get(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+            .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
     @Test
     public void testGetAllKeysAsAdmin() {
         initializeTestKeyPayload();
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
         .when()
-                .post(RequestMappings.KEYS)
+            .post(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.CREATED.value());
+            .statusCode(HttpStatus.CREATED.value());
 
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
+            .auth().oauth2(adminUserOAuth2AccessToken)
         .when()
-                .get(RequestMappings.KEYS)
+            .get(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", equalTo(1));
+            .statusCode(HttpStatus.OK.value())
+            .body("size()", equalTo(1));
     }
 
     @Test
     public void testGetAllKeysAsUser() {
         initializeTestKeyPayload();
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
         .when()
-                .post(RequestMappings.KEYS)
+            .post(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.CREATED.value());
+            .statusCode(HttpStatus.CREATED.value());
 
         given()
-                .auth().oauth2(userOAuth2AccessToken)
+            .auth().oauth2(userOAuth2AccessToken)
         .when()
-                .get(RequestMappings.KEYS)
+            .get(RequestMappings.KEYS)
         .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", equalTo(0));
+            .statusCode(HttpStatus.OK.value())
+            .body("size()", equalTo(0));
     }
 
     @Test
     public void testUpdateKeyAsAdmin() {
         initializeTestKeyPayload();
         String createdKeyHashid = given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
-        .when()
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
+            .when()
                 .post(RequestMappings.KEYS)
-        .then()
+            .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getString("id");
 
@@ -303,117 +304,116 @@ public class KeyApiIT extends IntegrationBaseTest {
         keyPayload.replace("login", "newLogin");
 
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .pathParam(KEY_ID, createdKeyHashid)
-                .body(keyPayload)
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .pathParam(KEY_ID, createdKeyHashid)
+            .body(keyPayload)
         .when()
-                .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+            .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("name", equalTo(keyPayload.get("name")))
-                .body("login", equalTo(keyPayload.get("login")));
+            .statusCode(HttpStatus.OK.value())
+            .body("name", equalTo(keyPayload.get("name")))
+            .body("login", equalTo(keyPayload.get("login")));
     }
 
     @Test
     public void testUpdateKeyAsUser() {
         initializeTestKeyPayload();
-        String createdKeyHashid = given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .body(keyPayload)
-        .when()
+        final String createdKeyHashid = given()
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .body(keyPayload)
+            .when()
                 .post(RequestMappings.KEYS)
-        .then()
+            .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract().jsonPath().getString("id");
 
         keyPayload.replace("name", "newName");
         keyPayload.replace("login", "login");
         keyPayload.replace("password", "newPassword");
-
         given()
-                .auth().oauth2(userOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .pathParam(KEY_ID, createdKeyHashid)
-                .body(keyPayload)
+            .auth().oauth2(userOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .pathParam(KEY_ID, createdKeyHashid)
+            .body(keyPayload)
         .when()
-                .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+            .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+            .statusCode(HttpStatus.FORBIDDEN.value());
     }
 
     @Test
     public void testSubscriberListOfKeyWithTwoSubscribers() {
         initializeSubscriberTestData();
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .pathParam(KEY_ID, key.getHashid())
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .pathParam(KEY_ID, key.getHashid())
         .when()
-                .get(RequestMappings.KEYS + RequestMappings.KEY_SUBSCRIBERS)
+            .get(RequestMappings.KEYS + RequestMappings.KEY_SUBSCRIBERS)
         .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", equalTo(2))
-                .body("publicKey", hasItems(user.getPublicKey()))
-                .body("user", hasItems(user.getLogin()));
+            .statusCode(HttpStatus.OK.value())
+            .body("size()", equalTo(2))
+            .body("publicKey", hasItems(user.getPublicKey()))
+            .body("user", hasItems(user.getLogin()));
     }
 
     @Test
     public void testPutEncryptedPasswordsForSubscribers() {
         initializeSubscriberTestData();
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .pathParam(KEY_ID, key.getHashid())
-                .body(encryptedPasswordPayload())
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .pathParam(KEY_ID, key.getHashid())
+            .body(encryptedPasswordPayload())
         .when()
-                .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+            .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
-                .statusCode(HttpStatus.OK.value());
+            .statusCode(HttpStatus.OK.value());
     }
 
     @Test
     public void testEncryptedPasswordDeletionAfterLosingAccessToUserGroup() {
         initializeSubscriberTestData();
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .pathParam(KEY_ID, key.getHashid())
-                .body(encryptedPasswordPayload())
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .pathParam(KEY_ID, key.getHashid())
+            .body(encryptedPasswordPayload())
         .when()
-                .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
+            .put(RequestMappings.KEYS + RequestMappings.KEY_HASHID)
         .then()
-                .statusCode(HttpStatus.OK.value());
+            .statusCode(HttpStatus.OK.value());
 
         given()
-                .auth().oauth2(userOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .pathParam(KEY_ID, key.getHashid())
+            .auth().oauth2(userOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .pathParam(KEY_ID, key.getHashid())
         .when()
-                .get(RequestMappings.KEYS + RequestMappings.KEY_ENCRYPTED_PASSWORD)
+            .get(RequestMappings.KEYS + RequestMappings.KEY_ENCRYPTED_PASSWORD)
         .then()
-                .statusCode(HttpStatus.OK.value());
+            .statusCode(HttpStatus.OK.value());
 
         given()
-                .auth().oauth2(adminUserOAuth2AccessToken)
-                .pathParam("userGroupId", userGroup.getId())
-                .param("login", user.getLogin())
+            .auth().oauth2(adminUserOAuth2AccessToken)
+            .pathParam("userGroupId", userGroup.getId())
+            .param("login", user.getLogin())
         .when()
-                .delete(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_USERS)
+            .delete(RequestMappings.USER_GROUPS + RequestMappings.USER_GROUPS_USERS)
         .then()
-                .statusCode(HttpStatus.OK.value())
-                .root("users")
-                .body("size()", equalTo(0));
+            .statusCode(HttpStatus.OK.value())
+            .root("users")
+            .body("size()", equalTo(0));
 
         given()
-                .auth().oauth2(userOAuth2AccessToken)
-                .contentType(ContentType.JSON)
-                .pathParam(KEY_ID, key.getHashid())
+            .auth().oauth2(userOAuth2AccessToken)
+            .contentType(ContentType.JSON)
+            .pathParam(KEY_ID, key.getHashid())
         .when()
-                .get(RequestMappings.KEYS + RequestMappings.KEY_ENCRYPTED_PASSWORD)
+            .get(RequestMappings.KEYS + RequestMappings.KEY_ENCRYPTED_PASSWORD)
         .then()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+            .statusCode(HttpStatus.NOT_FOUND.value());
 
     }
 
@@ -445,7 +445,7 @@ public class KeyApiIT extends IntegrationBaseTest {
     }
 
     /**
-     * Returns a payload for password encryption testing
+     * Returns a payload for password encryption testing.
      */
     private ImmutableMap<String, Object> encryptedPasswordPayload() {
         return ImmutableMap.<String, Object>builder()

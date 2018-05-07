@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.communicode.communikey;
 
+import static de.communicode.communikey.config.util.DefaultProfileUtil.COMMUNIKEY_PROFILE_INTEGRATION_TEST;
 import static io.restassured.RestAssured.given;
 import static java.util.Objects.requireNonNull;
 
@@ -67,7 +69,7 @@ import java.util.Set;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = CommunikeyApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Category(CommunikeyIntegrationTest.class)
-@ActiveProfiles("test")
+@ActiveProfiles(COMMUNIKEY_PROFILE_INTEGRATION_TEST)
 public abstract class IntegrationBaseTest {
     @Autowired
     protected UserRepository userRepository;
@@ -106,10 +108,10 @@ public abstract class IntegrationBaseTest {
     protected String decodedUserPassword = "password";
     protected String userLogin = "user";
     protected String userEmail = userLogin + "@communicode.de";
-    protected String userPublicKey = "-----BEGIN PUBLIC KEY-----" +
-                                     "VGhpcyBpcyBhIGJhc2U2NCBlbm" +
-                                     "NyeXB0ZWQgcHVibGljIGtleQ==" +
-                                     "-----END PUBLIC KEY-----";
+    protected String userPublicKey = "-----BEGIN PUBLIC KEY-----"
+                                     + "VGhpcyBpcyBhIGJhc2U2NCBlbm"
+                                     + "NyeXB0ZWQgcHVibGljIGtleQ=="
+                                     + "-----END PUBLIC KEY-----";
 
     protected String userOAuth2AccessToken;
     protected String adminUserOAuth2AccessToken;
@@ -144,8 +146,8 @@ public abstract class IntegrationBaseTest {
      * @param login the login of the user to generate the OAuth2 access token for
      * @param password the password of the user
      * @return the redirect URL which contains the access token as parameter
-     * @see <a href="https://tools.ietf.org/html/rfc6749#section-1.3.2"></a>RFC6749 - The OAuth 2.0 Authorization Framework</a>
-     * @see <a href="http://oauthlib.readthedocs.io/en/latest/oauth2/grants/implicit.html"></a>oauthlib - Read The Docs</a>
+     * @see <a href="https://tools.ietf.org/html/rfc6749#section-1.3.2">RFC6749 - The OAuth 2.0 Authorization Framework</a>
+     * @see <a href="http://oauthlib.readthedocs.io/en/latest/oauth2/grants/implicit.html">oauthlib - Read The Docs</a>
      */
     protected String generateOAuth2AccessToken(String login, String password) {
         Map<String, String> oAuth2TokenRequestParam = new HashMap<>();

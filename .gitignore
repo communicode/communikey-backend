@@ -1,21 +1,12 @@
-# +--------------+
-# + Apache Maven +
-# +--------------+
-/target/
-
 # +---------------+
 # + IntelliJ IDEA +
 # +---------------+
-# https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
-out/
 .idea
-.idea/*
 !.idea/runConfigurations
-!.idea/compiler.xml
-!.idea/encodings.xml
-!.idea/misc.xml
-!.idea/modules.xml
-!.idea/vcs.xml
+*.iws
+*.iml
+*.ipr
+/out/
 
 # +------+
 # + Java +
@@ -27,8 +18,8 @@ out/
 # http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# +------+
-# + Sass +
-# +------+
-.sass-cache/
-*.css.map
+# +--------+
+# + Gradle +
+# +--------+
+.gradle
+/build/
