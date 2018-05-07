@@ -14,7 +14,7 @@ communikey is an open source project and we love to receive contributions from t
 
 The project development workflow and process uses [GitHub Issues][gh-issues]- and [Pull Requests][gh-pr] management to track issues and pull requests.
 
-Before you continue with this contribution guideslines we highly recommend to read the awesome GitHub [Open Source Guide](https://opensource.guide) on how to [making open source contributions][gh-osguide-contribute].
+Before you continue with these contribution guidelines we highly recommend to read the awesome GitHub [Open Source Guide](https://opensource.guide) on how to [making open source contributions][gh-osguide-contribute].
 
 ### Repository Assignment
 

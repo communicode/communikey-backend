@@ -6,7 +6,7 @@ If you are being harassed, notice that someone else is being harassed, or have a
 
 ## What we believe in and how we act
 
-* In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to making participation in our project and our community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation. We welcome people regardless of these or other attributes.
+* In the interest of fostering an open and welcoming environment, we as contributors and maintainers pledge to make participation in our project and our community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation. We welcome people regardless of these or other attributes.
 * Our community is based on mutual respect, tolerance, and encouragement.
 * We believe that a diverse community where people treat each other with respect is stronger, more vibrant and has more potential contributors and more sources for ideas. We aim for more diversity.
 * We are kind, welcoming and courteous to everyone.
